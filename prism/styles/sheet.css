@@ -1,0 +1,268 @@
+.prism.sheet.actor {
+    min-width: 760px;
+    min-height: 800px;
+}
+
+.prism .window-content {
+    padding: 0;
+    background: var(--prism-bg);
+    color: var(--prism-text);
+}
+
+.prism form {
+    padding: 14px;
+}
+
+.prism-header {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--prism-border);
+}
+
+.prism-header .profile-img {
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+    border: 2px solid var(--prism-border-strong);
+    background: #ddd;
+    border-radius: 6px;
+}
+
+.prism-header-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.prism-name {
+    font-size: 26px;
+    font-weight: 700;
+    height: 40px;
+}
+
+.prism input,
+.prism textarea,
+.prism select {
+    width: 100%;
+    border: 1px solid var(--prism-border);
+    border-radius: 4px;
+    background: var(--prism-surface-strong);
+    color: var(--prism-text);
+    padding: 6px 8px;
+}
+
+.prism textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.prism button {
+    border: 1px solid var(--prism-border);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--prism-text);
+    padding: 5px 9px;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.prism button:hover {
+    background: #e8e8e8;
+    border-color: var(--prism-border-strong);
+}
+
+.prism-full-button {
+    width: 100%;
+}
+
+.prism-icon-button {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0;
+    line-height: 1;
+    text-align: center;
+}
+
+.prism-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0 10px;
+    border-bottom: 1px solid var(--prism-border);
+}
+
+.prism-tabs .item {
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    color: var(--prism-text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.prism-tabs .item:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.prism-tabs .item.active {
+    background: var(--prism-surface-strong);
+    border-color: var(--prism-border);
+}
+
+.sheet-body {
+    margin-top: 8px;
+}
+
+.sheet-body .tab {
+    padding-top: 4px;
+}
+
+.prism-main {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 12px;
+}
+
+.prism-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.prism-panel {
+    border: 1px solid var(--prism-border);
+    border-radius: 6px;
+    background: var(--prism-surface);
+    padding: 10px;
+}
+
+.prism-panel h2 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+    border-bottom: 1px solid var(--prism-border);
+    padding-bottom: 4px;
+}
+
+.prism-label-row {
+    display: grid;
+    grid-template-columns: 1fr auto 32px;
+    gap: 6px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.prism-risk-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.prism-bag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 120px;
+}
+
+.prism-bag-entry {
+    display: grid;
+    grid-template-columns: 1fr 28px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--prism-border);
+    font-weight: 600;
+}
+
+.prism-bag-entry span {
+    overflow-wrap: anywhere;
+}
+
+.prism-last-draw-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.prism-drawn-entry {
+    padding: 7px 9px;
+    border-radius: 4px;
+    border: 1px solid var(--prism-border);
+    font-weight: 600;
+}
+
+.prism-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.prism-actions button {
+    width: 100%;
+}
+
+.prism-tab-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.prism-tab-grid textarea {
+    min-height: 240px;
+}
+
+.prism-inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.prism-inventory-table th {
+    padding: 6px;
+    text-align: left;
+    border-bottom: 1px solid var(--prism-border);
+    font-weight: 700;
+}
+
+.prism-inventory-table td {
+    padding: 5px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.prism-inventory-table th:nth-child(2),
+.prism-inventory-table td:nth-child(2) {
+    width: 90px;
+}
+
+.prism-inventory-table th:nth-child(3),
+.prism-inventory-table td:nth-child(3) {
+    width: 36px;
+    text-align: center;
+}
+
+.prism-inventory-table input[type="number"] {
+    text-align: center;
+}
+
+.prism-trait {
+    background: var(--prism-trait-bg);
+}
+
+.prism-adversity {
+    background: var(--prism-adversity-bg);
+}
+
+.prism-fear {
+    background: var(--prism-fear-bg);
+}
+
+.prism-danger {
+    background: var(--prism-danger-bg);
+}

@@ -1,0 +1,33 @@
+.prism-chat-card {
+    border: 1px solid #999;
+    padding: 8px;
+}
+
+.prism-chat-card h2 {
+    margin: 0 0 8px 0;
+}
+
+.prism-chat-label {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    border: 1px solid #777;
+    font-weight: 700;
+}
+
+.prism-chat-label.prism-trait {
+    background: #dcefdc;
+}
+
+.prism-chat-label.prism-adversity {
+    background: #f0d4d4;
+}
+
+.prism-chat-label.prism-fear {
+    background: #ddd8f0;
+}
+
+.prism-chat-label.prism-danger {
+    background: #f3e1bd;
+}

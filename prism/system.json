@@ -1,0 +1,33 @@
+{
+  "id": "prism",
+  "title": "PRISM-System",
+  "description": "Sistema minimale per giocare PRISM su Foundry VTT.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Heldan"
+    }
+  ],
+  "esmodules": [
+    "module/prism.mjs"
+  ],
+  "styles": [
+    "styles/variables.css",
+    "styles/sheet.css",
+    "styles/prism.css"
+  ],
+  "languages": [
+    {
+      "lang": "it",
+      "name": "Italiano",
+      "path": "lang/it.json"
+    }
+  ],
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "socket": false
+}

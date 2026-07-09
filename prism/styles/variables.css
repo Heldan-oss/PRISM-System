@@ -1,0 +1,14 @@
+:root {
+    --prism-bg: #f3f0ec;
+    --prism-surface: rgba(255, 255, 255, 0.68);
+    --prism-surface-strong: rgba(255, 255, 255, 0.88);
+    --prism-border: rgba(0, 0, 0, 0.22);
+    --prism-border-strong: rgba(0, 0, 0, 0.38);
+    --prism-text: #1f1f1f;
+    --prism-muted: #666;
+
+    --prism-trait-bg: rgba(80, 150, 95, 0.25);
+    --prism-adversity-bg: rgba(170, 70, 70, 0.25);
+    --prism-fear-bg: rgba(100, 90, 150, 0.25);
+    --prism-danger-bg: rgba(200, 140, 40, 0.30);
+}

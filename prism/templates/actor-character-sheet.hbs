@@ -1,0 +1,150 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="prism-header">
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+
+        <div class="prism-header-fields">
+            <input class="prism-name" name="name" type="text" value="{{actor.name}}" placeholder="Nome dell'Anomalia" />
+
+            <label>Concetto</label>
+            <input name="system.concept" type="text" value="{{system.concept}}" placeholder="Una frase sul personaggio" />
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs prism-tabs" data-group="primary">
+        <a class="item active" data-tab="main">Scheda</a>
+        <a class="item" data-tab="bio">Bio</a>
+        <a class="item" data-tab="inventory">Inventario</a>
+    </nav>
+
+    <section class="sheet-body">
+        <section class="tab active" data-group="primary" data-tab="main">
+            <main class="prism-main">
+                <section class="prism-column prism-wide">
+                    <section class="prism-panel">
+                        <h2>Tratti</h2>
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">+ Tratto</button>
+
+                        {{#each traits}}
+                            <div class="prism-label-row" data-type="trait" data-id="{{this.id}}">
+                                <input type="text" value="{{this.name}}" placeholder="Nome tratto" />
+                                <button type="button" data-action="add-to-bag" data-type="trait" data-id="{{this.id}}">Sacchetto</button>
+                                <button type="button" class="prism-icon-button" data-action="delete-label" data-type="trait" data-id="{{this.id}}">×</button>
+                            </div>
+                        {{/each}}
+                    </section>
+
+                    <section class="prism-panel">
+                        <h2>Avversità</h2>
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">+ Avversità</button>
+
+                        {{#each adversities}}
+                            <div class="prism-label-row" data-type="adversity" data-id="{{this.id}}">
+                                <input type="text" value="{{this.name}}" placeholder="Nome avversità" />
+                                <button type="button" data-action="add-to-bag" data-type="adversity" data-id="{{this.id}}">Sacchetto</button>
+                                <button type="button" class="prism-icon-button" data-action="delete-label" data-type="adversity" data-id="{{this.id}}">×</button>
+                            </div>
+                        {{/each}}
+                    </section>
+
+                    <div class="prism-risk-row">
+                        <section class="prism-panel">
+                            <h2>Paura</h2>
+                            <button type="button" class="prism-full-button" data-action="add-fear">+ Paura</button>
+                        </section>
+
+                        <section class="prism-panel">
+                            <h2>Pericolo</h2>
+                            <button type="button" class="prism-full-button" data-action="add-danger">+ Pericolo</button>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="prism-column">
+                    <section class="prism-panel prism-bag">
+                        <h2>Sacchetto</h2>
+
+                        <div class="prism-bag-list">
+                            {{#each bag}}
+                                <div class="prism-bag-entry prism-{{this.type}}">
+                                    <span>{{this.name}}</span>
+                                    <button type="button" class="prism-icon-button" data-action="remove-from-bag" data-id="{{this.id}}">×</button>
+                                </div>
+                            {{/each}}
+                        </div>
+
+                        <div class="prism-actions">
+                            <button type="button" data-action="draw-three">Estrai 3</button>
+                            <button type="button" data-action="risk">Rischia</button>
+                            <button type="button" data-action="clear-bag">Svuota</button>
+                        </div>
+                    </section>
+
+                    <section class="prism-panel">
+                        <h2>Ultima estrazione</h2>
+
+                        <div class="prism-last-draw-list">
+                            {{#each lastDraw}}
+                                <div class="prism-drawn-entry prism-{{this.type}}">
+                                    {{this.name}}
+                                </div>
+                            {{/each}}
+                        </div>
+                    </section>
+
+                    <section class="prism-panel">
+                        <h2>Segni</h2>
+                        <textarea name="system.marks">{{system.marks}}</textarea>
+                    </section>
+                </section>
+            </main>
+        </section>
+
+        <section class="tab" data-group="primary" data-tab="bio">
+            <section class="prism-tab-grid">
+                <section class="prism-panel">
+                    <h2>Biografia</h2>
+                    <textarea name="system.biography">{{system.biography}}</textarea>
+                </section>
+
+                <section class="prism-panel">
+                    <h2>Note personali</h2>
+                    <textarea name="system.personalNotes">{{system.personalNotes}}</textarea>
+                </section>
+            </section>
+        </section>
+
+        <section class="tab" data-group="primary" data-tab="inventory">
+            <section class="prism-panel">
+                <h2>Inventario</h2>
+
+                <table class="prism-inventory-table">
+                    <thead>
+                    <tr>
+                        <th>Oggetto</th>
+                        <th>Quantità</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {{#each inventory}}
+                        <tr class="prism-inventory-row" data-id="{{this.id}}">
+                            <td>
+                                <input type="text" value="{{this.name}}" placeholder="Nome oggetto" />
+                            </td>
+                            <td>
+                                <input type="number" value="{{this.quantity}}" min="0" step="1" />
+                            </td>
+                            <td>
+                                <button type="button" class="prism-icon-button" data-action="delete-inventory-item" data-id="{{this.id}}">×</button>
+                            </td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                <button type="button" class="prism-full-button" data-action="add-inventory-item">+ Oggetto</button>
+            </section>
+        </section>
+    </section>
+</form>

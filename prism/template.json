@@ -1,0 +1,28 @@
+{
+  "Actor": {
+    "types": ["character"],
+    "templates": {
+      "base": {
+        "concept": "",
+        "biography": "",
+        "personalNotes": "",
+        "notes": "",
+        "questions": "",
+        "inventory": [],
+        "traits": [],
+        "adversities": [],
+        "fears": [],
+        "dangers": [],
+        "marks": [],
+        "bag": [],
+        "lastDraw": []
+      }
+    },
+    "character": {
+      "templates": ["base"]
+    }
+  },
+  "Item": {
+    "types": []
+  }
+}
