@@ -1,0 +1,60 @@
+{
+  "prism": {
+
+    "bag": {
+      "empty": "Il sacchetto è vuoto.",
+      "labelWithoutName": "Etichetta senza nome: non posso aggiungerla al sacchetto.",
+      "pExtractMessage": "Estrai 3",
+      "riskMessage": "Rischia",
+      "emptyMessage": "Svuota"
+    },
+
+    "sheet": {
+      "characterName": "Nome dell'Anomalia",
+      "concept": "Concetto",
+      "bag": "Sacchetto",
+      "mainTab": "Scheda",
+      "bioTab": "Bio",
+      "inventoryTab": "Inventario",
+      "traits": "Tratti",
+      "tTipsMessage":"inserisci un Tratto",
+      "mConcept": "Una frase sul personaggio",
+      "plabel": "Scheda Anomalia PRISM",
+      "trait": "Tratto",
+      "adversity": "Avversità",
+      "aTipsMessage":"inserisci una Avversità",
+      "fear": "Paura",
+      "danger": "Pericolo",
+      "latestDraw": "Ultima Estrazione",
+      "signs": "Segni",
+      "bio": "Biografia",
+      "note": "Note Personali",
+      "inventory": "Inventario",
+      "object": "Oggetto",
+      "objectMessage": "Inserisci un Oggetto",
+      "quantity": "Quantità"
+    },
+
+    "bagManager": {
+      "fear": "paura",
+      "danger": "pericolo"
+    },
+
+    "dialog": {
+      "risk": "Rischiare",
+      "danger": "pericolo",
+      "qLabels": "Quante etichette vuoi estrarre?",
+      "fLabel": "1 etichetta",
+      "sLabel": "2 etichette",
+      "tLabel": "3 etichette",
+      "extract": "Estrai",
+      "cancel" : "Annulla"
+    },
+
+    "chat": {
+      "draw": "Estrazione PRISM",
+      "risk": "Rischio PRISM"
+    }
+
+  }
+}

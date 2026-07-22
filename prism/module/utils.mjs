@@ -11,10 +11,10 @@ export function labelPathFromType(type) {
 
 export function labelTypeLabel(type) {
     const labels = {
-        trait: "Tratto",
-        adversity: "Avversità",
-        fear: "Paura",
-        danger: "Pericolo"
+        trait: game.i18n.localize("prism.sheet.trait"),
+        adversity: game.i18n.localize("prism.sheet.adversity"),
+        fear: game.i18n.localize("prism.sheet.fear"),
+        danger: game.i18n.localize("prism.sheet.danger"),
     };
 
     return labels[type] ?? type;

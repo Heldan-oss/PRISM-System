@@ -1,5 +1,5 @@
 import { BagManager } from "./bag-manager.mjs";
-import { PrismDialogs } from "./dialogs.mjs";
+import PrismDialogs from "./dialogs.mjs";
 import { labelPathFromType } from "./utils.mjs";
 
 export class PrismActorSheet extends ActorSheet {
@@ -145,7 +145,7 @@ export class PrismActorSheet extends ActorSheet {
         const drawn = await BagManager.draw(this.actor, 3);
 
         if (drawn.length > 0) {
-            await this._sendDrawToChat("Estrazione PRISM", drawn);
+            await this._sendDrawToChat(game.i18n.localize("prism.chat.draw"), drawn);
             this.render(false);
         }
     }
@@ -162,7 +162,7 @@ export class PrismActorSheet extends ActorSheet {
         const drawn = await BagManager.draw(this.actor, amount);
 
         if (drawn.length > 0) {
-            await this._sendDrawToChat("Rischio PRISM", drawn);
+            await this._sendDrawToChat(game.i18n.localize("prism.chat.risk"), drawn);
             this.render(false);
         }
     }
@@ -174,7 +174,7 @@ export class PrismActorSheet extends ActorSheet {
         await this._syncSheetData();
 
         await BagManager.addGeneric(this.actor, {
-            name: "Paura",
+            name: game.i18n.localize("prism.bagManager.fear"),
             type: "fear"
         });
 
@@ -188,7 +188,7 @@ export class PrismActorSheet extends ActorSheet {
         await this._syncSheetData();
 
         await BagManager.addGeneric(this.actor, {
-            name: "Pericolo",
+            name: game.i18n.localize("prism.bagManager.danger"),
             type: "danger"
         });
 

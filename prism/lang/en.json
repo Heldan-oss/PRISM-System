@@ -1,0 +1,60 @@
+{
+  "prism": {
+
+    "bag": {
+      "empty": "The bag is empty.",
+      "labelWithoutName": "Unnamed label: it cannot be added to the bag.",
+      "pExtractMessage": "Draw 3",
+      "riskMessage": "Take a Risk",
+      "emptyMessage": "Empty Bag"
+    },
+
+    "sheet": {
+      "characterName": "Anomaly Name",
+      "concept": "Concept",
+      "bag": "Bag",
+      "mainTab": "Sheet",
+      "bioTab": "Bio",
+      "inventoryTab": "Inventory",
+      "traits": "Traits",
+      "tTipsMessage": "Enter a Trait",
+      "mConcept": "A short sentence describing the character",
+      "plabel": "PRISM Anomaly Sheet",
+      "trait": "Trait",
+      "adversity": "Adversity",
+      "aTipsMessage": "Enter an Adversity",
+      "fear": "Fear",
+      "danger": "Danger",
+      "latestDraw": "Latest Draw",
+      "signs": "Marks",
+      "bio": "Biography",
+      "note": "Personal Notes",
+      "inventory": "Inventory",
+      "object": "Item",
+      "objectMessage": "Enter an Item",
+      "quantity": "Quantity"
+    },
+
+    "bagManager": {
+      "fear": "fear",
+      "danger": "danger"
+    },
+
+    "dialog": {
+      "risk": "Take a Risk",
+      "danger": "danger",
+      "qLabels": "How many labels do you want to draw?",
+      "fLabel": "1 label",
+      "sLabel": "2 labels",
+      "tLabel": "3 labels",
+      "extract": "Draw",
+      "cancel": "Cancel"
+    },
+
+    "chat": {
+      "draw": "PRISM Draw",
+      "risk": "PRISM Risk"
+    }
+
+  }
+}

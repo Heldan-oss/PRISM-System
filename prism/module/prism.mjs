@@ -8,6 +8,6 @@ Hooks.once("init", () => {
     Actors.registerSheet("prism", PrismActorSheet, {
         types: ["character"],
         makeDefault: true,
-        label: "Scheda Anomalia PRISM"
+        label: game.i18n.localize("prism.sheet.plabel")
     });
 });

@@ -1,30 +1,30 @@
-export class PrismDialogs {
+class PrismDialogs {
     static async askRiskAmount() {
         return new Promise(resolve => {
             new Dialog({
-                title: "Rischiare",
+                title: game.i18n.localize("prism.dialog.risk"),
                 content: `
           <form>
             <div class="form-group">
-              <label>Quante etichette vuoi estrarre?</label>
+              <label>${game.i18n.localize("prism.dialog.qLabels")}</label>
               <select name="amount">
-                <option value="1">1 etichetta</option>
-                <option value="2">2 etichette</option>
-                <option value="3">3 etichette</option>
+                <option value="1">${game.i18n.localize("prism.dialog.fLabel")}</option>
+                <option value="2">${game.i18n.localize("prism.dialog.sLabel")}</option>
+                <option value="3">${game.i18n.localize("prism.dialog.tLabel")}</option>
               </select>
             </div>
           </form>
         `,
                 buttons: {
                     confirm: {
-                        label: "Estrai",
+                        label: game.i18n.localize("prism.dialog.extract"),
                         callback: html => {
                             const amount = Number(html.find("[name='amount']").val());
                             resolve(amount);
                         }
                     },
                     cancel: {
-                        label: "Annulla",
+                        label: game.i18n.localize("prism.dialog.cancel"),
                         callback: () => resolve(null)
                     }
                 },
@@ -34,3 +34,5 @@ export class PrismDialogs {
         });
     }
 }
+
+export default PrismDialogs

@@ -3,17 +3,17 @@
         <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
 
         <div class="prism-header-fields">
-            <input class="prism-name" name="name" type="text" value="{{actor.name}}" placeholder="Nome dell'Anomalia" />
+            <input class="prism-name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'prism.sheet.characterName'}}" />
 
-            <label>Concetto</label>
-            <input name="system.concept" type="text" value="{{system.concept}}" placeholder="Una frase sul personaggio" />
+            <label>{{localize "prism.sheet.concept"}}</label>
+            <input name="system.concept" type="text" value="{{system.concept}}" placeholder="{{localize 'prism.sheet.mConcept'}}" />
         </div>
     </header>
 
     <nav class="sheet-tabs tabs prism-tabs" data-group="primary">
-        <a class="item active" data-tab="main">Scheda</a>
-        <a class="item" data-tab="bio">Bio</a>
-        <a class="item" data-tab="inventory">Inventario</a>
+        <a class="item active" data-tab="main">{{localize "prism.sheet.mainTab"}}</a>
+        <a class="item" data-tab="bio">{{localize "prism.sheet.bioTab"}}</a>
+        <a class="item" data-tab="inventory">{{localize "prism.sheet.inventoryTab"}}</a>
     </nav>
 
     <section class="sheet-body">
@@ -21,26 +21,26 @@
             <main class="prism-main">
                 <section class="prism-column prism-wide">
                     <section class="prism-panel">
-                        <h2>Tratti</h2>
-                        <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">+ Tratto</button>
+                        <h2>{{localize "prism.sheet.traits"}}</h2>
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">+ {{localize "prism.sheet.trait"}}</button>
 
                         {{#each traits}}
                             <div class="prism-label-row" data-type="trait" data-id="{{this.id}}">
-                                <input type="text" value="{{this.name}}" placeholder="Nome tratto" />
-                                <button type="button" data-action="add-to-bag" data-type="trait" data-id="{{this.id}}">Sacchetto</button>
+                                <input type="text" value="{{this.name}}" placeholder="{{localize 'prism.sheet.tTipsMessage'}}" />
+                                <button type="button" data-action="add-to-bag" data-type="trait" data-id="{{this.id}}">{{localize "prism.sheet.bag"}}</button>
                                 <button type="button" class="prism-icon-button" data-action="delete-label" data-type="trait" data-id="{{this.id}}">×</button>
                             </div>
                         {{/each}}
                     </section>
 
                     <section class="prism-panel">
-                        <h2>Avversità</h2>
-                        <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">+ Avversità</button>
+                        <h2>{{localize "prism.sheet.adversity"}}</h2>
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">+ {{localize "prism.sheet.adversity"}}</button>
 
                         {{#each adversities}}
                             <div class="prism-label-row" data-type="adversity" data-id="{{this.id}}">
-                                <input type="text" value="{{this.name}}" placeholder="Nome avversità" />
-                                <button type="button" data-action="add-to-bag" data-type="adversity" data-id="{{this.id}}">Sacchetto</button>
+                                <input type="text" value="{{this.name}}" placeholder="{{localize 'prism.sheet.aTipsMessage'}}" />
+                                <button type="button" data-action="add-to-bag" data-type="adversity" data-id="{{this.id}}">{{localize "prism.sheet.bag"}}</button>
                                 <button type="button" class="prism-icon-button" data-action="delete-label" data-type="adversity" data-id="{{this.id}}">×</button>
                             </div>
                         {{/each}}
@@ -48,20 +48,20 @@
 
                     <div class="prism-risk-row">
                         <section class="prism-panel">
-                            <h2>Paura</h2>
-                            <button type="button" class="prism-full-button" data-action="add-fear">+ Paura</button>
+                            <h2>{{localize "prism.sheet.fear"}}</h2>
+                            <button type="button" class="prism-full-button" data-action="add-fear">+ {{localize "prism.sheet.fear"}}</button>
                         </section>
 
                         <section class="prism-panel">
-                            <h2>Pericolo</h2>
-                            <button type="button" class="prism-full-button" data-action="add-danger">+ Pericolo</button>
+                            <h2>{{localize "prism.sheet.danger"}}</h2>
+                            <button type="button" class="prism-full-button" data-action="add-danger">+ {{localize "prism.sheet.danger"}}</button>
                         </section>
                     </div>
                 </section>
 
                 <section class="prism-column">
                     <section class="prism-panel prism-bag">
-                        <h2>Sacchetto</h2>
+                        <h2>{{localize "prism.sheet.bag"}}</h2>
 
                         <div class="prism-bag-list">
                             {{#each bag}}
@@ -73,14 +73,14 @@
                         </div>
 
                         <div class="prism-actions">
-                            <button type="button" data-action="draw-three">Estrai 3</button>
-                            <button type="button" data-action="risk">Rischia</button>
-                            <button type="button" data-action="clear-bag">Svuota</button>
+                            <button type="button" data-action="draw-three">{{localize "prism.bag.pExtractMessage"}}</button>
+                            <button type="button" data-action="risk">{{localize "prism.bag.riskMessage"}}</button>
+                            <button type="button" data-action="clear-bag">{{localize "prism.bag.emptyMessage"}}</button>
                         </div>
                     </section>
 
                     <section class="prism-panel">
-                        <h2>Ultima estrazione</h2>
+                        <h2>{{localize "prism.sheet.latestDraw"}}</h2>
 
                         <div class="prism-last-draw-list">
                             {{#each lastDraw}}
@@ -92,7 +92,7 @@
                     </section>
 
                     <section class="prism-panel">
-                        <h2>Segni</h2>
+                        <h2>{{localize "prism.sheet.signs"}}</h2>
                         <textarea name="system.marks">{{system.marks}}</textarea>
                     </section>
                 </section>
@@ -102,12 +102,12 @@
         <section class="tab" data-group="primary" data-tab="bio">
             <section class="prism-tab-grid">
                 <section class="prism-panel">
-                    <h2>Biografia</h2>
+                    <h2>{{localize "prism.sheet.bio"}}</h2>
                     <textarea name="system.biography">{{system.biography}}</textarea>
                 </section>
 
                 <section class="prism-panel">
-                    <h2>Note personali</h2>
+                    <h2>{{localize "prism.sheet.note"}}</h2>
                     <textarea name="system.personalNotes">{{system.personalNotes}}</textarea>
                 </section>
             </section>
@@ -115,13 +115,13 @@
 
         <section class="tab" data-group="primary" data-tab="inventory">
             <section class="prism-panel">
-                <h2>Inventario</h2>
+                <h2>{{localize "prism.sheet.inventory"}}</h2>
 
                 <table class="prism-inventory-table">
                     <thead>
                     <tr>
-                        <th>Oggetto</th>
-                        <th>Quantità</th>
+                        <th>{{localize "prism.sheet.object"}}</th>
+                        <th>{{localize "prism.sheet.quantity"}}</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -130,7 +130,7 @@
                     {{#each inventory}}
                         <tr class="prism-inventory-row" data-id="{{this.id}}">
                             <td>
-                                <input type="text" value="{{this.name}}" placeholder="Nome oggetto" />
+                                <input type="text" value="{{this.name}}" placeholder={{localize 'prism.sheet.objectMessage'}} />
                             </td>
                             <td>
                                 <input type="number" value="{{this.quantity}}" min="0" step="1" />
@@ -143,7 +143,7 @@
                     </tbody>
                 </table>
 
-                <button type="button" class="prism-full-button" data-action="add-inventory-item">+ Oggetto</button>
+                <button type="button" class="prism-full-button" data-action="add-inventory-item">+ {{localize "prism.sheet.object"}}</button>
             </section>
         </section>
     </section>

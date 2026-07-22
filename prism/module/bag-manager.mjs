@@ -9,7 +9,7 @@ export class BagManager {
         const name = label?.name?.trim();
 
         if (!name) {
-            ui.notifications.warn("Etichetta senza nome: non posso aggiungerla al sacchetto.");
+            ui.notifications.warn(game.i18n.localize("prism.bag.labelWithoutName"));
             return;
         }
 
@@ -54,7 +54,7 @@ export class BagManager {
         const bag = this.getBag(actor);
 
         if (bag.length === 0) {
-            ui.notifications.warn("Il sacchetto è vuoto.");
+            ui.notifications.warn(game.i18n.localize("prism.bag.empty"));
             return [];
         }
 
