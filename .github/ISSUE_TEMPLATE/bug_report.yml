@@ -1,0 +1,306 @@
+name: Bug report
+description: Report a reproducible problem with the PRISM RPG system for Foundry VTT
+title: "[Bug]: "
+labels:
+
+  * "bug"
+assignees: []
+
+body:
+
+  * type: markdown
+      attributes:
+      value: |
+      Thank you for reporting a problem with **PRISM RPG for Foundry Virtual Tabletop**.
+      
+      ```
+      Please provide enough information for the maintainers to reproduce and investigate the issue.
+
+      > **Alpha notice**
+      >
+      > The system is currently in Alpha development. Incomplete features and breaking changes may occur, but clear bug reports are still valuable.
+      ```
+
+  * type: markdown
+      attributes:
+      value: |
+      ### Before continuing
+
+      ```
+      - Search the existing open and closed Issues for the same problem.
+      - Test with unrelated Foundry modules disabled whenever possible.
+      - Remove passwords, access tokens, license keys, private campaign data, and copyrighted commercial content from logs and screenshots.
+      - Do not report exploitable security vulnerabilities through a public Issue. Follow `SECURITY.md` instead.
+      ```
+
+  * type: dropdown
+      id: affected_area
+      attributes:
+      label: Affected area
+      description: Which part of the system is affected?
+      multiple: true
+      options:
+        - "Anomaly sheet"
+        - "Tag creation or editing"
+        - "Tag selection"
+        - "Virtual bag"
+        - "Tag draw"
+        - "Chat messages"
+        - "Localization"
+        - "Installation or update"
+        - "Foundry VTT compatibility"
+        - "Data storage or migration"
+        - "User interface or styling"
+        - "Other"
+      validations:
+      required: true
+
+  * type: textarea
+      id: summary
+      attributes:
+      label: Bug summary
+      description: Provide a concise description of the problem.
+      placeholder: |
+      Example: Drawing from the virtual bag fails when one of the selected tags has an empty value.
+      validations:
+      required: true
+
+  * type: input
+      id: system_version
+      attributes:
+      label: PRISM system version
+      description: Enter the installed system version or the commit hash you tested.
+      placeholder: "Example: 0.1.0 or a1b2c3d"
+      validations:
+      required: true
+
+  * type: input
+      id: foundry_version
+      attributes:
+      label: Foundry VTT version
+      description: Enter the complete Foundry Virtual Tabletop version and build number.
+      placeholder: "Example: 13.348"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: installation_method
+      attributes:
+      label: Installation method
+      description: How was the PRISM system installed?
+      options:
+        - "Git clone of the main branch"
+        - "Downloaded repository archive"
+        - "Foundry manifest URL"
+        - "Packaged GitHub release"
+        - "Other"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: operating_system
+      attributes:
+      label: Operating system
+      options:
+        - "Windows"
+        - "macOS"
+        - "Linux"
+        - "Other"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: client
+      attributes:
+      label: Foundry client or browser
+      description: Select the application or browser where the problem occurs.
+      multiple: true
+      options:
+        - "Foundry VTT desktop application"
+        - "Google Chrome"
+        - "Mozilla Firefox"
+        - "Microsoft Edge"
+        - "Safari"
+        - "Other Chromium-based browser"
+        - "Other"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: clean_world
+      attributes:
+      label: Reproducible in a new test world
+      description: Does the problem also occur in a newly created PRISM world?
+      options:
+        - "Yes"
+        - "No"
+        - "Not tested"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: modules_disabled
+      attributes:
+      label: Reproducible with other modules disabled
+      description: Does the problem occur when unrelated Foundry modules are disabled?
+      options:
+        - "Yes"
+        - "No"
+        - "Not tested"
+        - "No additional modules are installed"
+      validations:
+      required: true
+
+  * type: textarea
+      id: modules
+      attributes:
+      label: Enabled modules
+      description: List any enabled Foundry modules that may be relevant. Write "None" when testing without modules.
+      placeholder: |
+      Example:
+        - Module Name — version 1.2.3
+        - Another Module — version 4.5.6
+      validations:
+      required: true
+
+  * type: textarea
+      id: prerequisites
+      attributes:
+      label: Required setup
+      description: Describe any Actor, tags, settings, permissions, or world state required before reproducing the problem.
+      placeholder: |
+      Example:
+        - Create an Anomaly actor.
+        - Add one empty tag and two normal tags.
+        - Log in as a Player with ownership of the Actor.
+      validations:
+      required: false
+
+  * type: textarea
+      id: reproduction_steps
+      attributes:
+      label: Steps to reproduce
+      description: Provide a complete, numbered sequence that reliably reproduces the problem.
+      placeholder: |
+      1. Create or open an Anomaly.
+      2. Add three tags.
+      3. Leave the second tag empty.
+      4. Add all tags to the virtual bag.
+      5. Select Draw.
+      6. Observe the error.
+      validations:
+      required: true
+
+  * type: textarea
+      id: expected_behavior
+      attributes:
+      label: Expected behavior
+      description: Explain what you expected the system to do.
+      placeholder: |
+      The system should reject the empty tag and display a localized validation message.
+      validations:
+      required: false
+
+  * type: textarea
+      id: actual_behavior
+      attributes:
+      label: Actual behavior
+      description: Explain what happened instead.
+      placeholder: |
+      The draw dialog closes without posting a result, and an error appears in the browser console.
+      validations:
+      required: false
+
+  * type: dropdown
+      id: frequency
+      attributes:
+      label: Frequency
+      description: How consistently does the problem occur?
+      options:
+        - "Every time"
+        - "Frequently"
+        - "Sometimes"
+        - "Rarely"
+        - "Occurred once"
+      validations:
+      required: true
+
+  * type: dropdown
+      id: impact
+      attributes:
+      label: Impact
+      description: How severely does the problem affect usage?
+      options:
+        - "Cosmetic issue"
+        - "Minor inconvenience with a workaround"
+        - "Important workflow is partially blocked"
+        - "Important workflow is completely blocked"
+        - "System or world becomes unusable"
+        - "Possible data corruption or data loss"
+      validations:
+      required: true
+
+  * type: textarea
+      id: console_errors
+      attributes:
+      label: Browser console errors
+      description: Paste relevant errors from the browser developer console. Do not include credentials, tokens, license keys, or private data.
+      render: shell
+      placeholder: Paste relevant console output here.
+      validations:
+      required: false
+
+  * type: textarea
+      id: logs
+      attributes:
+      label: Additional logs
+      description: Paste any other relevant Foundry VTT or server logs.
+      render: shell
+      placeholder: Paste additional logs here.
+      validations:
+      required: false
+
+  * type: textarea
+      id: screenshots
+      attributes:
+      label: Screenshots or recordings
+      description: Drag and drop screenshots or recordings that help demonstrate the problem. Remove private or copyrighted content first.
+      placeholder: Attach images or recordings here.
+      validations:
+      required: false
+
+  * type: textarea
+      id: workaround
+      attributes:
+      label: Known workaround
+      description: Describe any temporary workaround you discovered.
+      placeholder: |
+      Example: Removing empty tags before opening the virtual bag prevents the error.
+      validations:
+      required: false
+
+  * type: textarea
+      id: additional_context
+      attributes:
+      label: Additional context
+      description: Add any other information that may help investigate the problem.
+      placeholder: Include related Issues, recent changes, unusual world settings, or other relevant details.
+      validations:
+      required: false
+
+  * type: checkboxes
+      id: confirmation
+      attributes:
+      label: Submission checklist
+      description: Confirm each statement before submitting the report.
+      options:
+        - label: I searched the existing open and closed Issues and did not find an equivalent report.
+      required: true
+        - label: I provided the PRISM system version and the complete Foundry VTT version.
+      required: true
+        - label: I included clear steps to reproduce the problem.
+      required: true
+        - label: I removed credentials, tokens, license keys, private data, and unauthorized commercial content.
+      required: true
+        - label: This report describes a software bug rather than a general support request or a security vulnerability.
+      required: true

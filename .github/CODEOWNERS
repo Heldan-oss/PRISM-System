@@ -1,0 +1,5 @@
+# Default owner for every file in the repository
+* @Heldan-oss
+
+# Explicit ownership of GitHub configuration and governance files
+/.github/ @Heldan-oss

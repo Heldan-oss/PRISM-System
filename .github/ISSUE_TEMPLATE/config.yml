@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+
+contact_links:
+
+  - name: Questions and Community Support
+    url: https://github.com/Heldan-oss/PRISM-System/discussions
+    about: Ask general questions, request help, or discuss ideas that are not yet actionable bug reports or feature requests.
+
+  - name: Report a Security Vulnerability
+    url: https://github.com/Heldan-oss/PRISM-System/security/advisories/new
+    about: Privately report vulnerabilities involving credentials, private data, remote code execution, filesystem access, or other security-sensitive behavior.

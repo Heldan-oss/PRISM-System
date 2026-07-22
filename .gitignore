@@ -1,0 +1,44 @@
+
+# IntelliJ IDEA / JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Ignored default folder with query files
+/queries/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Foundry
+/data/
+/packs/
+*.db
+
+# Node
+node_modules/
+
+
+
+# IDE
+.vscode/
+
+# Build and test output, if introduced later
+dist/
+build/
+coverage/

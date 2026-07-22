@@ -1,0 +1,315 @@
+name: Feature request
+description: Propose a new feature or improvement for the PRISM RPG system for Foundry VTT
+title: "[Feature]: "
+labels:
+  - "enhancement"
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing an improvement to **PRISM RPG for Foundry Virtual Tabletop**.
+
+        Feature requests should describe a concrete problem or gameplay need before proposing a technical solution.
+
+        > **Alpha notice**
+        >
+        > The system is currently in Alpha development. Features, priorities, interfaces, and internal data structures may change as the project evolves.
+
+  - type: markdown
+    attributes:
+      value: |
+        ### Before continuing
+
+        - Search existing open and closed Issues for similar proposals.
+        - Check whether the feature is already planned or under development.
+        - For large or breaking changes, discuss the proposal before starting implementation.
+        - Do not include copyrighted PRISM rulebook text, commercial assets, credentials, private campaign data, or license keys.
+
+  - type: dropdown
+    id: request_type
+    attributes:
+      label: Request type
+      description: What kind of change are you proposing?
+      multiple: true
+      options:
+        - "New gameplay feature"
+        - "Existing feature improvement"
+        - "Anomaly sheet improvement"
+        - "Tag management improvement"
+        - "Virtual bag improvement"
+        - "Chat message improvement"
+        - "User interface improvement"
+        - "Accessibility improvement"
+        - "Localization improvement"
+        - "New language support"
+        - "Foundry VTT compatibility improvement"
+        - "Documentation improvement"
+        - "Development tooling"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: Provide a concise summary of the requested feature.
+      placeholder: |
+        Example: Add a preview showing which tags will be placed in the virtual bag before confirming a test.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or limitation
+      description: Describe the current problem, limitation, or difficult workflow.
+      placeholder: |
+        Example: Players currently cannot review the complete set of selected tags before starting a draw, which can lead to accidental selections.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you think the feature should work from the user's perspective.
+      placeholder: |
+        Example:
+        Before confirming the draw, display a dialog containing all selected tags.
+        The user should be able to remove incorrect tags or return to the sheet.
+    validations:
+      required: true
+
+  - type: textarea
+    id: user_workflow
+    attributes:
+      label: Expected user workflow
+      description: Describe the complete sequence a user would follow when using this feature.
+      placeholder: |
+        1. Open an Anomaly sheet.
+        2. Select the tags involved in the test.
+        3. Select "Prepare Bag".
+        4. Review the selected tags.
+        5. Remove any incorrect tags.
+        6. Confirm the draw.
+        7. Share the result in chat.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: intended_users
+    attributes:
+      label: Intended users
+      description: Who would primarily use this feature?
+      multiple: true
+      options:
+        - "Game Masters"
+        - "Players"
+        - "All participants"
+        - "System administrators"
+        - "Developers"
+        - "Translators"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: prism_context
+    attributes:
+      label: PRISM rule or gameplay context
+      description: Explain which PRISM procedure, mechanic, or gameplay need this feature supports.
+      placeholder: |
+        Describe the relevant gameplay context without reproducing large portions of copyrighted rules text.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe alternative solutions, manual procedures, or workarounds you considered.
+      placeholder: |
+        Example:
+        Players can currently review tags individually on the sheet, but there is no combined preview before drawing.
+    validations:
+      required: false
+
+  - type: textarea
+    id: current_workaround
+    attributes:
+      label: Current workaround
+      description: Explain how users currently handle this problem, if a workaround exists.
+      placeholder: |
+        Example: Players manually read every selected tag aloud before starting the draw.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority
+      description: How important is this feature to the current workflow?
+      options:
+        - "Low — optional convenience"
+        - "Medium — meaningful usability improvement"
+        - "High — important workflow is difficult without it"
+        - "Critical — core gameplay cannot be completed reliably"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Estimated scope
+      description: Provide your best estimate. Maintainers may reassess it.
+      options:
+        - "Small — isolated interface or documentation change"
+        - "Medium — affects one system workflow"
+        - "Large — affects multiple files or workflows"
+        - "Major — architectural or data-model change"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: data_impact
+    attributes:
+      label: Stored data impact
+      description: Could this feature affect Actor, Item, world, or system data?
+      options:
+        - "No stored data changes expected"
+        - "Adds new stored data"
+        - "Changes existing stored data"
+        - "May require data migration"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compatibility_impact
+    attributes:
+      label: Compatibility impact
+      description: Could the feature affect Foundry VTT compatibility or existing worlds?
+      options:
+        - "No compatibility impact expected"
+        - "May affect specific Foundry VTT versions"
+        - "May affect existing worlds"
+        - "May introduce a breaking change"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: data_details
+    attributes:
+      label: Data or migration details
+      description: Describe any expected data changes, migrations, or compatibility risks.
+      placeholder: |
+        Example:
+        The feature may add a saved preparation state to each Anomaly Actor. Existing Actors should default to an empty state.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: localization_impact
+    attributes:
+      label: Localization impact
+      description: Will the feature require new or changed user-facing text?
+      options:
+        - "No user-facing text changes"
+        - "English and Italian updates required"
+        - "Additional language updates may be required"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: interface_details
+    attributes:
+      label: Interface details
+      description: Describe any proposed buttons, dialogs, sheet sections, notifications, or chat messages.
+      placeholder: |
+        Include labels, placement, behavior, validation messages, and accessibility considerations where relevant.
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups, screenshots, or examples
+      description: Attach sketches, screenshots, workflow diagrams, or examples that help explain the proposal.
+      placeholder: |
+        Drag and drop supporting files here.
+
+        Remove private campaign data and unauthorized commercial content before uploading.
+    validations:
+      required: false
+
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility considerations
+      description: Describe any keyboard, screen-reader, contrast, text-size, or interaction requirements.
+      placeholder: |
+        Example:
+        The tag preview should be keyboard navigable and should not communicate selection state through color alone.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribution_intent
+    attributes:
+      label: Are you willing to contribute?
+      description: Indicate whether you may be able to help implement or test the feature.
+      options:
+        - "Yes, I would like to implement it"
+        - "Yes, I can help test it"
+        - "Yes, I can help with documentation or localization"
+        - "Possibly, with maintainer guidance"
+        - "No, I am only proposing the idea"
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation_notes
+    attributes:
+      label: Possible implementation
+      description: Optional technical notes for contributors or maintainers.
+      placeholder: |
+        Describe relevant files, Foundry APIs, data structures, or implementation ideas.
+
+        User-facing needs are more important than a complete technical design.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add any other information that may help evaluate the proposal.
+      placeholder: |
+        Include related Issues, Pull Requests, examples from current gameplay, limitations, or dependencies.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Submission checklist
+      description: Confirm each statement before submitting the request.
+      options:
+        - label: I searched existing open and closed Issues for similar proposals.
+          required: true
+        - label: I described a concrete problem or gameplay need.
+          required: true
+        - label: I explained the expected user workflow.
+          required: true
+        - label: I identified the relevant PRISM gameplay context without reproducing substantial copyrighted rules text.
+          required: true
+        - label: I removed credentials, private data, license keys, and unauthorized commercial content.
+          required: true
+        - label: I understand that submitting a request does not guarantee that it will be implemented.
+          required: true
