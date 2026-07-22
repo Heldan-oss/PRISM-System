@@ -314,7 +314,7 @@ The most direct way to support PRISM is to obtain the official game and follow t
 
 * [Claudio Pustorino — Official Website](https://claudiopustorino.com/)
 * [PRISM on itch.io](https://fumblegdr.itch.io/prism)
-* [PRISM from MS Edizioni](https://www.msedizioni.it/prodotto/prism/)
+* [PRISM from FUMBLE GDR](https://www.fumblegdr.it/giochi/prism/)
 
 Do not use this repository to request, share, or redistribute unauthorized copies of PRISM publications or commercial assets.
 
