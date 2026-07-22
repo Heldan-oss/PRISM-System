@@ -57,7 +57,7 @@ Official information and legally distributed copies of PRISM are available from:
 
 * [Claudio Pustorino — Official Website](https://claudiopustorino.com/)
 * [PRISM on Fumble GDR’s itch.io page](https://fumblegdr.itch.io/prism)
-* [PRISM from MS Edizioni](https://www.msedizioni.it/prodotto/prism/)
+* [PRISM from FUMBLE GDR](https://www.fumblegdr.it/giochi/prism/)
 
 ---
 
