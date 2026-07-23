@@ -17,19 +17,38 @@ const ACTION_HANDLERS = Object.freeze({
 });
 
 const LABEL_CONFIGS = Object.freeze([{
-	type: "trait", path: "traits"
+	type: "trait",
+	path: "traits"
 }, {
-	type: "adversity", path: "adversities"
+	type: "adversity",
+	path: "adversities"
 }]);
 
-const ALLOWED_CHAT_LABEL_TYPES = new Set(["trait", "adversity", "fear", "danger"]);
+const DYNAMIC_FIELD_SELECTOR = [
+	".prism-label-row input",
+	".prism-inventory-row input"
+].join(", ");
+
+const ALLOWED_CHAT_LABEL_TYPES = new Set([
+	"trait",
+	"adversity",
+	"fear",
+	"danger"
+]);
 
 const HTML_ESCAPE_CHARACTERS = Object.freeze({
-	"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': "&quot;",
+	"'": "&#39;"
 });
 
 function escapeHtml(value) {
-	return String(value ?? "").replace(/[&<>"']/g, character => HTML_ESCAPE_CHARACTERS[character]);
+	return String(value ?? "").replace(
+		/[&<>"']/g,
+		character => HTML_ESCAPE_CHARACTERS[character]
+	);
 }
 
 function normalizeQuantity(value) {
@@ -44,16 +63,26 @@ function normalizeQuantity(value) {
 
 export class PrismActorSheet extends ActorSheet {
 	static get defaultOptions() {
-		return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["prism", "sheet", "actor"],
-			template: "systems/prism/templates/actor-character-sheet.hbs",
-			width: 800,
-			height: 900,
-			resizable: true,
-			tabs: [{
-				navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "main"
-			}]
-		});
+		return foundry.utils.mergeObject(
+			super.defaultOptions,
+			{
+				classes: ["prism", "sheet", "actor"],
+				template: "systems/prism/templates/actor-character-sheet.hbs",
+				width: 800,
+				height: 900,
+				resizable: true,
+
+				submitOnChange: false,
+				submitOnClose: true,
+				closeOnSubmit: false,
+
+				tabs: [{
+					navSelector: ".sheet-tabs",
+					contentSelector: ".sheet-body",
+					initial: "main"
+				}]
+			}
+		);
 	}
 
 	getData(options) {
@@ -66,22 +95,48 @@ export class PrismActorSheet extends ActorSheet {
 			adversities: system.adversities ?? [],
 			bag: system.bag ?? [],
 			lastDraw: system.lastDraw ?? [],
-			inventory: system.inventory ?? [], ...BagManager.getViewState(this.actor)
+			inventory: system.inventory ?? [],
+			...BagManager.getViewState(this.actor)
 		});
 
 		return context;
 	}
 
+	_getSubmitData(updateData = {}) {
+		const submitData = super._getSubmitData(updateData);
+
+		const root =
+			this.form ??
+			this.element?.[0]?.querySelector("form");
+
+		if (!root) {
+			return submitData;
+		}
+
+		return {
+			...submitData,
+			...this._getLabelUpdateData(root),
+			"system.inventory": this._getInventoryFromSheet(root)
+		};
+	}
+
 	activateListeners(html) {
 		super.activateListeners(html);
 
-		html.on("click", "[data-action]", this._onAction.bind(this));
+		html.on(
+			"click",
+			"[data-action]",
+			this._onAction.bind(this)
+		);
+
+		html.on(
+			"change",
+			DYNAMIC_FIELD_SELECTOR,
+			this._onDynamicFieldChange.bind(this)
+		);
 	}
 
 	async _onAction(event) {
-		event.preventDefault();
-		event.stopPropagation();
-
 		const element = event.currentTarget;
 		const action = element.dataset.action;
 		const handlerName = ACTION_HANDLERS[action];
@@ -91,7 +146,21 @@ export class PrismActorSheet extends ActorSheet {
 			return;
 		}
 
+		event.preventDefault();
+		event.stopPropagation();
+
 		await handler.call(this, element);
+	}
+
+	async _onDynamicFieldChange() {
+		try {
+			await this._queueSheetSubmit();
+		} catch (error) {
+			console.error(
+				"PRISM | Failed to save dynamic sheet data",
+				error
+			);
+		}
 	}
 
 	async _onAddLabel(element) {
@@ -107,7 +176,9 @@ export class PrismActorSheet extends ActorSheet {
 		const labels = this._getSystemArray(path);
 
 		labels.push({
-			id: foundry.utils.randomID(), name: "", type
+			id: foundry.utils.randomID(),
+			name: "",
+			type
 		});
 
 		await this.actor.update({
@@ -155,7 +226,10 @@ export class PrismActorSheet extends ActorSheet {
 			return;
 		}
 
-		const added = await BagManager.add(this.actor, label);
+		const added = await BagManager.add(
+			this.actor,
+			label
+		);
 
 		this._renderIfSuccessful(added);
 	}
@@ -169,7 +243,10 @@ export class PrismActorSheet extends ActorSheet {
 			return;
 		}
 
-		const removed = await BagManager.remove(this.actor, id);
+		const removed = await BagManager.remove(
+			this.actor,
+			id
+		);
 
 		this._renderIfSuccessful(removed);
 	}
@@ -184,9 +261,15 @@ export class PrismActorSheet extends ActorSheet {
 	async _onDrawThree() {
 		await this._syncSheetData();
 
-		const drawn = await BagManager.drawInitial(this.actor, 3);
+		const drawn = await BagManager.drawInitial(
+			this.actor,
+			3
+		);
 
-		await this._completeDraw("prism.chat.draw", drawn);
+		await this._completeDraw(
+			"prism.chat.draw",
+			drawn
+		);
 	}
 
 	async _onRisk() {
@@ -196,31 +279,49 @@ export class PrismActorSheet extends ActorSheet {
 			return;
 		}
 
-		const amount = await PrismDialogs.askRiskAmount(BagManager.getBagSize(this.actor));
+		const amount = await PrismDialogs.askRiskAmount(
+			BagManager.getBagSize(this.actor)
+		);
 
 		if (!amount) {
 			return;
 		}
 
-		const drawn = await BagManager.drawRisk(this.actor, amount);
+		const drawn = await BagManager.drawRisk(
+			this.actor,
+			amount
+		);
 
-		await this._completeDraw("prism.chat.risk", drawn);
+		await this._completeDraw(
+			"prism.chat.risk",
+			drawn
+		);
 	}
 
 	async _onAddFear() {
-		await this._addGenericBagEntry("fear", "prism.bagManager.fear");
+		await this._addGenericBagEntry(
+			"fear",
+			"prism.bagManager.fear"
+		);
 	}
 
 	async _onAddDanger() {
-		await this._addGenericBagEntry("danger", "prism.bagManager.danger");
+		await this._addGenericBagEntry(
+			"danger",
+			"prism.bagManager.danger"
+		);
 	}
 
 	async _addGenericBagEntry(type, localizationKey) {
 		await this._syncSheetData();
 
-		const added = await BagManager.addGeneric(this.actor, {
-			name: game.i18n.localize(localizationKey), type
-		});
+		const added = await BagManager.addGeneric(
+			this.actor,
+			{
+				name: game.i18n.localize(localizationKey),
+				type
+			}
+		);
 
 		this._renderIfSuccessful(added);
 	}
@@ -228,10 +329,14 @@ export class PrismActorSheet extends ActorSheet {
 	async _onAddInventoryItem() {
 		await this._syncSheetData();
 
-		const inventory = this._getSystemArray("inventory");
+		const inventory = this._getSystemArray(
+			"inventory"
+		);
 
 		inventory.push({
-			id: foundry.utils.randomID(), name: "", quantity: 1
+			id: foundry.utils.randomID(),
+			name: "",
+			quantity: 1
 		});
 
 		await this.actor.update({
@@ -262,11 +367,17 @@ export class PrismActorSheet extends ActorSheet {
 	}
 
 	async _completeDraw(titleKey, drawn) {
-		if (!Array.isArray(drawn) || drawn.length === 0) {
+		if (
+			!Array.isArray(drawn) ||
+			drawn.length === 0
+		) {
 			return false;
 		}
 
-		await this._sendDrawToChat(game.i18n.localize(titleKey), drawn);
+		await this._sendDrawToChat(
+			game.i18n.localize(titleKey),
+			drawn
+		);
 
 		this.render(false);
 
@@ -278,7 +389,10 @@ export class PrismActorSheet extends ActorSheet {
 
 		const labels = drawn
 			.map(entry => {
-				const type = ALLOWED_CHAT_LABEL_TYPES.has(entry.type) ? entry.type : "unknown";
+				const type =
+					ALLOWED_CHAT_LABEL_TYPES.has(entry.type)
+						? entry.type
+						: "unknown";
 
 				const name = escapeHtml(entry.name);
 
@@ -293,7 +407,9 @@ export class PrismActorSheet extends ActorSheet {
 		await ChatMessage.create({
 			speaker: ChatMessage.getSpeaker({
 				actor: this.actor
-			}), content: `
+			}),
+
+			content: `
                 <div class="prism-chat-card">
                     <h2>${safeTitle}</h2>
                     <p>${labels}</p>
@@ -303,50 +419,95 @@ export class PrismActorSheet extends ActorSheet {
 	}
 
 	async _syncSheetData() {
-		const root = this.element?.[0];
-
-		if (!root) {
+		if (!this.form) {
 			return false;
 		}
 
-		await this.actor.update({
-			...this._getLabelUpdateData(root), "system.inventory": this._getInventoryFromSheet(root)
-		});
+		await this._queueSheetSubmit();
 
 		return true;
+	}
+
+	_queueSheetSubmit() {
+		const previousSubmit =
+			this._sheetSubmitQueue ??
+			Promise.resolve();
+
+		const currentSubmit = previousSubmit
+			.catch(() => undefined)
+			.then(() => this.submit({
+				preventClose: true,
+				preventRender: true
+			}));
+
+		this._sheetSubmitQueue = currentSubmit;
+
+		return currentSubmit.finally(() => {
+			if (
+				this._sheetSubmitQueue ===
+				currentSubmit
+			) {
+				this._sheetSubmitQueue = null;
+			}
+		});
 	}
 
 	_getLabelUpdateData(root) {
 		const updateData = {};
 
 		for (const {type, path} of LABEL_CONFIGS) {
-			const rows = root.querySelectorAll(`.prism-label-row[data-type="${type}"]`);
+			const rows = root.querySelectorAll(
+				`.prism-label-row[data-type="${type}"]`
+			);
 
-			updateData[`system.${path}`] = Array.from(rows, row => ({
-				id: row.dataset.id, type, name: row
-					.querySelector("input")
-					?.value
-					?.trim() ?? ""
-			}));
+			updateData[`system.${path}`] = Array.from(
+				rows,
+				row => ({
+					id: row.dataset.id,
+					type,
+
+					name:
+						row
+							.querySelector("input")
+							?.value
+							?.trim() ??
+						""
+				})
+			);
 		}
 
 		return updateData;
 	}
 
 	_getInventoryFromSheet(root) {
-		const rows = root.querySelectorAll(".prism-inventory-row");
+		const rows = root.querySelectorAll(
+			".prism-inventory-row"
+		);
 
 		return Array.from(rows, row => {
-			const inputs = row.querySelectorAll("input");
+			const inputs =
+				row.querySelectorAll("input");
 
 			return {
-				id: row.dataset.id, name: inputs[0]?.value?.trim() ?? "", quantity: normalizeQuantity(inputs[1]?.value)
+				id: row.dataset.id,
+
+				name:
+					inputs[0]
+						?.value
+						?.trim() ??
+					"",
+
+				quantity: normalizeQuantity(
+					inputs[1]?.value
+				)
 			};
 		});
 	}
 
 	_getSystemArray(path) {
-		return foundry.utils.deepClone(this.actor.system[path] ?? []);
+		return foundry.utils.deepClone(
+			this.actor.system[path] ?? []
+		);
 	}
 
 	_renderIfSuccessful(successful) {
