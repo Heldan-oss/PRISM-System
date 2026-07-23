@@ -36,7 +36,7 @@ Because the project is currently in Alpha:
 
 ### Changed
 
-* bumped system version from v13 to v14
+* bumped compatibility verified version from v13 to v14
 
 ---
 
