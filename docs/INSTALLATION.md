@@ -2,110 +2,73 @@
 
 ## Overview
 
-This guide explains how to install, update, verify, back up, and remove **PRISM RPG for Foundry Virtual Tabletop**.
+This guide explains how to install, update, verify, and remove **PRISM RPG for Foundry Virtual Tabletop**.
 
-PRISM RPG for Foundry VTT is currently in Alpha development. Installation is primarily intended for developers, testers, and users who understand that:
+The recommended installation method uses the official Foundry manifest URL:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
+```
+
+The same manifest can be used with:
+
+* A local Foundry VTT installation.
+* A self-hosted Foundry VTT server.
+* A remote Foundry VTT installation that supports custom manifest URLs.
+
+PRISM RPG for Foundry VTT is currently in Alpha development.
+
+During the Alpha phase:
 
 * Features may be incomplete.
-* Stored data may change.
-* Existing worlds may require migration.
+* Interfaces and stored data may change.
 * Backward compatibility is not guaranteed.
-* Development versions may contain unresolved bugs.
+* Updates may require manual intervention.
+* Existing worlds should be backed up before updating.
 
-Always back up important Foundry VTT data before installing or updating the system.
-
-For project architecture, source-code conventions, and development procedures, see [`DEVELOPMENT.md`](DEVELOPMENT.md).
-
----
-
-## Table of Contents
-
-* [Compatibility](#compatibility)
-* [Before Installing](#before-installing)
-* [System Package Structure](#system-package-structure)
-* [Locate the Foundry User Data Directory](#locate-the-foundry-user-data-directory)
-* [Manual Installation from the Repository](#manual-installation-from-the-repository)
-* [Development Installation with Git](#development-installation-with-git)
-* [Packaged Release Installation](#packaged-release-installation)
-* [Manifest Installation](#manifest-installation)
-* [Verify the Installation](#verify-the-installation)
-* [Create a PRISM World](#create-a-prism-world)
-* [Updating the System](#updating-the-system)
-* [Backing Up Foundry Data](#backing-up-foundry-data)
-* [Downgrading](#downgrading)
-* [Removing the System](#removing-the-system)
-* [Troubleshooting](#troubleshooting)
-* [Reporting Installation Problems](#reporting-installation-problems)
-* [Related Documentation](#related-documentation)
+For source-code setup and contributor workflows, see [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
 ---
 
 ## Compatibility
 
-The authoritative Foundry VTT compatibility values are defined in:
+The authoritative compatibility information is stored in:
 
 ```text
 prism/system.json
 ```
 
-The current manifest declares:
+Before installing or updating, check:
 
-```json
-{
-  "compatibility": {
-    "minimum": "12",
-    "verified": "13"
-  }
-}
-```
+* The Foundry VTT compatibility shown in the installation interface.
+* The latest [`CHANGELOG.md`](../CHANGELOG.md).
+* The notes attached to the latest GitHub Release.
 
-Before installing or updating:
-
-1. Open [`prism/system.json`](../prism/system.json).
-2. Check the declared compatibility values.
-3. Compare them with the Foundry VTT version in use.
-4. Review the latest [`CHANGELOG.md`](../CHANGELOG.md).
-5. Review the relevant GitHub release notes, when releases are available.
-
-Compatibility with Foundry VTT versions not declared in `system.json` is not guaranteed.
-
-The `verified` value indicates the version against which the current package has been tested or verified. It does not guarantee that every feature works in every environment.
+Compatibility outside the versions declared by the manifest is not guaranteed.
 
 ---
 
-## Before Installing
+## Recommended Installation
 
-Before installing the system:
+### Install Using the Manifest URL
 
-1. Stop the Foundry VTT server or return to the Setup screen.
-2. Identify the configured Foundry User Data directory.
-3. Back up existing worlds and user data.
-4. Remove or rename any older manual installation of the `prism` system.
-5. Confirm that the downloaded source comes from the official repository:
-
-```text
-https://github.com/Heldan-oss/PRISM-System
-```
-
-Do not install files received from an unknown or untrusted source.
-
-Do not overwrite an existing installation while Foundry is actively using the system.
-
----
-
-## System Package Structure
-
-The repository contains project documentation and GitHub configuration in addition to the Foundry system.
-
-The installable Foundry system is only the:
+1. Start Foundry Virtual Tabletop.
+2. Open the **Setup** screen.
+3. Select **Game Systems**.
+4. Select **Install System**.
+5. Paste the following URL into the **Manifest URL** field:
 
 ```text
-prism/
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
 ```
 
-directory.
+6. Select **Install**.
+7. Wait for Foundry to download and install the system.
+8. Confirm that PRISM appears in the installed game-system list.
 
-The installed system must have this structure:
+Foundry reads the manifest, downloads the matching release package, and installs it as the `prism` system.
+
+The installation should result in:
 
 ```text
 FOUNDRY_USER_DATA/
@@ -120,715 +83,411 @@ FOUNDRY_USER_DATA/
             └── templates/
 ```
 
-The following path must exist:
+### Remote and Hosted Installations
 
-```text
-Data/systems/prism/system.json
-```
+The same manifest URL can be used on a remote Foundry server, provided that:
 
-Do not install the entire repository as the system directory.
+* The server can access GitHub.
+* The administrator can install custom systems.
+* The hosting provider supports manifest-based installation.
 
-This structure is incorrect:
+Some hosting providers use a custom control panel instead of the standard Foundry Setup screen. In that case, locate the option for installing a custom system or package using a manifest URL.
 
-```text
-Data/systems/PRISM-System/prism/system.json
-```
-
-This structure is also incorrect:
-
-```text
-Data/systems/prism/prism/system.json
-```
-
-The directory containing `system.json` must be named:
-
-```text
-prism
-```
-
-This matches the system identifier declared in the manifest:
-
-```json
-{
-  "id": "prism"
-}
-```
-
----
-
-## Locate the Foundry User Data Directory
-
-Foundry stores installed systems under the configured User Data directory.
-
-The system directory is:
-
-```text
-FOUNDRY_USER_DATA/Data/systems/
-```
-
-The actual location depends on:
-
-* Operating system.
-* Foundry installation method.
-* Hosting provider.
-* Container or server configuration.
-* Any custom User Data path selected by the administrator.
-
-Use the User Data path configured for the Foundry installation rather than assuming that the application installation directory is also the data directory.
-
-Do not place the system inside the Foundry application binaries or program directory unless that directory is also explicitly configured as the User Data location.
-
-For hosted Foundry installations, consult the hosting provider’s file-management documentation.
-
----
-
-## Manual Installation from the Repository
-
-This method is suitable for Alpha testers who want to install the current source without using Git for updates.
-
-### 1. Download the Repository
-
-Open:
-
-```text
-https://github.com/Heldan-oss/PRISM-System
-```
-
-Download the repository source as a ZIP archive.
-
-### 2. Extract the Archive
-
-Extract the downloaded archive to a temporary directory.
-
-The extracted repository will contain files similar to:
-
-```text
-PRISM-System/
-├── docs/
-├── prism/
-├── README.md
-├── CONTRIBUTING.md
-├── LICENSE
-└── SECURITY.md
-```
-
-### 3. Copy the System Directory
-
-Copy only:
-
-```text
-PRISM-System/prism/
-```
-
-into:
-
-```text
-FOUNDRY_USER_DATA/Data/systems/
-```
-
-The final directory must be:
-
-```text
-FOUNDRY_USER_DATA/Data/systems/prism/
-```
-
-### 4. Verify the Result
-
-Confirm that this file exists:
-
-```text
-FOUNDRY_USER_DATA/Data/systems/prism/system.json
-```
-
-Also confirm that the directory contains:
-
-```text
-template.json
-lang/
-module/
-styles/
-templates/
-```
-
-### 5. Restart Foundry
-
-Restart Foundry VTT or reload the Setup screen.
-
-The system should appear in the list of available game systems.
-
----
-
-## Development Installation with Git
-
-This method is intended for contributors and testers who want to update the source through Git.
-
-### 1. Clone the Repository
-
-Clone the repository to a normal development directory:
-
-```bash
-git clone https://github.com/Heldan-oss/PRISM-System.git
-cd PRISM-System
-```
-
-The runtime system is located in:
-
-```text
-PRISM-System/prism/
-```
-
-### 2. Choose a Development Installation Method
-
-You may either:
-
-* Copy the `prism/` directory into Foundry after every change, or
-* Link the repository’s `prism/` directory directly into the Foundry systems directory.
-
-A symbolic link or directory junction is recommended for active development.
-
-### Linux or macOS
-
-```bash
-ln -s "/path/to/PRISM-System/prism" \
-      "/path/to/FOUNDRY_USER_DATA/Data/systems/prism"
-```
-
-### Windows PowerShell
-
-```powershell
-New-Item `
-  -ItemType Junction `
-  -Path "C:\path\to\FOUNDRY_USER_DATA\Data\systems\prism" `
-  -Target "C:\path\to\PRISM-System\prism"
-```
-
-Replace the example paths with the actual local paths.
-
-### 3. Verify the Link
-
-Confirm that Foundry can access:
-
-```text
-Data/systems/prism/system.json
-```
-
-### 4. Restart or Reload Foundry
-
-Changes to JavaScript, templates, styles, localization files, or the manifest may require:
-
-* Closing and reopening the Actor sheet.
-* Reloading the world.
-* Reloading the browser.
-* Restarting Foundry.
-* Returning to Setup after a manifest change.
-
-More detailed contributor setup belongs in [`DEVELOPMENT.md`](DEVELOPMENT.md).
-
----
-
-## Packaged Release Installation
-
-When packaged releases become available, each release archive should contain a top-level directory named:
-
-```text
-prism/
-```
-
-with:
-
-```text
-prism/
-├── system.json
-├── template.json
-├── lang/
-├── module/
-├── styles/
-└── templates/
-```
-
-To install a packaged release:
-
-1. Download the release archive from the official GitHub Releases page.
-2. Stop Foundry VTT or return to Setup.
-3. Back up existing worlds.
-4. Extract the archive.
-5. Copy the resulting `prism/` directory into:
-
-```text
-FOUNDRY_USER_DATA/Data/systems/
-```
-
-6. Replace the previous installation only after confirming that the backup is complete.
-7. Restart Foundry.
-8. Verify the installed version through `system.json` or the Foundry system list.
-
-Do not merge files from multiple versions manually. Replace the system directory as one complete package unless release instructions explicitly state otherwise.
-
----
-
-## Manifest Installation
-
-The project does not currently provide a stable manifest URL intended for general installation through Foundry’s package manager.
-
-When a stable manifest becomes available, it will be documented in:
-
-* [`README.md`](../README.md)
-* GitHub release notes
-* The official repository release page
-
-Until then, do not use unofficial manifest URLs.
-
-A future manifest installation procedure will normally involve:
-
-1. Opening Foundry Setup.
-2. Opening the Game Systems installation interface.
-3. Providing the official manifest URL.
-4. Installing the system.
-5. Verifying the installed version.
-6. Creating or opening a test world.
-
-This section should be updated when the project publishes an official installable manifest.
-
----
-
-## Verify the Installation
-
-After installing the system:
-
-1. Start Foundry VTT.
-2. Open the Setup screen.
-3. Open the list of installed game systems.
-4. Confirm that PRISM appears.
-5. Check the displayed version.
-6. Check for compatibility warnings.
-7. Open the browser developer console if an error appears.
-
-The system should load files from:
-
-```text
-systems/prism/
-```
-
-The JavaScript entry point is:
-
-```text
-systems/prism/module/prism.mjs
-```
-
-The Actor-sheet template is:
-
-```text
-systems/prism/templates/actor-character-sheet.hbs
-```
-
-The browser console should display:
-
-```text
-PRISM | Init
-```
-
-when the system initializes successfully.
-
-The presence of this message does not guarantee that every feature is working, but its absence may indicate that the entry module failed to load.
+Consult the provider’s documentation when its installation interface differs from standard Foundry VTT.
 
 ---
 
 ## Create a PRISM World
 
-After verifying that the system is installed:
+After installing the system:
 
-1. Open Foundry Setup.
-2. Create a new world.
-3. Select PRISM as the game system.
-4. Use a temporary name for the first test world.
+1. Return to the Foundry Setup screen.
+2. Select **Game Worlds**.
+3. Create a new world.
+4. Select PRISM as the game system.
 5. Launch the world.
-6. Create an Actor.
-7. Select the `character` Actor type.
-8. Open the Actor sheet.
-9. Test basic sheet and bag operations.
+6. Create an Actor of type `character`.
+7. Open the Anomaly sheet.
+8. Test the sheet and virtual bag before using the world for an important campaign.
 
-For an Alpha installation, use a dedicated test world before opening or converting important campaign data.
+The project does not currently provide an automatic conversion tool for worlds created with another game system.
 
-The current system does not provide a world-conversion tool from another game system.
+---
+
+## Verify the Installation
+
+After launching a PRISM world, confirm that:
+
+* The world loads without an initialization error.
+* An Actor of type `character` can be created.
+* The Anomaly sheet opens.
+* Traits and Adversities can be added.
+* Entries can be added to the virtual bag.
+* Draw results appear in chat.
+* English and Italian localization work correctly.
+
+The browser developer console should contain:
+
+```text
+PRISM | Init
+```
+
+The presence of this message confirms that the system entry module started loading.
+
+If the world does not load correctly, check the browser console for additional errors.
 
 ---
 
 ## Updating the System
 
-Always back up Foundry data before updating.
+Before updating, back up any important PRISM worlds.
 
-### Manual Installation Update
+### Update Through Foundry
 
-For a manually installed copy:
+When a newer release is available:
 
-1. Stop Foundry or return to Setup.
-2. Back up worlds and the existing system directory.
-3. Download the new source or release archive.
-4. Extract it to a temporary directory.
-5. Remove or rename the existing:
+1. Open the Foundry Setup screen.
+2. Open **Game Systems**.
+3. Locate PRISM.
+4. Use the available update or package-update control.
+5. Wait for Foundry to download the new release.
+6. Restart Foundry when required.
+7. Confirm the installed version.
+8. Review the release notes and `CHANGELOG.md`.
+9. Test the updated system in a test world before opening an important campaign.
 
-```text
-Data/systems/prism/
-```
+The installed system retains its manifest URL, allowing Foundry to check for later releases.
 
-6. Copy the new `prism/` directory into:
+### After an Update
 
-```text
-Data/systems/
-```
+Verify at least:
 
-7. Restart Foundry.
-8. Confirm the new version.
-9. Test the system in a disposable world.
-10. Open an existing backed-up world only after the basic test succeeds.
+* World startup.
+* Anomaly-sheet rendering.
+* Actor data persistence.
+* Virtual-bag operations.
+* Chat output.
+* Inventory.
+* English localization.
+* Italian localization.
 
-Do not copy only a few changed files unless the release instructions explicitly require it. Partial updates can leave incompatible files from an older version.
-
-### Git Development Update
-
-For a development clone:
-
-```bash
-git checkout main
-git pull --ff-only origin main
-```
-
-When working from a fork with the original repository configured as `upstream`:
-
-```bash
-git checkout main
-git fetch upstream
-git pull --ff-only upstream main
-git push origin main
-```
-
-After updating:
-
-1. Restart or reload Foundry.
-2. Confirm the version in `prism/system.json`.
-3. Review `CHANGELOG.md`.
-4. Test the affected workflows.
-5. Check the browser console.
-
-Do not pull new commits while you have uncommitted local changes unless you understand how those changes will be preserved or merged.
-
-### Package-Manager Update
-
-When official package-manager updates become available, follow the instructions associated with the release.
-
-Even when Foundry performs the package update automatically, world backups remain the administrator’s responsibility.
+Alpha updates may change stored data or behavior. Do not assume that every older world is automatically compatible with every newer release.
 
 ---
 
-## Backing Up Foundry Data
+## Manual Release Installation
 
-Before updating, downgrading, removing, or testing migration-sensitive changes, back up:
+Manifest installation is recommended. Manual installation is available when the Foundry installer cannot access the manifest or when an administrator must manage files directly.
 
-* The relevant world directory.
-* Important Actor and Item data.
-* User data.
-* System configuration where appropriate.
-* The currently installed `prism/` directory.
-* Any custom changes made locally to the system.
+### Download the Release Package
 
-At minimum, copy the affected world directory from:
+Open the repository’s Releases page:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases
+```
+
+Download the `prism.zip` asset attached to the desired release.
+
+Do not use GitHub’s automatically generated:
+
+```text
+Source code (zip)
+Source code (tar.gz)
+```
+
+Those archives contain the complete repository rather than only the prepared Foundry system package.
+
+### Install the Package
+
+1. Stop Foundry VTT or return to the Setup screen.
+2. Back up existing PRISM worlds.
+3. Extract `prism.zip`.
+4. Copy the extracted `prism/` directory into:
+
+```text
+FOUNDRY_USER_DATA/Data/systems/
+```
+
+5. Confirm that the final path is:
+
+```text
+FOUNDRY_USER_DATA/Data/systems/prism/system.json
+```
+
+6. Restart Foundry.
+7. Confirm that PRISM appears in the system list.
+
+Do not create a nested structure such as:
+
+```text
+Data/systems/prism/prism/system.json
+```
+
+Do not copy the complete repository into the systems directory.
+
+---
+
+## Development Installation
+
+Contributors should normally clone the repository and link its `prism/` directory to the Foundry systems directory.
+
+Repository:
+
+```text
+https://github.com/Heldan-oss/PRISM-System
+```
+
+Runtime system directory:
+
+```text
+PRISM-System/prism/
+```
+
+Development installations should not use the packaged release files as the working source.
+
+Complete Git, symbolic-link, branch, testing, and development instructions are available in [`DEVELOPMENT.md`](DEVELOPMENT.md).
+
+---
+
+## Backups
+
+Back up important Foundry data before:
+
+* Updating the system.
+* Downgrading the system.
+* Testing schema or migration changes.
+* Replacing a manual installation.
+* Removing the system.
+
+At minimum, back up the relevant world directory from:
 
 ```text
 FOUNDRY_USER_DATA/Data/worlds/
 ```
 
-to a location outside the active Foundry User Data directory.
-
-Do not treat a copy inside the same active directory as the only backup.
+Store the backup outside the active Foundry User Data directory.
 
 A useful backup name includes:
 
 * World name.
-* PRISM system version.
+* PRISM version.
 * Foundry VTT version.
-* Date.
+* Backup date.
 
 Example:
 
 ```text
-my-prism-world_prism-0.1.1_foundry-13_2026-07-22
+my-prism-world_prism-0.1.1_foundry-13_2026-07-23
 ```
 
 Stop Foundry before copying an active world directory whenever possible.
-
-Verify that the backup can be accessed before removing or replacing the original files.
 
 ---
 
 ## Downgrading
 
-Downgrading to an earlier Alpha version may not be safe.
+Downgrading to an earlier Alpha release may not be safe.
 
-A newer version may change:
+A newer release may change:
 
 * Actor data.
-* Bag entries.
-* Inventory entries.
+* Virtual-bag entries.
+* Inventory data.
 * Localization keys.
 * Templates.
 * Stored field types.
-* Compatibility requirements.
+* Foundry compatibility.
 
-Before downgrading:
+Installing an older package does not automatically reverse data changes made by a newer version.
 
-1. Read the changelog entries between the versions.
-2. Check whether stored data changed.
-3. Back up the current world.
-4. Prefer restoring a world backup created before the upgrade.
-5. Install the older system as a complete package.
-6. Test it in a separate environment.
+When a downgrade is necessary:
 
-Do not assume that installing an older system version reverses data migrations or schema changes.
+1. Back up the current world.
+2. Review the changelog between the two versions.
+3. Prefer restoring a world backup created before the update.
+4. Download the required `prism.zip` from the corresponding GitHub Release.
+5. Replace the complete system directory.
+6. Test the older version in a separate environment.
 
-The project does not currently provide an automatic downgrade or rollback migration system.
+The project does not currently provide an automatic downgrade migration.
 
 ---
 
 ## Removing the System
 
-Removing the system files does not automatically delete worlds that use the system.
+Removing the game system does not automatically delete worlds that use it.
 
-To remove PRISM RPG for Foundry VTT:
+To remove PRISM:
 
 1. Stop Foundry or return to Setup.
 2. Back up any PRISM worlds that may be needed later.
-3. Confirm that no active world is using the system.
-4. Delete or move:
+3. Open **Game Systems**.
+4. Use the uninstall control for PRISM when available.
+
+For a manual installation, remove:
 
 ```text
 FOUNDRY_USER_DATA/Data/systems/prism/
 ```
 
-5. Restart Foundry.
-6. Confirm that the system no longer appears in the installed-system list.
+Restart Foundry and confirm that the system no longer appears in the installed-system list.
 
-If the installation uses a symbolic link or junction, remove the link from the Foundry systems directory.
-
-Removing a link should not delete the original repository, but verify the path before running any deletion command.
-
-Do not delete PRISM world directories unless the campaign data is no longer needed and a verified backup exists.
+Do not delete PRISM world directories unless their contents are no longer required and a verified backup exists.
 
 ---
 
 ## Troubleshooting
 
-## System Does Not Appear in Foundry
+### Foundry Rejects the Manifest URL
 
-Check that:
+Confirm that the complete URL is:
 
-* The directory is named `prism`.
-* `system.json` is directly inside that directory.
-* The complete path is:
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
+```
+
+Also check:
+
+* The server has internet access.
+* GitHub is reachable from the Foundry host.
+* The URL was copied without additional spaces.
+* The latest Release is published and not a draft.
+* The Release contains both `system.json` and `prism.zip`.
+* The installed Foundry version satisfies the manifest compatibility requirements.
+
+Open the manifest URL in a browser. It should download or display a JSON file.
+
+### Package Download Fails
+
+The manifest contains a version-specific download URL.
+
+Check:
+
+* The matching GitHub Release exists.
+* The release tag matches the URL stored in `system.json`.
+* The Release contains an asset named exactly `prism.zip`.
+* The Release is publicly accessible.
+* The remote Foundry server can access GitHub release assets.
+
+### System Does Not Appear After Manual Installation
+
+Confirm that this file exists:
 
 ```text
 Data/systems/prism/system.json
 ```
 
-* `system.json` contains valid JSON.
-* The system is installed in the configured User Data directory.
-* Foundry was restarted or the Setup page was reloaded.
-* The current Foundry version satisfies the manifest compatibility requirements.
-
-A common incorrect installation is:
+Common incorrect structures include:
 
 ```text
-Data/systems/prism/PRISM-System/prism/system.json
+Data/systems/prism/prism/system.json
 ```
 
-Move the inner `prism/` directory to the correct level.
+and:
 
----
+```text
+Data/systems/PRISM-System/prism/system.json
+```
 
-## Foundry Reports an Invalid Manifest
+Also confirm that:
 
-Check:
+* The directory is named `prism`.
+* `system.json` contains valid JSON.
+* Foundry was restarted.
+* The system is located in the configured User Data directory.
 
-* JSON syntax in `system.json`.
-* Missing commas or quotation marks.
-* The presence of the required `id`, `title`, and `version` fields.
-* File paths listed under `esmodules`, `styles`, and `languages`.
-* Whether the file was modified manually.
-
-Restore an unmodified copy from the official repository when necessary.
-
----
-
-## The World Does Not Start
+### World Does Not Start
 
 Check:
 
-* The browser developer console.
+* Foundry compatibility warnings.
+* Browser developer-console errors.
 * Foundry server logs.
-* Compatibility warnings.
-* Whether `module/prism.mjs` exists.
-* Whether all imported `.mjs` files exist.
-* Whether the system was only partially updated.
-* Whether unrelated modules are causing the failure.
+* Whether the installed package is complete.
+* Whether all files belong to the same release.
+* Whether unrelated modules are interfering.
 
-Test using a new world with additional modules disabled.
+Test the system in a new world with unrelated modules disabled.
 
----
+### Anomaly Sheet Does Not Open
 
-## The Actor Sheet Does Not Open
-
-Check:
+Confirm that:
 
 * The Actor type is `character`.
-* The browser console contains `PRISM | Init`.
-* The template exists at:
+* The console contains `PRISM | Init`.
+* The installed package contains:
 
 ```text
-systems/prism/templates/actor-character-sheet.hbs
+module/actor-sheet.mjs
+templates/actor-character-sheet.hbs
 ```
 
-* `actor-sheet.mjs` loaded without an import error.
-* The installation directory is named `prism`.
-* The installed files all come from the same project version.
+* The package was installed as `prism`.
+* The system was not partially overwritten with another version.
 
----
+### Localization Keys Appear Instead of Text
 
-## Styles Are Missing
-
-Check that these files exist:
-
-```text
-styles/variables.css
-styles/sheet.css
-styles/prism.css
-```
-
-Also check:
-
-* Browser network errors.
-* Manifest stylesheet paths.
-* Browser caching.
-* Whether the world was reloaded after the update.
-
-A forced browser reload may be useful after stylesheet changes.
-
----
-
-## Localization Keys Appear Instead of Text
-
-Visible text such as:
+Visible strings such as:
 
 ```text
 prism.sheet.characterName
 ```
 
-usually indicates a localization problem.
+usually indicate a localization loading problem.
 
 Check:
 
+* The selected Foundry language.
 * `lang/en.json`.
 * `lang/it.json`.
-* JSON syntax.
-* The selected Foundry language.
-* The language paths in `system.json`.
-* Whether the key exists in both language files.
-* Whether the system was reloaded after changing language files.
+* The language paths declared in `system.json`.
+* Whether Foundry was reloaded after installation or update.
 
----
+### An Existing World Behaves Differently After Updating
 
-## The System Works in a New World but Not an Existing World
+The world may contain data created by an older Alpha version.
 
-The existing world may contain data created by an older Alpha schema.
+Before modifying it further:
 
-Before modifying the world:
-
-1. Make a backup.
+1. Create a backup.
 2. Review `CHANGELOG.md`.
-3. Check for documented data changes.
-4. Test the same operation in a copied world.
-5. Report the exact previous and current versions.
-
-Do not manually delete stored Actor fields unless the relevant migration or recovery procedure is understood.
-
----
-
-## An Update Appears to Have No Effect
-
-Check:
-
-* The installed `system.json` version.
-* Whether Foundry is loading a different `prism/` directory.
-* Whether a symbolic link points to the expected repository.
-* Browser caching.
-* Whether Foundry was restarted.
-* Whether the updated branch was actually checked out.
-* Whether local changes prevented the Git update.
-* Whether the update was copied into a nested directory.
-
----
-
-## Permission Errors
-
-Confirm that the operating-system account running Foundry can read:
-
-```text
-Data/systems/prism/
-```
-
-and all contained files.
-
-For Git links or junctions, confirm that:
-
-* The target exists.
-* The target is readable.
-* The link was created with the correct path.
-* The hosting environment permits links.
-
-For hosted Foundry services, use the provider’s supported upload and permission mechanisms.
+3. Check the release notes for data changes.
+4. Reproduce the behavior in a copied world.
+5. Record the previous and current PRISM versions.
 
 ---
 
 ## Reporting Installation Problems
 
-Use the repository’s Bug Report form when the problem is reproducible and appears to be caused by the PRISM system:
+Use the repository’s Bug Report form for reproducible installation or update problems:
 
 ```text
 https://github.com/Heldan-oss/PRISM-System/issues/new/choose
 ```
 
-Before reporting:
+Before submitting:
 
-1. Search existing Issues.
-2. Test in a new world.
-3. Disable unrelated modules when possible.
-4. Verify the installation structure.
-5. Check the browser console.
-6. Remove private data from screenshots and logs.
+* Search existing open and closed Issues.
+* Test in a new PRISM world.
+* Disable unrelated modules when possible.
+* Check the browser console.
+* Remove private information from logs and screenshots.
 
 Include:
 
-* PRISM system version or commit.
+* PRISM version.
 * Foundry VTT version and build.
 * Operating system.
 * Browser or Foundry desktop client.
+* Local, hosted, or remote installation.
 * Installation method.
-* Exact installation path, with private account names removed if necessary.
-* Steps performed.
+* Steps to reproduce.
 * Expected result.
 * Actual result.
-* Console errors.
-* Whether the problem occurs in a new world.
-* Whether additional modules are enabled.
+* Relevant console errors.
 
-Do not publish:
-
-* Passwords.
-* Access tokens.
-* License keys.
-* Session cookies.
-* Private server addresses.
-* Personal information.
-* Commercial PRISM content.
-* Private campaign data.
+Do not publish credentials, access tokens, license keys, private server information, private campaign data, or unauthorized commercial content.
 
 Security vulnerabilities must be reported privately according to [`SECURITY.md`](../SECURITY.md).
 

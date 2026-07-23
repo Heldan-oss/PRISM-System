@@ -6,6 +6,7 @@
 
 [![Project Status](https://img.shields.io/badge/status-alpha-orange)](#project-status)
 [![Foundry VTT](https://img.shields.io/badge/Foundry%20VTT-game%20system-red)](https://foundryvtt.com/)
+[![GitHub Release](https://img.shields.io/github/v/release/Heldan-oss/PRISM-System)](https://github.com/Heldan-oss/PRISM-System/releases/latest)
 [![GitHub Issues](https://img.shields.io/github/issues/Heldan-oss/PRISM-System)](https://github.com/Heldan-oss/PRISM-System/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Heldan-oss/PRISM-System)](https://github.com/Heldan-oss/PRISM-System/pulls)
 [![Languages](https://img.shields.io/badge/languages-English%20%7C%20Italian-blue)](#localization)
@@ -153,7 +154,7 @@ Additional screenshots and demonstrations will be added as the Alpha interface b
 > [!WARNING]
 > PRISM RPG for Foundry VTT is currently in **Alpha development**.
 
-The project is available for development and testing, but it should not yet be considered stable.
+The project is available for installation, development, and testing, but it should not yet be considered stable.
 
 During the Alpha phase:
 
@@ -187,22 +188,31 @@ Priorities may change based on technical requirements, testing results, and comm
 
 ## Installation
 
-The project does not currently provide a stable manifest intended for general installation.
+PRISM RPG for Foundry VTT can be installed through Foundry’s package installer using the official manifest URL.
 
-During Alpha development, installation is primarily intended for developers and testers.
+From the Foundry Setup screen:
 
-Read the complete instructions in the:
+1. Open **Game Systems**.
+2. Select **Install System**.
+3. Paste the following address into the **Manifest URL** field:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
+```
+
+4. Select **Install**.
+
+Foundry will read the manifest and download the package associated with the latest published release.
+
+The system is currently distributed as an Alpha release. Back up important worlds before updating.
+
+For manual installation, updates, backups, removal, hosted-server notes, and troubleshooting, read the:
 
 **[Installation Guide](docs/INSTALLATION.md)**
 
-Before installing or updating:
+The latest published package and release notes are available from:
 
-1. Review the compatibility information in [`system.json`](system.json).
-2. Check the latest project changes or release notes.
-3. Back up existing Foundry VTT worlds.
-4. Remember that development versions may introduce breaking changes.
-
-A stable manifest URL will be documented here when packaged releases become available.
+**[GitHub Releases](https://github.com/Heldan-oss/PRISM-System/releases/latest)**
 
 ---
 
@@ -212,19 +222,19 @@ Foundry VTT compatibility may change during Alpha development.
 
 The authoritative compatibility values for the current version are defined in:
 
-* [`system.json`](system.json)
-* The relevant [GitHub release notes](https://github.com/Heldan-oss/PRISM-System/releases), once releases are available
+* [`prism/system.json`](prism/system.json)
+* The relevant [GitHub release notes](https://github.com/Heldan-oss/PRISM-System/releases)
 
-Compatibility with Foundry VTT versions not explicitly declared in `system.json` is not guaranteed.
+Compatibility with Foundry VTT versions not explicitly declared in `prism/system.json` is not guaranteed.
 
 | Component                 | Current status              |
 | ------------------------- | --------------------------- |
 | Development stage         | Alpha                       |
-| Foundry VTT compatibility | See `system.json`           |
+| Foundry VTT compatibility | See `prism/system.json`     |
 | English localization      | Available                   |
 | Italian localization      | Available                   |
 | Additional languages      | Open to contributions       |
-| Stable release manifest   | Not yet available           |
+| Release manifest          | Available                   |
 | World-data compatibility  | Not guaranteed during Alpha |
 
 ---
@@ -248,14 +258,15 @@ Translation files, terminology conventions, testing requirements, and instructio
 
 This README is the main entry point for the project. Detailed procedures and policies are maintained in dedicated documents.
 
-| Document                                   | Purpose                                                                             |
-| ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| [Installation Guide](docs/INSTALLATION.md) | Installation, updates, backups, removal, and troubleshooting                        |
-| [Contributing Guidelines](CONTRIBUTING.md) | Forks, branches, commits, Pull Requests, reviews, and contribution rules            |
-| [Development Guide](docs/DEVELOPMENT.md)   | Project structure, development setup, coding conventions, testing, and data changes |
-| [Localization Guide](docs/LOCALIZATION.md) | Translation files, localization keys, terminology, and new languages                |
-| [Changelog](CHANGELOG.md)                  | Notable project changes organized by version                                        |
-| [License](LICENSE)                         | Terms governing use and redistribution of the repository source code                |
+| Document                                   | Purpose                                                                                       |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| [Installation Guide](docs/INSTALLATION.md) | Installation, updates, backups, removal, and troubleshooting                                  |
+| [Contributing Guidelines](CONTRIBUTING.md) | Issues, forks, branches, commits, Pull Requests, reviews, and contribution rules              |
+| [Development Guide](docs/DEVELOPMENT.md)   | Architecture, development setup, coding rules, testing, data changes, packaging, and releases |
+| [Localization Guide](docs/LOCALIZATION.md) | Translation files, localization keys, terminology, and new languages                          |
+| [Security Policy](SECURITY.md)             | Private vulnerability reporting and supported versions                                        |
+| [Changelog](CHANGELOG.md)                  | Notable project changes organized by version                                                  |
+| [License](LICENSE)                         | Terms governing use and redistribution of the repository source code                          |
 
 ---
 

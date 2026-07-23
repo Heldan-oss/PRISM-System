@@ -2,42 +2,45 @@
 
 Thank you for your interest in contributing to **PRISM RPG for Foundry Virtual Tabletop**.
 
-This is an unofficial, community-developed Foundry VTT implementation of PRISM RPG. Contributions are welcome from developers, testers, translators, technical writers, designers, and players.
+This is an unofficial, fan-made Foundry VTT implementation of PRISM RPG. Contributions are welcome from developers, testers, translators, technical writers, designers, and players.
 
-This document is the authoritative guide for:
+This document explains how to:
 
-* Proposing changes.
-* Working with forks and branches.
-* Writing commits.
-* Submitting Pull Requests.
-* Participating in reviews.
-* Contributing legally redistributable content.
+* Report bugs.
+* Propose features.
+* Work with Issues and Discussions.
+* Create branches.
+* Submit Pull Requests.
+* Test changes.
+* Participate in review.
+* Contribute legally redistributable content.
 
-For the complete project documentation index, see the [README](README.md#documentation).
+For the complete documentation index, see the [README](README.md#documentation).
 
 > [!IMPORTANT]
-> This project is unofficial. Contributing to this repository does not grant permission to reproduce or redistribute copyrighted PRISM publications, artwork, commercial assets, or substantial portions of the original rules text.
+> Contributions must not reproduce or redistribute copyrighted PRISM publications, commercial artwork, proprietary layouts, unauthorized fonts, or substantial portions of the original rules text.
 
 ---
 
 ## Table of Contents
 
 * [Ways to Contribute](#ways-to-contribute)
-* [Before You Begin](#before-you-begin)
+* [Issues, Discussions, and Planning](#issues-discussions-and-planning)
 * [Reporting Bugs](#reporting-bugs)
 * [Suggesting Features](#suggesting-features)
+* [Before Starting Work](#before-starting-work)
 * [External Contributor Workflow](#external-contributor-workflow)
 * [Invited Collaborator Workflow](#invited-collaborator-workflow)
 * [Branch Naming](#branch-naming)
 * [Commit Messages](#commit-messages)
 * [Contribution Requirements](#contribution-requirements)
-* [Testing Requirements](#testing-requirements)
-* [Pull Request Guidelines](#pull-request-guidelines)
-* [Review and Merge Process](#review-and-merge-process)
-* [Updating a Pull Request](#updating-a-pull-request)
-* [After a Pull Request Is Merged](#after-a-pull-request-is-merged)
-* [Licensing of Contributions](#licensing-of-contributions)
-* [Community, Support, and Security](#community-support-and-security)
+* [Testing](#testing)
+* [Pull Requests](#pull-requests)
+* [Review and Merge](#review-and-merge)
+* [After Merge](#after-merge)
+* [Release Responsibilities](#release-responsibilities)
+* [Licensing and Third-Party Content](#licensing-and-third-party-content)
+* [Community and Security](#community-and-security)
 
 ---
 
@@ -46,155 +49,226 @@ For the complete project documentation index, see the [README](README.md#documen
 Contributions may include:
 
 * Reporting reproducible bugs.
-* Testing Alpha versions.
+* Proposing focused features.
+* Testing Alpha releases.
 * Fixing defects.
 * Improving the Anomaly sheet.
-* Improving tag creation and management.
-* Improving the virtual bag workflow.
+* Improving Traits, Adversities, Fear, Danger, or Signs.
+* Improving virtual-bag behavior.
 * Improving chat messages.
-* Adding gameplay-support features.
-* Improving accessibility or responsive layouts.
+* Improving accessibility.
 * Improving documentation.
 * Correcting translations.
 * Adding new languages.
-* Improving Foundry VTT compatibility.
-* Refactoring existing code.
+* Improving Foundry compatibility.
+* Refactoring focused areas of the code.
+* Improving development or release tooling.
 
-Not every contribution needs to include code.
+Not every contribution requires code.
 
-Clear bug reports, testing results, documentation corrections, screenshots, translation reviews, and focused design proposals are also useful.
+Useful contributions also include:
+
+* Clear reproduction steps.
+* Test results.
+* Screenshots.
+* Translation reviews.
+* Documentation corrections.
+* Focused technical analysis.
 
 ---
 
-## Before You Begin
+## Issues, Discussions, and Planning
 
-Before starting work:
+### Issues
 
-1. Read the project [README](README.md).
-2. Search existing [Issues](https://github.com/Heldan-oss/PRISM-System/issues).
-3. Search open and closed [Pull Requests](https://github.com/Heldan-oss/PRISM-System/pulls).
-4. Confirm that another contributor is not already working on the same change.
-5. Read the documentation relevant to the proposed change.
-6. Open an Issue before beginning a large or potentially breaking change.
+Use Issues for concrete work that can be implemented, tested, and completed.
 
-A preliminary Issue or Discussion is strongly recommended when a contribution:
+Examples:
 
-* Introduces a new gameplay workflow.
-* Changes Actor, Item, world, or system data.
-* Renames or removes stored properties.
-* Changes how tags are represented.
-* Changes the virtual bag behavior.
-* Changes Foundry VTT compatibility.
-* Introduces a new dependency.
-* Reorganizes a significant part of the project.
-* Adds third-party assets or content.
-* May affect existing worlds.
+* A reproducible bug.
+* A defined feature.
+* A documentation change.
+* A localization change.
+* A focused refactor.
+* A compatibility improvement.
 
-Small spelling corrections and minor documentation improvements generally do not require prior discussion.
+### Discussions
 
-Opening an Issue before major work allows the scope and implementation approach to be reviewed before significant effort is invested.
+Use [GitHub Discussions](https://github.com/Heldan-oss/PRISM-System/discussions) for:
+
+* General questions.
+* Installation help.
+* Community support.
+* Early ideas.
+* Proposals whose behavior is not yet defined.
+* Architectural or gameplay discussions requiring feedback.
+
+Once a Discussion produces a clear and actionable result, create or link a corresponding Issue.
+
+### Project and Milestones
+
+The maintainers use the GitHub Project and milestones to plan work.
+
+Contributors do not need to create duplicate Project items.
+
+Normally:
+
+1. Create or identify the repository Issue.
+2. A maintainer adds it to the Project.
+3. A maintainer assigns a milestone when the work is planned for a release.
+4. The Issue moves through the Project as work progresses.
+
+A milestone is planning information. It does not create a branch or publish a release.
+
+Do not assign a version or milestone to a contribution without maintainer agreement.
 
 ---
 
 ## Reporting Bugs
 
-Use the repository’s:
+Use the repository’s Bug Report form:
 
-**[Bug Report form](https://github.com/Heldan-oss/PRISM-System/issues/new/choose)**
+```text
+https://github.com/Heldan-oss/PRISM-System/issues/new/choose
+```
 
-Search existing open and closed Issues before submitting a new report.
+A bug is a reproducible case where existing functionality does not behave as intended.
 
-Bug reports should not be submitted as Pull Requests unless the Pull Request already contains a tested correction for a clearly documented problem.
+Examples:
 
-Do not report security vulnerabilities through public Issues. Follow the private process described in [SECURITY.md](SECURITY.md).
+* The Anomaly sheet does not open.
+* Actor data is lost.
+* A draw produces the wrong result.
+* A localization key appears instead of text.
+* A supported workflow throws a JavaScript error.
+* The release manifest or package cannot be installed.
+
+Before reporting:
+
+* Search open and closed Issues.
+* Test in a new PRISM world.
+* Disable unrelated modules when possible.
+* Record the PRISM and Foundry versions.
+* Check the browser console.
+* Remove private data from logs and screenshots.
+
+Do not use a public Issue for an exploitable security vulnerability. Follow [`SECURITY.md`](SECURITY.md).
 
 ---
 
 ## Suggesting Features
 
-Use the repository’s:
+Use the Feature Request form:
 
-**[Feature Request form](https://github.com/Heldan-oss/PRISM-System/issues/new/choose)**
+```text
+https://github.com/Heldan-oss/PRISM-System/issues/new/choose
+```
 
-Feature requests should describe a concrete problem, gameplay need, or difficult workflow before proposing a technical solution.
+A feature request covers:
 
-Discuss major, breaking, architectural, or data-model changes before beginning implementation.
+* New gameplay behavior.
+* A missing mechanic.
+* An improvement to an existing workflow.
+* Interface or styling improvements.
+* New content support.
+* Localization.
+* Documentation.
+* Development tooling.
 
-Submitting a feature request does not guarantee that it will be accepted or implemented. Maintainers may reject, defer, narrow, or reshape proposals based on:
+Describe:
 
-* Project scope.
-* Technical risk.
-* Foundry VTT compatibility.
-* Data compatibility.
-* Maintainability.
-* Legal restrictions.
-* Available development resources.
+* The current problem or limitation.
+* The expected user behavior.
+* The relevant gameplay context.
+* Suggested completion criteria, when known.
+
+Use a Discussion first when the proposal:
+
+* Is still vague.
+* Has several competing solutions.
+* Changes the data model significantly.
+* Introduces a breaking workflow.
+* Requires broad community feedback.
+* Involves uncertain content or licensing rights.
+
+Submitting a feature request does not guarantee implementation.
+
+Maintainers may:
+
+* Accept it.
+* Narrow its scope.
+* Split it into smaller Issues.
+* Defer it.
+* Assign it to another release.
+* Reject it when it is outside project scope.
 
 ---
 
-# External Contributor Workflow
+## Before Starting Work
 
-External contributors should work from a fork and submit changes through a Pull Request.
+Before implementing a contribution:
+
+1. Read the [README](README.md).
+2. Search existing [Issues](https://github.com/Heldan-oss/PRISM-System/issues).
+3. Search existing [Pull Requests](https://github.com/Heldan-oss/PRISM-System/pulls).
+4. Confirm that the work is not already in progress.
+5. Read the relevant documentation.
+6. Comment on or create the related Issue.
+7. Wait for scope confirmation when the change is large or risky.
+
+Prior approval is strongly recommended when a change:
+
+* Adds a gameplay mechanic.
+* Changes Actor data.
+* Changes virtual-bag rules.
+* Changes Foundry compatibility.
+* Introduces a dependency.
+* Adds a compendium.
+* Adds third-party content.
+* Changes installation or packaging.
+* Requires data migration.
+* Reorganizes a significant part of the codebase.
+
+Minor spelling and documentation corrections usually do not require prior discussion.
+
+---
+
+## External Contributor Workflow
+
+External contributors should work from a fork.
 
 The protected `main` branch does not accept direct community pushes.
 
-## 1. Fork the Repository
+### 1. Fork and Clone
 
-Open:
+Fork:
 
 ```text
 https://github.com/Heldan-oss/PRISM-System
 ```
 
-Select **Fork** and create a copy under your GitHub account.
-
-Your fork will normally be available at:
-
-```text
-https://github.com/YOUR-USERNAME/PRISM-System
-```
-
----
-
-## 2. Clone Your Fork
-
-Replace `YOUR-USERNAME` with your GitHub username:
+Clone your fork:
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/PRISM-System.git
 cd PRISM-System
 ```
 
----
-
-## 3. Add the Original Repository as `upstream`
-
-Your fork is normally configured as `origin`.
-
-Add the original repository as `upstream`:
+### 2. Add the Original Repository
 
 ```bash
 git remote add upstream https://github.com/Heldan-oss/PRISM-System.git
-```
-
-Verify the remotes:
-
-```bash
 git remote -v
 ```
 
-Expected structure:
+Expected remotes:
 
 ```text
 origin    https://github.com/YOUR-USERNAME/PRISM-System.git
 upstream  https://github.com/Heldan-oss/PRISM-System.git
 ```
 
----
-
-## 4. Synchronize `main`
-
-Before starting new work:
+### 3. Synchronize `main`
 
 ```bash
 git checkout main
@@ -205,11 +279,7 @@ git push origin main
 
 Do not implement changes directly on `main`.
 
----
-
-## 5. Create a Dedicated Branch
-
-Create a branch from the updated `main` branch:
+### 4. Create a Branch
 
 ```bash
 git checkout -b feature/short-description
@@ -218,91 +288,37 @@ git checkout -b feature/short-description
 Examples:
 
 ```bash
-git checkout -b feature/improve-tag-draw
-```
-
-```bash
-git checkout -b bugfix/prevent-empty-tags
-```
-
-```bash
-git checkout -b docs/update-installation-guide
+git checkout -b feature/add-bag-validation
+git checkout -b bugfix/fix-empty-draw
+git checkout -b docs/update-readme
+git checkout -b i18n/update-italian-labels
 ```
 
 Each branch should address one coherent change.
 
----
+### 5. Commit and Push
 
-## 7. Commit Your Changes
-
-Stage only the relevant files:
+Stage relevant files:
 
 ```bash
 git add path/to/file
 ```
 
-Create a clear commit:
+Commit:
 
 ```bash
-git commit -m "feat: improve virtual bag draw workflow"
+git commit -m "feat: add virtual bag validation"
 ```
 
-Multiple focused commits are acceptable.
-
-Avoid temporary messages such as:
-
-```text
-fix
-test
-updates
-final version
-really final
-```
-
-The repository normally uses squash merging, so accepted Pull Request commits may be combined into one commit on `main`.
-
----
-
-## 8. Synchronize Before Opening the Pull Request
-
-Fetch the latest upstream changes:
+Push:
 
 ```bash
-git fetch upstream
-git rebase upstream/main
+git push -u origin feature/add-bag-validation
 ```
 
-Resolve any conflicts locally and test the system again.
+### 6. Open a Pull Request
 
-When a previously pushed branch has been rebased, update the fork with:
-
-```bash
-git push --force-with-lease origin YOUR-BRANCH-NAME
-```
-
-Use `--force-with-lease`, not `--force`.
-
-Never force-push to the original repository’s `main` branch.
-
----
-
-## 9. Push Your Branch
-
-```bash
-git push -u origin YOUR-BRANCH-NAME
-```
-
-Example:
-
-```bash
-git push -u origin feature/improve-tag-draw
-```
-
----
-
-## 10. Open a Pull Request
-
-Create the Pull Request using:
+Use:
 
 ```text
 Base repository: Heldan-oss/PRISM-System
@@ -312,13 +328,19 @@ Head repository: YOUR-USERNAME/PRISM-System
 Compare branch: YOUR-BRANCH-NAME
 ```
 
-Complete the Pull Request template and provide enough information for maintainers to understand, test, and review the change.
+Complete the Pull Request template.
+
+When the Pull Request fully resolves an Issue, include:
+
+```text
+Closes #123
+```
 
 ---
 
-# Invited Collaborator Workflow
+## Invited Collaborator Workflow
 
-Invited collaborators with repository Write or Maintain access may clone the original repository directly:
+Collaborators with Write or Maintain access may clone the original repository directly:
 
 ```bash
 git clone https://github.com/Heldan-oss/PRISM-System.git
@@ -331,56 +353,58 @@ They must still:
 2. Create a dedicated branch.
 3. Push the branch.
 4. Open a Pull Request.
-5. Wait for the required approval.
-6. Resolve all blocking review conversations.
+5. Obtain the required approval.
+6. Resolve blocking conversations.
 
 Example:
 
 ```bash
 git checkout main
-git pull origin main
+git pull --ff-only origin main
 git checkout -b feature/improve-anomaly-sheet
 git push -u origin feature/improve-anomaly-sheet
 ```
 
-Write or Maintain access does not authorize direct pushes to `main`.
-
-The normal Pull Request workflow applies to maintainers and collaborators unless a repository administrator uses an emergency bypass.
+Write access does not authorize direct pushes to `main`.
 
 ---
 
-# Branch Naming
+## Branch Naming
 
-Use lowercase branch names with hyphens between words.
+Use lowercase names with hyphens.
 
-| Prefix      | Purpose                     |
-| ----------- | --------------------------- |
-| `feature/`  | New functionality           |
-| `bugfix/`   | Bug correction              |
-| `hotfix/`   | Urgent correction           |
-| `docs/`     | Documentation               |
-| `i18n/`     | Localization or translation |
-| `refactor/` | Internal restructuring      |
-| `test/`     | Testing changes             |
-| `chore/`    | Maintenance or tooling      |
+| Prefix      | Purpose                        |
+| ----------- | ------------------------------ |
+| `feature/`  | New functionality              |
+| `bugfix/`   | Bug correction                 |
+| `hotfix/`   | Urgent production correction   |
+| `docs/`     | Documentation                  |
+| `i18n/`     | Localization                   |
+| `refactor/` | Internal restructuring         |
+| `test/`     | Tests or test tooling          |
+| `chore/`    | Maintenance                    |
+| `release/`  | Maintainer release preparation |
 
 Examples:
 
 ```text
-feature/add-tag-preview
-bugfix/fix-chat-result
+feature/add-bag-limits
+bugfix/fix-chat-label
 hotfix/prevent-data-loss
-docs/update-user-guide
-i18n/add-french-localization
-refactor/simplify-bag-service
-test/add-tag-utility-tests
-chore/update-development-tools
+docs/update-installation
+i18n/add-french
+refactor/extract-draw-service
+test/add-bag-tests
+chore/update-workflows
 ```
 
-Avoid vague names such as:
+The `release/` prefix is reserved for maintainer-led release preparation.
+
+Avoid vague names:
 
 ```text
 new-stuff
+changes
 test123
 final
 my-branch
@@ -388,9 +412,7 @@ my-branch
 
 ---
 
-# Commit Messages
-
-Use concise and descriptive commit messages.
+## Commit Messages
 
 Recommended format:
 
@@ -398,226 +420,188 @@ Recommended format:
 type: short description
 ```
 
-| Type       | Purpose                                           |
-| ---------- | ------------------------------------------------- |
-| `feat`     | New functionality                                 |
-| `fix`      | Bug correction                                    |
-| `docs`     | Documentation                                     |
-| `refactor` | Internal change without intended behavior changes |
-| `style`    | Visual or formatting change                       |
-| `i18n`     | Localization                                      |
-| `test`     | Testing                                           |
-| `chore`    | Maintenance, dependencies, or tooling             |
-| `perf`     | Performance improvement                           |
+| Type       | Purpose                     |
+| ---------- | --------------------------- |
+| `feat`     | New functionality           |
+| `fix`      | Bug correction              |
+| `docs`     | Documentation               |
+| `refactor` | Internal restructuring      |
+| `style`    | Visual or formatting change |
+| `i18n`     | Localization                |
+| `test`     | Tests                       |
+| `chore`    | Maintenance or release work |
+| `perf`     | Performance improvement     |
 
 Examples:
 
 ```text
-feat: add tag selection preview
-fix: prevent duplicate tags in the virtual bag
-docs: document manual installation
-refactor: extract chat message builder
+feat: enforce virtual bag composition limits
+fix: preserve inventory values before drawing
+docs: update manifest installation steps
 style: improve anomaly sheet spacing
-i18n: add missing Italian labels
-test: cover empty bag validation
-chore: update development tools
+i18n: revise English bag messages
+refactor: extract bag validation
+chore: prepare release 0.2.0
 ```
 
 Avoid:
 
 ```text
-Updated files
+Updates
 Various fixes
 Work in progress
+Final version
 Fixed everything
 ```
 
+The repository normally uses squash merging, so Pull Request commits may be combined into one commit on `main`.
+
 ---
 
-# Contribution Requirements
+## Contribution Requirements
 
-Every contribution must follow these essential rules:
+Every contribution must:
 
-* Keep the change focused on one primary purpose.
-* Follow the existing project structure and conventions.
-* Avoid unrelated refactoring or formatting.
-* Explain significant architectural changes.
-* Do not hard-code user-facing text that should be localized.
+* Address one primary problem.
+* Follow the current repository structure.
+* Avoid unrelated formatting and refactoring.
+* Use existing Foundry document-update patterns.
+* Validate user-controlled values.
+* Preserve existing data unless a documented change is required.
+* Localize user-facing text.
 * Update documentation when behavior changes.
-* Document changes to stored data.
-* Explain any new dependency.
-* Remove temporary debugging code.
-* Do not expose private or sensitive data.
-* Do not submit content that cannot legally be redistributed.
+* Remove temporary debugging output.
+* Avoid exposing private information.
+* Avoid unauthorized third-party material.
 
-Detailed architecture, coding, debugging, and data-management requirements belong in:
-
-**[Development Guide](docs/DEVELOPMENT.md)**
-
-Localization-specific rules belong in:
-
-**[Localization Guide](docs/LOCALIZATION.md)**
-
----
-
-## Focused Changes
-
-A Pull Request should solve one primary problem.
-
-Good scope:
+Detailed architecture and data rules are documented in:
 
 ```text
-Prevent empty tags from being added to the virtual bag.
+docs/DEVELOPMENT.md
 ```
 
-Poor scope:
+Localization rules are documented in:
 
 ```text
-Rewrite the virtual bag, redesign the Anomaly sheet, rename stored data,
-change every translation, and reorganize unrelated documentation.
+docs/LOCALIZATION.md
 ```
 
-Large changes should be divided into smaller Pull Requests when practical.
+### User-Facing Changes
 
-Avoid reformatting an entire file while changing a small piece of behavior. Formatting-only changes should normally be submitted separately.
+When changing the interface:
 
----
-
-## User-Facing Changes
-
-When adding or changing user-facing behavior:
-
-* Use the localization system.
-* Update English and Italian when applicable.
-* Check labels and messages inside the actual interface.
+* Update English and Italian.
+* Test translated labels.
 * Include screenshots for meaningful visual changes.
-* Consider keyboard navigation and accessibility.
-* Document incomplete translations or known interface limitations.
+* Preserve keyboard focus.
+* Consider contrast and text size.
+* Avoid communicating state through color alone.
 
-The detailed localization process is documented in [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).
+### Data Changes
 
----
+A data-changing Pull Request must explain:
 
-## Data Changes
+* Added properties.
+* Changed properties.
+* Removed or renamed properties.
+* Existing-world impact.
+* Migration behavior.
+* Backward compatibility.
+* Testing performed.
 
-Changes to Actor, Item, world, or system data must be clearly documented.
+Do not silently rename or delete stored fields.
 
-The Pull Request must explain:
+### Changelog
 
-* Which properties are added.
-* Which properties are changed.
-* Which properties are renamed or removed.
-* Whether existing worlds are affected.
-* Whether a migration is required.
-* Whether the change is backward compatible.
-* How the behavior was tested.
+Add notable changes under:
 
-Do not silently rename or remove stored properties.
+```md
+## [Unreleased]
+```
 
-During Alpha development, data structures may change, but the effects of those changes must still be documented.
+Use an appropriate category:
 
----
+```md
+### Added
+### Changed
+### Fixed
+### Removed
+### Security
+```
 
-## Dependencies
+Do not create the final versioned changelog section unless the Pull Request is specifically preparing a release.
 
-Do not add a new runtime or development dependency without explaining:
+Do not include internal changes that have no meaningful user, contributor, compatibility, or security impact.
 
-* Why it is needed.
-* Why the existing project cannot provide the same behavior.
-* Its license.
-* Its maintenance status.
-* Its effect on package size or packaging.
-* Its security implications.
+### Dependencies
 
-Avoid adding dependencies for trivial functionality.
+A new dependency requires an explanation of:
 
----
-
-## Assets and Third-Party Content
-
-Contributors must have the legal right to submit every included file.
-
-Do not submit:
-
-* Scans or copies of the PRISM rulebook.
-* Commercial PDF content.
-* Substantial portions of published rules text.
-* Published artwork without permission.
-* Proprietary layouts.
-* Unauthorized logos.
-* Fonts without redistribution rights.
-* Assets extracted from paid products.
-* Code or assets copied from another Foundry package without permission.
-
-Third-party content must include:
-
-* Author or rights-holder.
-* Source.
+* Purpose.
 * License.
-* Required attribution.
-* Confirmation that redistribution is permitted.
+* Maintenance status.
+* Security implications.
+* Package-size impact.
+* Build impact.
+* Contributor impact.
 
-The maintainers may reject or remove content whose licensing status is unclear.
+Avoid dependencies for trivial behavior.
 
 ---
 
-# Testing Requirements
+## Testing
 
-Until automated checks are introduced, contributors are responsible for meaningful manual testing.
+Manual testing is required until automated checks are introduced.
 
-Before opening a Pull Request:
+Before requesting review:
 
-* Confirm that the PRISM system loads in Foundry VTT.
+* Confirm that the system loads.
 * Test the affected workflow.
-* Test relevant empty or invalid states.
-* Check the browser developer console.
+* Test invalid and boundary states.
+* Check the browser console.
 * Test with unrelated modules disabled when possible.
-* Test English and Italian when user-facing text changes.
-* Verify existing data when the change affects Actor, Item, or world data.
-* Reload Foundry VTT and repeat the affected operation.
+* Test English and Italian when visible text changes.
+* Test existing Actor data when stored data changes.
+* Reload Foundry and repeat the workflow.
+* Record the Foundry version and build.
 
-Do not mark an untested change as tested.
+Do not claim that a change was tested when it was not.
 
-Complete setup, testing, and debugging instructions belong in the [Development Guide](docs/DEVELOPMENT.md).
+Use a dedicated test world rather than an important campaign.
 
----
-
-# Pull Request Guidelines
-
-## Pull Request Title
-
-Use the same style as commit messages:
-
-```text
-feat: improve virtual bag draw workflow
-```
-
-```text
-fix: prevent empty tags from being selected
-```
-
-```text
-docs: add manual installation instructions
-```
+Detailed testing procedures are in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
 ---
 
-## Pull Request Description
+## Pull Requests
 
-Use the repository’s Pull Request template.
+### Title
 
-The description must provide enough information to understand:
+Use the commit-message style:
+
+```text
+feat: enforce virtual bag limits
+fix: prevent invalid bag entries
+docs: update release instructions
+```
+
+### Description
+
+Complete the Pull Request template.
+
+Explain:
 
 * What changed.
-* Why the change is needed.
-* How it was implemented.
+* Why it is needed.
+* How it works.
 * How it was tested.
-* Whether stored data is affected.
+* Whether data changed.
 * Whether migration is required.
-* Whether documentation or localization was updated.
-* Any known limitations.
+* Whether documentation changed.
+* Whether localization changed.
+* Known limitations.
 
-When the Pull Request completely resolves an Issue, include:
+Link the relevant Issue:
 
 ```text
 Closes #123
@@ -625,114 +609,102 @@ Closes #123
 
 Use `Closes`, `Fixes`, or `Resolves` only when the Issue is fully addressed.
 
----
+### Scope
 
-## Minimum Review Checklist
+Good scope:
 
-Before requesting review, confirm that:
+```text
+Prevent duplicate Traits from being added to the virtual bag.
+```
 
-* The change has a focused scope.
-* The branch was created from an updated `main`.
-* The system loads successfully.
-* The affected workflow was tested.
-* Documentation and localization were updated when required.
-* No temporary, private, generated, or unauthorized content is included.
+Poor scope:
 
-The complete submission checklist is included automatically in the Pull Request template.
+```text
+Rewrite the bag, redesign the sheet, change the data model,
+update every translation, and reorganize documentation.
+```
 
----
+Split large work into smaller Pull Requests when practical.
 
-## Draft Pull Requests
+### Draft Pull Requests
 
 Use a Draft Pull Request when:
 
 * The implementation is incomplete.
-* Early architectural feedback is needed.
-* Testing is still pending.
-* A migration requires discussion.
+* Early feedback is needed.
+* Testing is pending.
+* A migration needs review.
 * The work is too large to review only after completion.
 
-Mark the Pull Request as ready for review only when it is complete enough to evaluate and test.
+Mark it ready only when it can be meaningfully reviewed and tested.
 
 ---
 
-# Review and Merge Process
+## Review and Merge
 
+Pull Requests targeting `main` require approval from an authorized maintainer.
 
-Pull Requests require approval from an authorized repository maintainer before merging into the main.
+Review may request:
 
-Review may include:
+* Code changes.
+* Additional validation.
+* Additional tests.
+* Documentation updates.
+* Localization updates.
+* Reduced scope.
+* Conflict resolution.
+* Removal of unauthorized content.
 
-* Questions about implementation choices.
-* Requests for code changes.
-* Requests for additional tests.
-* Requests for documentation.
-* Requests for localization updates.
-* Requests to reduce the scope.
-* Requests to resolve merge conflicts.
-* Requests to remove unauthorized content.
+All blocking conversations must be resolved before merge.
 
-All blocking review conversations must be resolved before merge.
-
-New commits may invalidate an earlier approval and require another review.
-
-External contributors cannot approve and merge their own changes into `main`.
-
-Accepted Pull Requests are normally merged using **squash merging**.
+Accepted Pull Requests are normally merged through **squash merge**.
 
 Example final commit:
 
 ```text
-feat: add virtual tag bag workflow (#42)
+feat: enforce virtual bag limits (#42)
 ```
-
-Merge commits and rebase merges are not part of the normal repository workflow.
 
 Direct pushes and force pushes to `main` are blocked by repository rules.
 
+An external contributor cannot approve and merge their own change.
+
 ---
 
-# Updating a Pull Request
+## Updating a Pull Request
 
-When changes are requested:
-
-1. Modify the same branch.
-2. Test the updated behavior.
-3. Commit the changes.
-4. Push the branch again.
-
-Example:
+Apply review changes to the same branch:
 
 ```bash
 git add .
-git commit -m "fix: address pull request review"
+git commit -m "fix: address review feedback"
 git push
 ```
 
 The existing Pull Request updates automatically.
 
-Do not open a new Pull Request for every review revision.
-
-When the target branch has changed significantly:
+When `main` has changed significantly:
 
 ```bash
 git fetch upstream
 git rebase upstream/main
 ```
 
-After resolving conflicts:
+After rebasing a fork branch:
 
 ```bash
 git push --force-with-lease origin YOUR-BRANCH-NAME
 ```
 
-Resolve review conversations only after the concern has been addressed or an agreement has been reached.
+Use `--force-with-lease`, not `--force`.
+
+Do not open a new Pull Request for each review revision.
 
 ---
 
-# After a Pull Request Is Merged
+## After Merge
 
-Update your local fork:
+External contributors should synchronize their fork:
 
 ```bash
 git checkout main
@@ -741,7 +713,7 @@ git pull --ff-only upstream main
 git push origin main
 ```
 
-Delete the completed local branch:
+Delete the local branch:
 
 ```bash
 git branch -d YOUR-BRANCH-NAME
@@ -753,41 +725,96 @@ Delete the remote branch:
 git push origin --delete YOUR-BRANCH-NAME
 ```
 
-Begin each new contribution from an updated `main` branch.
+Start each contribution from an updated `main`.
 
 ---
 
-# Licensing of Contributions
+## Release Responsibilities
 
-The repository source code is licensed under the terms described in [`LICENSE`](LICENSE).
+Publishing releases is reserved for repository maintainers.
+
+A normal contribution should not:
+
+* Change `prism/system.json` version.
+* Change the version-specific `download` URL.
+* Create a release branch.
+* Create a Git tag.
+* Upload `prism.zip`.
+* Upload the release `system.json`.
+* Publish a GitHub Release.
+* Close a release milestone.
+
+Exceptions require explicit maintainer instruction.
+
+Maintainer release preparation includes:
+
+* Finalizing `CHANGELOG.md`.
+* Updating the manifest version and download URL.
+* Validating compatibility.
+* Packaging `prism.zip`.
+* Uploading release assets.
+* Publishing the tag and Release.
+* Testing installation from the public manifest.
+
+The complete release procedure is documented in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md#release-process).
+
+---
+
+## Licensing and Third-Party Content
+
+The repository software is licensed under [`LICENSE`](LICENSE).
 
 By submitting a contribution, you confirm that:
 
-* You created the contribution or have the legal right to submit it.
-* The contribution may be distributed under the repository license.
-* The contribution does not knowingly contain unauthorized third-party material.
-* Required notices and attributions have been provided.
-* An accepted contribution may be modified and redistributed under the repository license.
+* You created it or have the right to submit it.
+* It may be distributed under the repository license.
+* It does not contain unauthorized third-party material.
+* Required attribution is included.
+* It may be modified and redistributed if accepted.
 
-The repository license applies to the submitted software contribution. It does not transfer ownership of PRISM RPG, Foundry Virtual Tabletop, or third-party intellectual property.
+Do not submit:
+
+* Scans of PRISM publications.
+* Commercial PDF content.
+* Substantial published rules text.
+* Unauthorized artwork.
+* Proprietary layouts.
+* Unauthorized logos.
+* Fonts without redistribution rights.
+* Assets extracted from paid products.
+* Code copied from another package without permission.
+
+Third-party material must identify:
+
+* Author or rights-holder.
+* Source.
+* License.
+* Required attribution.
+* Redistribution permission.
+
+Public availability does not automatically grant redistribution rights.
 
 ---
 
-# Community, Support, and Security
+## Community and Security
 
-## Security
+### Questions and Support
 
-Do not report security vulnerabilities through public Issues.
+Use [GitHub Discussions](https://github.com/Heldan-oss/PRISM-System/discussions) for:
 
-Follow the private reporting process described in:
+* General questions.
+* Installation help.
+* Community discussion.
+* Ideas that are not yet actionable.
 
-**[Security Policy](SECURITY.md)**
+Use [GitHub Issues](https://github.com/Heldan-oss/PRISM-System/issues) for:
 
-## Questions and Support
+* Reproducible bugs.
+* Concrete feature requests.
+* Defined technical work.
 
-For questions that are not reproducible bugs or concrete feature requests, consult:
+### Security
 
-* [GitHub Discussions](https://github.com/Heldan-oss/PRISM-System/discussions)
-* [GitHub Issues](https://github.com/Heldan-oss/PRISM-System/issues)
+Do not report security vulnerabilities through public Issues or Discussions.
 
-Thank you for helping improve PRISM RPG for Foundry Virtual Tabletop.
+Follow the private reporting process in [`SECURITY.md`](SECURITY.md).

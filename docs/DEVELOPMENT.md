@@ -2,23 +2,33 @@
 
 ## Overview
 
-This document describes the current architecture, development workflow, data strucRISM RPG for Foundry Virtual Tabletop**.
+This document describes the current architecture, development workflow, testing requirements, data-management rules, and release process for **PRISM RPG for Foundry Virtual Tabletop**.
 
-PRISM RPG for Foundry VTT is currently an Alpha project. Its architecture and stored data may change while the system is under active development.
+PRISM RPG for Foundry VTT is an unofficial, fan-made system currently in Alpha development.
 
-This guide documents the implementation that currently exists. It must be updated whenundry system manifest.
+During the Alpha phase:
 
-* Actor or Item data.
+* Features may be incomplete.
+* Internal architecture may change.
+* Stored Actor data may change.
+* Backward compatibility is not guaranteed.
+* Manual testing is required before every release.
+
+This document describes the implementation currently present in the repository. It must be updated whenever a contribution changes:
+
+* Repository structure.
+* Runtime architecture.
+* Actor data.
 * Sheet behavior.
-* The virtual bag.
-* Chat messages.
+* Virtual-bag behavior.
 * Localization.
-* Styling.
-* Development tools.
-* Testing procedures.
-* Packaging or release workflows.
+* Packaging.
+* Release procedures.
+* Development requirements.
 
 For contribution branches, commits, Pull Requests, and review rules, see [`CONTRIBUTING.md`](../CONTRIBUTING.md).
+
+For user installation instructions, see [`INSTALLATION.md`](INSTALLATION.md).
 
 ---
 
@@ -26,28 +36,22 @@ For contribution branches, commits, Pull Requests, and review rules, see [`CONTR
 
 * [Current Technology](#current-technology)
 * [Repository Structure](#repository-structure)
-* [Repository Hygiene](#repository-hygiene)
 * [Local Development Setup](#local-development-setup)
 * [System Manifest](#system-manifest)
-* [System Initialization](#system-initialization)
-* [Current Architecture](#current-architecture)
-* [Actor Data Structure](#actor-data-structure)
+* [Runtime Architecture](#runtime-architecture)
+* [Actor Data](#actor-data)
 * [Anomaly Sheet](#anomaly-sheet)
 * [Virtual Bag](#virtual-bag)
-* [Risk Dialog](#risk-dialog)
-* [Chat Messages](#chat-messages)
-* [Utility Functions](#utility-functions)
-* [Templates](#templates)
+* [Dialogs and Chat](#dialogs-and-chat)
+* [Templates and Styles](#templates-and-styles)
 * [Localization](#localization)
-* [Styling](#styling)
-* [Coding Conventions](#coding-conventions)
-* [Error Handling](#error-handling)
+* [Coding Rules](#coding-rules)
 * [Data Changes and Migrations](#data-changes-and-migrations)
-* [Manual Testing](#manual-testing)
+* [Testing](#testing)
 * [Debugging](#debugging)
-* [Dependencies and Build Tools](#dependencies-and-build-tools)
+* [Dependencies and Generated Files](#dependencies-and-generated-files)
 * [Security Requirements](#security-requirements)
-* [Packaging and Releases](#packaging-and-releases)
+* [Release Process](#release-process)
 * [Known Technical Debt](#known-technical-debt)
 * [Definition of Done](#definition-of-done)
 * [Related Documentation](#related-documentation)
@@ -64,23 +68,10 @@ The current implementation uses:
 * Handlebars templates.
 * JSON localization files.
 * CSS stylesheets.
+* Foundry VTT dialogs.
+* Foundry VTT notifications.
 * Foundry VTT chat messages.
-* Foundry VTT notifications and dialogs.
-* A JSON-based Actor data template.
-
-The project currently has:
-
-* No Node.js package requirement.
-* No package manager configuration.
-* No compilation step.
-* No bundler.
-* No linter configuration.
-* No automated test suite.
-* No database migration framework.
-* No custom socket communication.
-* No custom Item types.
-
-Contributors must not assume that `npm install`, a build command, or an automated test command exists unless such tooling is added and documented in a dedicated change.
+* A JSON Actor data template.
 
 ---
 
@@ -88,9 +79,7 @@ Contributors must not assume that `npm install`, a build command, or an automate
 
 The repository is named `PRISM-System`.
 
-The actual Foundry VTT game system is contained in the `prism/` directory.
-
-The intended repository structure is:
+The Foundry VTT runtime package is contained in the `prism/` directory.
 
 ```text
 PRISM-System/
@@ -112,7 +101,6 @@ PRISM-System/
 │   ├── lang/
 │   │   ├── en.json
 │   │   └── it.json
-        └── ...
 │   │
 │   ├── module/
 │   │   ├── actor-sheet.mjs
@@ -142,48 +130,61 @@ PRISM-System/
 
 ### Repository Root
 
-The repository root contains project-level documentation, governance files, licensing information, and the `prism/` system package.
+The repository root contains:
 
-The repository root is not itself the installed Foundry VTT system directory.
+* Project documentation.
+* GitHub configuration.
+* Licensing information.
+* Governance files.
+* The `prism/` runtime package.
 
-### `prism/`
+The repository root is not the Foundry system directory.
 
-The `prism/` directory contains everything required by the Foundry game system at runtime.
+### Runtime Directory
 
-When installed for development or packaged for distribution, `prism/system.json` must appear as `system.json` at the root of the installed `prism` system directory.
+Everything required by Foundry at runtime must be contained in:
 
-### `docs/`
+```text
+prism/
+```
 
-The `docs/` directory contains development, installation, localization, and image documentation.
+After installation, Foundry must be able to access:
 
-### `.github/`
+```text
+Data/systems/prism/system.json
+```
 
-The `.github/` directory contains GitHub-specific repository configuration.
+### Documentation Directory
 
-It is separate from `.idea/`.
+The `docs/` directory contains documentation for:
+
+* Installation.
+* Development.
+* Localization.
+* Repository images.
+
+### GitHub Configuration
+
+GitHub-specific files belong in:
+
+```text
+.github/
+```
+
+IDE metadata does not belong in `.github/` and must not be committed.
 
 ---
 
 ## Repository Hygiene
 
-IDE and local environment metadata are not part of the application source.
-
-The following files should normally be excluded from version control:
-
-```text
-.idea/
-*.iml
-.DS_Store
-Thumbs.db
-*.log
-```
-
-A root-level `.gitignore` should contain at least:
+The root `.gitignore` should exclude local and generated files such as:
 
 ```gitignore
-# IntelliJ IDEA
+# JetBrains IDEs
 .idea/
 *.iml
+*.ipr
+*.iws
 
 # Operating-system metadata
 .DS_Store
@@ -193,41 +194,44 @@ Thumbs.db
 *.log
 *.tmp
 *.swp
+*.swo
 
 # Foundry local data
-worlds/
 Data/
 Config/
 Logs/
+worlds/
 
-# Dependencies and build output, if introduced later
+# Dependencies and generated output
 node_modules/
 dist/
 build/
 coverage/
+
+# Local release package
+prism.zip
+
+# Environment files
+.env
+.env.*
 ```
 
-Do not store GitHub Issue Forms, `CODEOWNERS`, or the Pull Request template inside `.idea/`.
+Do not commit:
 
-Use:
+* `.idea/`
+* IDE project files.
+* Foundry worlds.
+* Local Foundry configuration.
+* Access tokens.
+* Environment files.
+* Generated release archives.
+* Temporary logs.
+* Private campaign data.
 
-```text
-.github/ISSUE_TEMPLATE/
-.github/CODEOWNERS
-.github/pull_request_template.md
-```
-
-The file defining the current Actor defaults must be named exactly:
+The Actor data file must be named exactly:
 
 ```text
 template.json
-```
-
-Avoid misspellings such as:
-
-```text
-templete.json
-tempalte.json
 ```
 
 ---
@@ -236,13 +240,15 @@ tempalte.json
 
 ### Prerequisites
 
-Current development requires:
+Development requires:
 
-* A licensed and working Foundry Virtual Tabletop installation.
+* A working Foundry Virtual Tabletop installation.
 * Git.
 * A text editor or IDE.
-* A modern browser with developer tools, or the Foundry desktop application.
-* A separate Foundry world used only for development and testing.
+* A modern browser with developer tools, or the Foundry desktop client.
+* A dedicated Foundry world for development and testing.
+
+Use disposable test data. Do not use an important campaign as the primary development environment.
 
 ### Clone the Repository
 
@@ -251,23 +257,21 @@ git clone https://github.com/Heldan-oss/PRISM-System.git
 cd PRISM-System
 ```
 
-The cloned repository contains the installable system in:
+The runtime source is:
 
 ```text
 PRISM-System/prism/
 ```
 
-### Locate the Foundry User Data Directory
+### Foundry User Data Directory
 
-Foundry systems are stored under:
+Foundry systems are installed under:
 
 ```text
 FOUNDRY_USER_DATA/Data/systems/
 ```
 
-The exact user-data location depends on the operating system and the Foundry configuration.
-
-The final development installation must have this structure:
+The development installation must resolve to:
 
 ```text
 FOUNDRY_USER_DATA/
@@ -282,29 +286,21 @@ FOUNDRY_USER_DATA/
             └── templates/
 ```
 
-The system folder must be named:
+The system directory must be named:
 
 ```text
 prism
 ```
 
-This matches the manifest identifier:
-
-```json
-{
-  "id": "prism"
-}
-```
-
 ### Recommended Development Link
 
-A symbolic link or directory junction allows Foundry to load the repository files directly without copying them after every change.
+Use a symbolic link or directory junction so that Foundry loads the repository files directly.
 
 #### Linux or macOS
 
 ```bash
 ln -s "/path/to/PRISM-System/prism" \
-      "/path/to/FoundryVTT/Data/systems/prism"
+      "/path/to/FOUNDRY_USER_DATA/Data/systems/prism"
 ```
 
 #### Windows PowerShell
@@ -312,19 +308,17 @@ ln -s "/path/to/PRISM-System/prism" \
 ```powershell
 New-Item `
   -ItemType Junction `
-  -Path "C:\path\to\FoundryVTT\Data\systems\prism" `
+  -Path "C:\path\to\FOUNDRY_USER_DATA\Data\systems\prism" `
   -Target "C:\path\to\PRISM-System\prism"
 ```
 
-Adjust the paths for the local environment.
-
-Do not create a nested installation such as:
+Do not create:
 
 ```text
 Data/systems/prism/prism/system.json
 ```
 
-The correct location is:
+The correct path is:
 
 ```text
 Data/systems/prism/system.json
@@ -332,18 +326,22 @@ Data/systems/prism/system.json
 
 ### Create a Test World
 
-After installing or linking the system:
+After linking the system:
 
 1. Start Foundry VTT.
 2. Open the Setup screen.
-3. Confirm that the PRISM system is listed.
-4. Create a new world using the PRISM system.
+3. Confirm that PRISM appears in the system list.
+4. Create a new PRISM world.
 5. Launch the world.
-6. Create a test Actor of type `character`.
-7. Open the Actor sheet.
-8. Check the browser developer console for initialization errors.
+6. Create an Actor of type `character`.
+7. Open the Anomaly sheet.
+8. Check the browser developer console.
 
-Use disposable test data. Do not use a production campaign as the primary development environment.
+The console should contain:
+
+```text
+PRISM | Init
+```
 
 ---
 
@@ -355,351 +353,271 @@ The runtime manifest is:
 prism/system.json
 ```
 
-The current manifest declares:
+It is the authoritative source for:
+
+* System ID.
+* Display title.
+* Description.
+* Version.
+* Foundry compatibility.
+* Authors.
+* Repository metadata.
+* Manifest URL.
+* Package download URL.
+* JavaScript modules.
+* Stylesheets.
+* Languages.
+* Grid settings.
+* Socket configuration.
+
+### Distribution Fields
+
+The public manifest URL is:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
+```
+
+The manifest should contain:
 
 ```json
 {
-  "id": "prism",
-  "title": "prism-system",
-  "description": "An unofficial system for playing PRISM on Foundry VTT",
-  "version": "0.1.1",
-  "compatibility": {
-    "minimum": "12",
-    "verified": "13"
-  }
+  "url": "https://github.com/Heldan-oss/PRISM-System",
+  "manifest": "https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json",
+  "download": "https://github.com/Heldan-oss/PRISM-System/releases/download/vX.Y.Z/prism.zip"
 }
 ```
 
-The manifest is the authoritative source for:
+The `manifest` URL remains stable between releases.
 
-* System identifier.
-* Display title.
-* Description.
-* System version.
-* Foundry VTT compatibility.
-* Authors.
-* JavaScript entry points.
-* Stylesheets.
-* Languages.
-* Socket availability.
-* Grid configuration.
+The `download` URL must point to the exact release matching the manifest version.
+
+For example:
+
+```json
+{
+  "version": "0.1.1",
+  "download": "https://github.com/Heldan-oss/PRISM-System/releases/download/v0.1.1/prism.zip"
+}
+```
+
+Do not change the `version` or version-specific `download` URL outside release preparation unless explicitly requested by a maintainer.
 
 ### Entry Module
 
-The manifest loads:
+Foundry loads:
 
 ```text
 module/prism.mjs
 ```
 
-through:
-
-```json
-{
-  "esmodules": [
-    "module/prism.mjs"
-  ]
-}
-```
+through the `esmodules` manifest field.
 
 ### Stylesheets
 
 The current stylesheet order is:
 
-```json
-{
-  "styles": [
-    "styles/variables.css",
-    "styles/sheet.css",
-    "styles/prism.css"
-  ]
-}
+```text
+styles/variables.css
+styles/sheet.css
+styles/prism.css
 ```
 
 Order matters:
 
-1. `variables.css` defines reusable values.
-2. `sheet.css` defines sheet layout and components.
-3. `prism.css` defines remaining system-wide or presentation rules.
+1. `variables.css` defines reusable design values.
+2. `sheet.css` defines the Actor-sheet layout.
+3. `prism.css` defines shared system and chat presentation.
 
 ### Languages
 
 The current manifest registers:
 
-* Italian: `lang/it.json`
-* English: `lang/en.json`
+```text
+lang/en.json
+lang/it.json
+```
+
+Language files must remain synchronized at the key level.
 
 ### Compatibility Changes
 
-Do not change `minimum`, `verified`, or any future `maximum` value without testing the system on the corresponding Foundry versions.
+Do not change Foundry compatibility declarations without testing the affected versions.
 
-Any compatibility change must also update:
+A compatibility change must update, when applicable:
 
-* `README.md`, when relevant.
-* `CHANGELOG.md`.
-* Release notes.
-* Pull Request testing information.
-
-### Version Changes
-
-A release change must update the `version` field in `system.json`.
-
-Do not change the version for unrelated development commits unless the change is part of a planned release process.
+* `prism/system.json`
+* `README.md`
+* `CHANGELOG.md`
+* Release notes
+* Pull Request test results
 
 ---
 
-## System Initialization
+## Runtime Architecture
 
-The entry point is:
+The runtime code is divided into five modules.
+
+| File                     | Responsibility                                          |
+| ------------------------ | ------------------------------------------------------- |
+| `module/prism.mjs`       | System initialization and Actor-sheet registration      |
+| `module/actor-sheet.mjs` | Sheet context, events, synchronization, and chat output |
+| `module/bag-manager.mjs` | Virtual-bag data and draw operations                    |
+| `module/dialogs.mjs`     | User dialogs                                            |
+| `module/utils.mjs`       | Shared paths, labels, and array utilities               |
+
+High-level flow:
 
 ```text
-prism/module/prism.mjs
+Foundry init
+    │
+    ▼
+module/prism.mjs
+    │
+    ▼
+PrismActorSheet
+    │
+    ├── actor-character-sheet.hbs
+    ├── BagManager
+    ├── PrismDialogs
+    ├── utility functions
+    └── ChatMessage
 ```
 
-Current initialization:
+Keep initialization code small.
 
-```js
-import { PrismActorSheet } from "./actor-sheet.mjs";
+Business logic should be separated from:
 
-Hooks.once("init", () => {
-    console.log("PRISM | Init");
+* Handlebars presentation.
+* Click handlers.
+* CSS.
+* Localization values.
 
-    Actors.unregisterSheet("core", ActorSheet);
+Reusable bag behavior belongs in `BagManager`.
 
-    Actors.registerSheet("prism", PrismActorSheet, {
-        types: ["character"],
-        makeDefault: true,
-        label: game.i18n.localize("prism.sheet.plabel")
-    });
-});
-```
-
-During the Foundry `init` hook, the system:
-
-1. Logs the initialization message.
-2. Unregisters the default core Actor sheet.
-3. Registers `PrismActorSheet`.
-4. Associates it with Actors of type `character`.
-5. Makes it the default sheet for that Actor type.
-
-Initialization code should remain small.
-
-Additional initialization responsibilities should be separated into dedicated modules when they become significant, such as:
-
-* Data-model registration.
-* Settings registration.
-* Handlebars helpers.
-* Socket registration.
-* Migration registration.
-* Custom Document classes.
-* Custom application registration.
+Reusable interface-independent helpers belong in a focused module rather than directly in the Actor sheet.
 
 ---
 
-## Current Architecture
+## Actor Data
 
-The runtime architecture is divided into five JavaScript modules.
-
-| File                     | Responsibility                                                       |
-| ------------------------ | -------------------------------------------------------------------- |
-| `module/prism.mjs`       | System initialization and sheet registration                         |
-| `module/actor-sheet.mjs` | Actor-sheet data, user events, data synchronization, and chat output |
-| `module/bag-manager.mjs` | Virtual-bag state and draw operations                                |
-| `module/dialogs.mjs`     | User dialogs                                                         |
-| `module/utils.mjs`       | Shared path, label, and randomization helpers                        |
-
-The current high-level flow is:
-
-```text
-Foundry initializes the system
-        │
-        ▼
-prism.mjs registers PrismActorSheet
-        │
-        ▼
-actor-character-sheet.hbs renders Actor data
-        │
-        ▼
-actor-sheet.mjs handles user actions
-        │
-        ├── Bag operations → bag-manager.mjs
-        ├── Risk choice → dialogs.mjs
-        ├── Shared helpers → utils.mjs
-        └── Draw result → Foundry ChatMessage
-```
-
-Business logic that can be separated from rendering should not be placed directly in the Handlebars template.
-
-Reusable bag behavior belongs in `BagManager`, not in individual click handlers.
-
----
-
-## Actor Data Structure
-
-The current Actor schema is defined in:
+The Actor schema is defined in:
 
 ```text
 prism/template.json
 ```
 
-The system currently supports one Actor type:
+The current system supports one Actor type:
 
 ```text
 character
 ```
 
-It does not define Item types.
+No custom Item types are currently defined.
 
 ### Current Actor Fields
 
-| Field           | Current default | Intended purpose                                                         |
-| --------------- | --------------: | ------------------------------------------------------------------------ |
-| `concept`       |            `""` | Short character concept                                                  |
-| `biography`     |            `""` | Character biography                                                      |
-| `personalNotes` |            `""` | Personal notes                                                           |
-| `notes`         |            `""` | Currently reserved or unused                                             |
-| `questions`     |            `""` | Currently reserved or unused                                             |
-| `inventory`     |            `[]` | Inventory entries                                                        |
-| `traits`        |            `[]` | Trait labels                                                             |
-| `adversities`   |            `[]` | Adversity labels                                                         |
-| `fears`         |            `[]` | Currently reserved; generic fear entries are added directly to the bag   |
-| `dangers`       |            `[]` | Currently reserved; generic danger entries are added directly to the bag |
-| `marks`         |            `[]` | Marks displayed by the sheet                                             |
-| `bag`           |            `[]` | Current virtual-bag entries                                              |
-| `lastDraw`      |            `[]` | Most recently drawn entries                                              |
+| Field           | Default | Purpose             |
+| --------------- | ------: | ------------------- |
+| `concept`       |    `""` | Character concept   |
+| `biography`     |    `""` | Biography           |
+| `personalNotes` |    `""` | Personal notes      |
+| `notes`         |    `""` | Reserved or unused  |
+| `questions`     |    `""` | Reserved or unused  |
+| `inventory`     |    `[]` | Inventory entries   |
+| `traits`        |    `[]` | Trait entries       |
+| `adversities`   |    `[]` | Adversity entries   |
+| `fears`         |    `[]` | Reserved collection |
+| `dangers`       |    `[]` | Reserved collection |
+| `marks`         |    `[]` | Current Marks value |
+| `bag`           |    `[]` | Virtual-bag entries |
+| `lastDraw`      |    `[]` | Most recent draw    |
 
-### Label Structure
-
-Traits and adversities use this shape:
+### Trait and Adversity Entries
 
 ```json
 {
-  "id": "FOUNDARY_RANDOM_ID",
+  "id": "RANDOM_ID",
   "name": "Example label",
   "type": "trait"
 }
 ```
 
-Supported label types currently include:
+Each entry contains:
 
-```text
-trait
-adversity
-fear
-danger
-```
+* A stable local ID.
+* A user-visible name.
+* An internal semantic type.
 
-A stored trait or adversity contains:
-
-* `id`: stable identifier within the Actor data.
-* `name`: user-entered display value.
-* `type`: semantic label type.
-
-### Bag Entry Structure
-
-A bag entry uses:
+### Bag Entries
 
 ```json
 {
-  "id": "BAG_ENTRY_RANDOM_ID",
+  "id": "BAG_ENTRY_ID",
   "sourceId": "SOURCE_LABEL_ID",
   "name": "Example label",
   "type": "trait"
 }
 ```
 
-Generic fear and danger entries use:
+Generic Fear and Danger entries use:
 
 ```json
 {
-  "id": "BAG_ENTRY_RANDOM_ID",
+  "id": "BAG_ENTRY_ID",
   "sourceId": null,
-  "name": "fear",
+  "name": "Localized name",
   "type": "fear"
 }
 ```
 
-The `id` of a bag entry is different from the original label ID.
+The bag-entry ID is distinct from the source-label ID.
 
-This allows:
+The current implementation permits multiple bag entries originating from the same source label. Future validation changes must update this document and describe their effect on existing Actors.
 
-* The same source label to be placed into the bag more than once.
-* Each bag copy to be removed independently.
-* Generic entries to exist without a source label.
-
-### Inventory Entry Structure
-
-Inventory entries use:
+### Inventory Entries
 
 ```json
 {
-  "id": "FOUNDARY_RANDOM_ID",
+  "id": "RANDOM_ID",
   "name": "Example item",
   "quantity": 1
 }
 ```
 
-Inventory quantities are converted to numbers when read from the sheet.
+Inventory entries are plain objects stored inside Actor data. They are not Foundry Item documents.
 
-### Data-Model Invariants
+### Current Data Rules
 
-Contributions should preserve these rules unless a documented schema change is approved:
+Unless a focused data change is approved:
 
-* Every dynamic row has an `id`.
-* Trait and adversity entries have a valid `type`.
-* Bag entries have their own unique `id`.
-* Generic fear and danger entries have `sourceId: null`.
-* Inventory quantities are numeric.
-* `bag` and `lastDraw` remain arrays.
-* Blank named labels cannot be added to the bag.
-* Drawn entries are removed from the bag.
-* Clearing the bag also clears `lastDraw`.
+* Dynamic entries must have stable IDs.
+* Internal types must not be localized.
+* Inventory quantities must be numeric.
+* `bag` and `lastDraw` must remain arrays.
+* Blank labels must not be added to the bag.
+* Drawn entries must be removed from the bag.
+* Clearing the bag must also clear `lastDraw`.
 
 ---
 
 ## Anomaly Sheet
 
-The custom Actor sheet is implemented by:
+The custom Actor sheet is implemented in:
 
 ```text
 prism/module/actor-sheet.mjs
 ```
 
-and rendered using:
+and rendered by:
 
 ```text
 prism/templates/actor-character-sheet.hbs
 ```
 
-### Sheet Options
+### Sheet Context
 
-The sheet currently uses:
-
-```js
-{
-    classes: ["prism", "sheet", "actor"],
-    template: "systems/prism/templates/actor-character-sheet.hbs",
-    width: 760,
-    height: 820,
-    resizable: true
-}
-```
-
-It defines a tab group with:
-
-* `main`
-* `bio`
-* `inventory`
-
-The initial tab is:
-
-```text
-main
-```
-
-### Template Context
-
-`getData()` adds the following values to the standard Actor-sheet context:
+The sheet currently exposes:
 
 ```text
 system
@@ -710,217 +628,138 @@ lastDraw
 inventory
 ```
 
-Missing arrays fall back to empty arrays.
+Missing collections fall back to empty arrays.
 
-### Registered Sheet Actions
+### Sheet Actions
 
-The sheet registers event listeners for:
+Current actions include:
 
-| Action                  | Handler                  |
-| ----------------------- | ------------------------ |
-| `add-label`             | `_onAddLabel`            |
-| `delete-label`          | `_onDeleteLabel`         |
-| `add-to-bag`            | `_onAddToBag`            |
-| `remove-from-bag`       | `_onRemoveFromBag`       |
-| `clear-bag`             | `_onClearBag`            |
-| `draw-three`            | `_onDrawThree`           |
-| `risk`                  | `_onRisk`                |
-| `add-fear`              | `_onAddFear`             |
-| `add-danger`            | `_onAddDanger`           |
-| `add-inventory-item`    | `_onAddInventoryItem`    |
-| `delete-inventory-item` | `_onDeleteInventoryItem` |
+| Action                  | Purpose                       |
+| ----------------------- | ----------------------------- |
+| `add-label`             | Add a Trait or Adversity      |
+| `delete-label`          | Delete a Trait or Adversity   |
+| `add-to-bag`            | Add a stored label to the bag |
+| `remove-from-bag`       | Remove one bag entry          |
+| `clear-bag`             | Clear the bag and latest draw |
+| `draw-three`            | Draw up to three entries      |
+| `risk`                  | Open the risk dialog and draw |
+| `add-fear`              | Add a generic Fear            |
+| `add-danger`            | Add a generic Danger          |
+| `add-inventory-item`    | Add an inventory row          |
+| `delete-inventory-item` | Delete an inventory row       |
 
-Template actions are declared through `data-action` attributes.
+Use semantic template attributes:
 
-Example:
-
-```html
-<button type="button" data-action="add-label" data-type="trait">
+```hbs
+data-action="add-label"
+data-type="trait"
+data-id="{{this.id}}"
 ```
 
-Do not bind behavior through translated text, visual position, or CSS presentation classes.
+Do not bind behavior to:
 
-Use semantic `data-action`, `data-type`, and `data-id` attributes.
+* Translated text.
+* Visual position.
+* CSS presentation.
+* Array indexes.
 
-### Data Synchronization
+### Sheet Synchronization
 
-Dynamic label and inventory inputs are synchronized manually before action handlers change Actor data.
-
-The method:
+Dynamic fields are synchronized before actions through:
 
 ```text
 _syncSheetData()
 ```
 
-collects:
+Any new dynamic collection must define how unsaved values are preserved before:
 
-* Trait rows.
-* Adversity rows.
-* Inventory rows.
+* Adding rows.
+* Deleting rows.
+* Drawing.
+* Updating the bag.
+* Re-rendering the sheet.
 
-It then performs one Actor update before the requested action continues.
-
-This prevents typed but not yet submitted values from being lost when a user:
-
-* Adds another row.
-* Deletes a row.
-* Adds a label to the bag.
-* Removes a bag entry.
-* Draws from the bag.
-* Clears the bag.
-* Changes inventory rows.
-
-Any new dynamic collection added to the sheet must either:
-
-1. Use standard named form inputs that Foundry submits correctly, or
-2. Be included in `_syncSheetData()`.
-
-Do not create a new dynamic collection without defining how unsaved input values are preserved.
-
-### Adding Labels
-
-`_onAddLabel()`:
-
-1. Synchronizes the sheet.
-2. Reads `data-type`.
-3. Resolves the Actor-system path through `labelPathFromType()`.
-4. Clones the existing collection.
-5. Appends a new blank entry.
-6. Updates the Actor.
-7. Renders the sheet.
-
-### Deleting Labels
-
-`_onDeleteLabel()` removes the entry matching the selected ID.
-
-Deleting a source label does not currently search for or remove copies already present in the bag.
-
-Changes to that behavior require a deliberate gameplay decision and must not be introduced as an incidental refactor.
-
-### Inventory
-
-Inventory rows are managed as embedded plain objects inside `actor.system.inventory`.
-
-They are not Foundry Item documents.
-
-Adding a custom Item system in the future would be a significant architecture and migration change.
+Do not introduce controls that silently discard unsaved data.
 
 ---
 
 ## Virtual Bag
 
-The virtual bag is managed by:
+Bag logic is implemented in:
 
 ```text
 prism/module/bag-manager.mjs
 ```
 
-`BagManager` is responsible for reading, cloning, changing, and drawing entries from `actor.system.bag`.
+### Current Responsibilities
 
-### Reading the Bag
+`BagManager` handles:
+
+* Reading cloned bag data.
+* Adding stored labels.
+* Adding generic Fear and Danger entries.
+* Removing entries.
+* Clearing the bag.
+* Drawing entries.
+* Updating `lastDraw`.
+
+### Data Mutation
+
+Always clone stored arrays before changing them.
 
 ```js
-static getBag(actor) {
-    return foundry.utils.deepClone(actor.system.bag ?? []);
-}
+const bag = foundry.utils.deepClone(actor.system.bag ?? []);
 ```
 
-Bag operations should work on cloned data rather than directly mutating the Actor source object.
+Persist changes through Foundry document updates:
 
-### Adding a Stored Label
-
-`BagManager.add()`:
-
-1. Trims the label name.
-2. Rejects an empty name.
-3. Displays a localized warning.
-4. Creates a new bag-entry ID.
-5. Preserves the source-label ID.
-6. Copies the name and type.
-7. Updates `system.bag`.
-
-The same source label may currently be added more than once.
-
-Each addition creates a separate bag entry.
-
-### Adding Generic Entries
-
-`BagManager.addGeneric()` adds fear and danger entries directly to the bag.
-
-Generic entries:
-
-* Have a new bag-entry ID.
-* Have no source label.
-* Use `sourceId: null`.
-* Use localized names.
-* Use `fear` or `danger` as their type.
-
-### Removing Entries
-
-`BagManager.remove()` removes one bag entry by its bag-entry ID.
-
-It does not remove all entries with the same `sourceId`.
-
-### Clearing the Bag
-
-`BagManager.clear()` resets:
-
-```json
-{
-  "system.bag": [],
-  "system.lastDraw": []
-}
+```js
+await actor.update({
+    "system.bag": bag
+});
 ```
 
-Any future change to the clearing behavior must explicitly decide whether `lastDraw` should also be preserved or cleared.
+Do not directly mutate persisted Actor source data.
 
-### Drawing Entries
+### Drawing
 
-`BagManager.draw()`:
+The current draw process:
 
-1. Clones the current bag.
+1. Reads the current bag.
 2. Rejects an empty bag.
-3. Limits the requested amount to the number of available entries.
-4. Shuffles the bag.
+3. Limits the amount to the number of available entries.
+4. Shuffles the entries.
 5. Selects the requested entries.
-6. Stores the unselected entries as the remaining bag.
-7. Stores selected entries as `lastDraw`.
-8. Returns the selected entries.
+6. Removes drawn entries from the bag.
+7. Stores the result in `lastDraw`.
+8. Returns the result.
 
 Drawing is without replacement.
 
-A draw of three entries from a bag containing only two entries returns both available entries.
-
 ### Randomization
 
-The bag uses `shuffleArray()` from `utils.mjs`.
+The system currently uses a Fisher–Yates-style shuffle based on `Math.random()`.
 
-The current implementation uses a Fisher–Yates-style shuffle with `Math.random()`.
+It is intended for ordinary gameplay resolution, not cryptographic use.
 
-This is appropriate for ordinary gameplay randomization but is not intended for cryptographic use.
+A change to randomization must document:
 
-Do not replace or significantly change randomization behavior without:
-
-* Explaining the gameplay effect.
-* Testing distribution behavior.
-* Updating the changelog.
-* Documenting whether existing workflows are affected.
+* Gameplay impact.
+* Expected distribution.
+* Testing performed.
+* Compatibility with existing workflows.
 
 ---
 
-## Risk Dialog
+## Dialogs and Chat
 
-The risk-selection dialog is implemented by:
+### Risk Dialog
+
+The risk dialog is implemented in:
 
 ```text
 prism/module/dialogs.mjs
 ```
-
-`PrismDialogs.askRiskAmount()` displays a dialog allowing the user to select:
-
-* One label.
-* Two labels.
-* Three labels.
 
 It resolves with:
 
@@ -938,43 +777,13 @@ null
 
 when cancelled or closed.
 
-The Actor sheet passes the selected amount to `BagManager.draw()`.
+Visible dialog text must be localized.
 
-Dialog text must be localized.
+### Chat Messages
 
-Do not hard-code visible labels inside dialog definitions.
+Draw results are created by the Actor sheet using Foundry `ChatMessage`.
 
----
-
-## Chat Messages
-
-Draw results are sent to Foundry chat by:
-
-```text
-PrismActorSheet._sendDrawToChat()
-```
-
-The current chat structure is:
-
-```html
-<div class="prism-chat-card">
-    <h2>Localized title</h2>
-    <p>
-        <span class="prism-chat-label prism-trait">Label name</span>
-    </p>
-</div>
-```
-
-The speaker is generated from the current Actor.
-
-Draw titles use:
-
-```text
-prism.chat.draw
-prism.chat.risk
-```
-
-Bag-entry types are also used as CSS class suffixes:
+Current result types use CSS classes such as:
 
 ```text
 prism-trait
@@ -983,75 +792,22 @@ prism-fear
 prism-danger
 ```
 
-### Chat-Safety Requirement
+Chat output must:
 
-Label names are user-controlled data.
+* Use the current Actor as speaker.
+* Use localized titles.
+* Preserve semantic result types.
+* Handle long labels.
+* Escape or sanitize user-controlled content.
+* Avoid exposing private data.
 
-New code must not introduce additional unescaped user-controlled HTML.
-
-Before the system is considered stable, the current chat-message construction should be reviewed to ensure that label names are safely escaped or sanitized before being interpolated into HTML.
-
-Do not assume that a value is safe merely because it originated from an Actor sheet.
-
----
-
-## Utility Functions
-
-Shared helpers are defined in:
-
-```text
-prism/module/utils.mjs
-```
-
-### `labelPathFromType(type)`
-
-Maps label types to Actor-system paths:
-
-```js
-{
-    trait: "traits",
-    adversity: "adversities",
-    fear: "fears",
-    danger: "dangers"
-}
-```
-
-Callers must handle an unknown type returning `undefined`.
-
-### `labelTypeLabel(type)`
-
-Maps a label type to localized display text.
-
-It currently supports:
-
-* Trait.
-* Adversity.
-* Fear.
-* Danger.
-
-Unknown values fall back to the original type.
-
-This helper should be used where a localized label-type name is needed instead of creating duplicate mappings.
-
-### `shuffleArray(array)`
-
-Creates a deep clone and shuffles the clone.
-
-The input array must not be mutated.
-
-General-purpose helpers should remain:
-
-* Small.
-* Deterministic where appropriate.
-* Independent of sheet rendering.
-* Clearly named.
-* Reusable by more than one caller.
-
-Avoid turning `utils.mjs` into a collection of unrelated business logic.
+Do not interpolate new user-controlled values into HTML without reviewing their safety.
 
 ---
 
-## Templates
+## Templates and Styles
+
+### Templates
 
 The main template is:
 
@@ -1059,103 +815,61 @@ The main template is:
 prism/templates/actor-character-sheet.hbs
 ```
 
-### Template Sections
-
-The template contains:
-
-* Actor header.
-* Character image.
-* Character name.
-* Concept.
-* Sheet navigation.
-* Main tab.
-* Biography tab.
-* Inventory tab.
-
-### Main Tab
-
-The main tab contains:
-
-* Traits.
-* Adversities.
-* Fear controls.
-* Danger controls.
-* Virtual bag.
-* Latest draw.
-* Marks.
-
-### Biography Tab
-
-The biography tab contains:
-
-* Biography.
-* Personal notes.
-
-### Inventory Tab
-
-The inventory tab contains:
-
-* Item name.
-* Quantity.
-* Delete action.
-* Add-item action.
-
-### Template Rules
-
 Templates should:
 
-* Contain presentation and simple conditional rendering.
+* Contain presentation logic only.
 * Use `{{localize}}` for visible text.
-* Use semantic `data-*` attributes for actions.
-* Avoid complex business logic.
-* Avoid mutating Actor data.
-* Keep paths consistent with `actor.system`.
-* Quote generated HTML attribute values.
+* Use semantic `data-*` attributes.
+* Quote generated attribute values.
+* Avoid mutating data.
+* Avoid complex gameplay logic.
 
-For example, use:
+Correct:
 
 ```hbs
 placeholder="{{localize 'prism.sheet.objectMessage'}}"
 ```
 
-rather than:
+Avoid:
 
 ```hbs
 placeholder={{localize 'prism.sheet.objectMessage'}}
 ```
 
-### Adding a New Sheet Field
+### Styles
 
-When adding a new field:
+Styles are divided into:
 
-1. Add or confirm the field in the data schema.
-2. Add the localization keys.
-3. Add the template control.
-4. Confirm how the field is submitted.
-5. Add any required sheet context.
-6. Add event handling only when standard form submission is insufficient.
-7. Add styles.
-8. Test persistence after reload.
-9. Test both English and Italian.
-10. Update documentation and `CHANGELOG.md` when user-visible.
+```text
+styles/variables.css
+styles/sheet.css
+styles/prism.css
+```
+
+Use:
+
+* `variables.css` for reusable values and palette definitions.
+* `sheet.css` for Actor-sheet layout and controls.
+* `prism.css` for shared system and chat components.
+
+CSS must:
+
+* Be scoped under PRISM-specific classes.
+* Avoid broad selectors affecting Foundry core.
+* Preserve keyboard focus indicators.
+* Support translated text.
+* Avoid communicating state through color alone.
+* Remain usable when the sheet is resized.
 
 ---
 
 ## Localization
 
-Localization files are stored in:
+Localization files are:
 
 ```text
 prism/lang/en.json
 prism/lang/it.json
-```
-
-The English and Italian files must use the same key structure.
-
-The root namespace is:
-
-```text
-prism
 ```
 
 Current key groups include:
@@ -1168,624 +882,525 @@ prism.dialog
 prism.chat
 ```
 
-### JavaScript Localization
-
-Use:
+### JavaScript
 
 ```js
-game.i18n.localize("prism.sheet.characterName")
+game.i18n.localize("prism.sheet.characterName");
 ```
 
-### Handlebars Localization
-
-Use:
+### Handlebars
 
 ```hbs
 {{localize "prism.sheet.characterName"}}
 ```
 
-### Localization Rules
+Rules:
 
-* Do not hard-code user-facing text in JavaScript.
-* Do not hard-code user-facing text in templates.
-* Keep English and Italian key sets synchronized.
-* Preserve placeholders and formatting tokens.
-* Use one key for one stable semantic purpose.
-* Do not reuse an unrelated key because its current English text happens to match.
-* Keep key names stable whenever possible.
-* Use consistent PRISM terminology.
-* Test translated text in the actual interface.
-* Check that translated labels fit the available layout.
-* Do not include substantial copyrighted rules text in localization files.
+* Do not hard-code user-facing strings.
+* Keep English and Italian keys synchronized.
+* Do not localize internal types or IDs.
+* Preserve placeholders.
+* Test translated text in Foundry.
+* Avoid adding substantial copyrighted rules text.
 
-Complete translation procedures belong in [`LOCALIZATION.md`](LOCALIZATION.md).
+See [`LOCALIZATION.md`](LOCALIZATION.md) for the complete translation workflow.
 
 ---
 
-## Styling
-
-Stylesheets are stored in:
-
-```text
-prism/styles/
-```
-
-### `variables.css`
-
-Use `variables.css` for reusable design values such as:
-
-* Spacing.
-* Borders.
-* Radii.
-* Typography values.
-* Surface colors.
-* Type-specific colors.
-* Shared dimensions.
-
-Avoid repeating the same literal value throughout multiple stylesheets when it represents a shared design token.
-
-### `sheet.css`
-
-Use `sheet.css` for:
-
-* Actor-sheet layout.
-* Header structure.
-* Tabs.
-* Panels.
-* Form controls.
-* Inventory table.
-* Bag list.
-* Responsive sheet behavior.
-
-### `prism.css`
-
-Use `prism.css` for:
-
-* Shared PRISM components.
-* Chat-message presentation.
-* General system-level presentation not limited to one sheet.
-
-### CSS Rules
-
-* Scope system styles under PRISM-specific classes.
-* Avoid broad selectors that could affect Foundry core or other modules.
-* Reuse existing component classes.
-* Preserve visible focus indicators.
-* Test narrow and resized sheet layouts.
-* Avoid using color as the only indicator of label type.
-* Check both light and dark Foundry themes when practical.
-* Keep type classes consistent with runtime values.
-
-Current type-specific classes include:
-
-```text
-prism-trait
-prism-adversity
-prism-fear
-prism-danger
-```
-
----
-
-## Coding Conventions
-
-### Language
-
-Use modern JavaScript modules.
-
-Prefer:
-
-```js
-import { BagManager } from "./bag-manager.mjs";
-export class PrismActorSheet extends ActorSheet {
-}
-```
+## Coding Rules
 
 ### Formatting
 
-Follow the style of the file being edited.
+Follow the style of the edited file.
 
-Current code generally uses:
+Current JavaScript generally uses:
 
 * Four-space indentation.
 * Semicolons.
-* Double quotes for strings.
-* Trailing commas only where already established.
-* Braces for multi-line control structures.
+* Double-quoted strings.
+* `async` and `await`.
 * Descriptive method names.
-* `async` and `await` for document updates.
+* Braces for multi-line control structures.
 
-Avoid combining a functional change with repository-wide formatting.
+Do not combine functional changes with repository-wide formatting.
 
 ### Imports
 
 * Keep imports at the beginning of the file.
 * Use relative paths.
-* Include the `.mjs` extension.
+* Include `.mjs`.
 * Remove unused imports.
 * Avoid circular dependencies.
 
-### Actor Updates
-
-Use Foundry document updates:
-
-```js
-await actor.update({
-    "system.bag": bag
-});
-```
-
-Do not directly mutate persisted Actor data.
-
-Clone arrays or objects before modifying them:
-
-```js
-const inventory = foundry.utils.deepClone(
-    this.actor.system.inventory ?? []
-);
-```
-
 ### Identifiers
-
-Use `foundry.utils.randomID()` for new plain-object entries requiring stable IDs.
-
-Do not use array indexes as persistent identifiers.
-
-### Event Handlers
-
-Event handlers should:
-
-1. Prevent unwanted default behavior.
-2. Stop propagation when required.
-3. Synchronize unsaved data.
-4. Validate `data-*` values.
-5. Delegate reusable logic.
-6. Await document updates.
-7. Re-render only when necessary.
-
-### Naming
 
 Use:
 
-* `PascalCase` for classes.
-* `camelCase` for variables and methods.
-* Leading underscores for internal sheet handlers and helpers.
-* Clear action names matching their `data-action` values.
-* Lowercase hyphen-separated filenames where practical.
-
-### Comments
-
-Comments should explain:
-
-* Why a non-obvious decision exists.
-* Important Foundry lifecycle behavior.
-* Compatibility constraints.
-* Migration assumptions.
-* Security-sensitive handling.
-
-Do not add comments that merely repeat the code.
-
----
-
-## Error Handling
-
-Current code uses early returns and localized notifications for expected user errors.
-
-Example:
-
 ```js
-if (!name) {
-    ui.notifications.warn(
-        game.i18n.localize("prism.bag.labelWithoutName")
-    );
-    return;
-}
+foundry.utils.randomID()
 ```
 
-New code should:
+for persistent plain-object IDs.
 
-* Validate user-controlled values.
-* Reject invalid IDs and types.
-* Avoid partial updates.
-* Display useful localized messages for recoverable errors.
-* Log enough technical context for unexpected failures.
-* Avoid exposing private Actor or world data in logs.
-* Avoid silently swallowing unexpected exceptions.
-* Preserve data when an operation fails.
+Do not use array indexes as stored identifiers.
 
-Temporary `console.log()` calls must be removed before a Pull Request unless they are part of the intentional logging strategy.
+### Event Handlers
 
-The initialization message:
+Handlers should:
+
+1. Prevent unwanted default behavior.
+2. Synchronize unsaved data.
+3. Validate IDs and types.
+4. Delegate reusable logic.
+5. Await document updates.
+6. Re-render only when required.
+
+### Error Handling
+
+Expected user errors should use localized notifications.
+
+Unexpected failures should:
+
+* Preserve stored data.
+* Provide enough technical context for debugging.
+* Avoid exposing sensitive data.
+* Avoid being silently ignored.
+
+Remove temporary debugging output before review.
+
+The initialization log:
 
 ```text
 PRISM | Init
 ```
 
-is intentional and may remain.
+is intentional.
 
 ---
 
 ## Data Changes and Migrations
 
-The project does not currently have a migration framework.
+The project does not currently provide an automated migration framework.
 
-A change to stored Actor data is therefore high risk.
+Any stored-data change is therefore high risk.
 
 Examples include:
 
-* Adding a field.
-* Changing a field type.
-* Renaming a field.
-* Removing a field.
-* Changing the structure of a label.
-* Changing the structure of an inventory entry.
-* Changing the structure of a bag entry.
-* Moving inventory from plain objects to Item documents.
+* Adding or removing Actor fields.
+* Renaming fields.
+* Changing field types.
+* Changing Trait or Adversity structure.
+* Changing bag-entry structure.
+* Changing inventory structure.
+* Moving inventory to Foundry Items.
 * Replacing `template.json` with formal DataModel classes.
 
-### Required Change Description
+A Pull Request changing stored data must explain:
 
-A Pull Request changing stored data must document:
-
-* Previous path and structure.
-* New path and structure.
-* Affected Actor types.
-* Effect on existing worlds.
+* Previous structure.
+* New structure.
+* Existing-world impact.
 * Default behavior for new Actors.
 * Migration or fallback behavior.
 * Compatibility implications.
-* Manual test results using existing data.
-* Backup and recovery expectations.
+* Backup requirements.
+* Test results using existing data.
 
-### Migration Rules
+Rules:
 
-* Do not silently delete stored fields.
-* Do not silently rename stored fields.
-* Do not assume schema-default changes repair existing Actors.
-* Preserve unknown data unless removal is deliberate.
-* Make migration operations repeatable where possible.
-* Record migration completion when a formal migration system is introduced.
-* Back up a test world before running migration code.
+* Do not silently delete stored data.
+* Do not silently rename stored properties.
+* Do not assume that changing defaults updates existing Actors.
+* Preserve unknown data unless deliberate removal is approved.
+* Make migrations repeatable when possible.
+* Test migrations on copied worlds.
 * Never test migration code first on an important campaign.
 
-### Schema Versioning
-
-A future migration framework should introduce an explicit schema version stored in system or Actor data.
-
-Until that exists, every schema change must be clearly identified in:
+Every schema change must be documented in:
 
 * The Pull Request.
 * `CHANGELOG.md`.
 * Release notes.
-* Relevant development documentation.
+* This guide when architecture changes.
+* Installation documentation when user action is required.
 
 ---
 
-## Manual Testing
+## Testing
 
 Manual testing is currently required for every functional change.
 
 Use a dedicated test world with unrelated modules disabled whenever possible.
 
-### System Startup
+### Required Baseline
 
 Verify:
 
 * The system appears in Foundry Setup.
 * A PRISM world can be created.
 * The world loads.
-* `PRISM | Init` appears in the console.
-* No initialization errors appear.
-* The custom Actor sheet is registered.
+* `PRISM | Init` appears.
+* No blocking console errors appear.
 * A `character` Actor can be created.
+* The Anomaly sheet opens.
 
-### Sheet Rendering
-
-Verify:
-
-* The Actor sheet opens.
-* The character image renders.
-* The Actor name is editable.
-* The concept field persists.
-* Main, Bio, and Inventory tabs work.
-* The sheet can be resized.
-* Existing Actor data renders correctly.
-* Closing and reopening the sheet preserves saved values.
-
-### Traits and Adversities
+### Sheet
 
 Verify:
 
-* A trait can be added.
-* An adversity can be added.
-* Names can be edited.
-* Empty rows persist correctly while performing another action.
-* A trait can be deleted.
-* An adversity can be deleted.
-* Deleting one row does not delete another.
-* IDs remain stable after reload.
-* A blank label cannot be added to the bag.
-* The localized warning appears for a blank label.
+* Actor name and concept persist.
+* Tabs work.
+* Traits and Adversities can be managed.
+* Biography and notes persist.
+* Inventory rows persist.
+* The sheet remains usable when resized.
+* Existing Actor data still renders.
 
 ### Virtual Bag
 
 Verify:
 
-* Traits can be added.
-* Adversities can be added.
-* Fear can be added.
-* Danger can be added.
-* The same label can be added more than once.
-* Individual copies can be removed.
-* Clearing removes all bag entries.
-* Clearing also resets the latest draw.
-* Drawing from an empty bag displays a warning.
-* Drawing three entries works with at least three entries.
-* Drawing three from a bag with one or two entries draws only what is available.
+* Valid entries can be added.
+* Invalid entries are rejected as intended.
+* Entries can be removed.
+* Clearing resets the bag and latest draw.
+* Empty-bag drawing displays a warning.
 * Drawn entries leave the bag.
-* Remaining entries stay in the bag.
-* The latest draw contains only the most recent result.
-* Data remains correct after a reload.
+* Remaining entries persist.
+* Draw results persist after reload.
+* Any new composition limits are tested at, below, and above their boundaries.
 
-### Risk Action
+### Risk Dialog
 
 Verify:
 
-* The dialog opens.
 * One, two, and three can be selected.
-* Confirm performs the selected draw.
+* Confirm performs the correct draw.
 * Cancel performs no draw.
 * Closing the dialog performs no draw.
-* Drawing more entries than available is handled safely.
-* The result uses the risk chat title.
+* Small bags are handled safely.
 
 ### Chat
 
 Verify:
 
-* A standard draw creates a chat message.
-* A risk draw creates a chat message.
-* The correct Actor appears as speaker.
-* Every drawn label appears.
-* Trait, adversity, fear, and danger classes render correctly.
-* Long label names do not break the card.
-* Special characters do not break the markup.
-* Potential HTML input is handled safely.
-* English and Italian titles are correct.
-
-### Biography and Notes
-
-Verify:
-
-* Biography persists.
-* Personal notes persist.
-* Marks persist.
-* Multi-line content is preserved.
-* Reloading the world does not lose text.
-
-### Inventory
-
-Verify:
-
-* An inventory row can be added.
-* The item name persists.
-* Quantity persists as a number.
-* Quantity `0` is supported.
-* Rows can be deleted independently.
-* Editing one row does not overwrite another.
-* Values persist after another sheet action.
-* Values persist after reload.
+* Standard and risk draws create messages.
+* The Actor speaker is correct.
+* Every result is present.
+* Type classes render correctly.
+* Long and special-character labels do not break output.
+* User-controlled HTML is handled safely.
 
 ### Localization
 
-Test the system in both:
+Test both:
 
 * English.
 * Italian.
 
 Verify:
 
-* No localization keys appear visibly.
-* Both files contain all used keys.
-* Buttons fit the interface.
+* No raw localization keys appear.
 * Dialogs are translated.
 * Notifications are translated.
 * Chat titles are translated.
-* New user-facing strings are translated.
+* Buttons and labels fit the interface.
 
 ### Compatibility
 
-When changing Foundry APIs, test all Foundry versions claimed by `system.json`.
-
-Record:
+When changing Foundry APIs, record:
 
 * Exact Foundry version and build.
 * Browser or desktop client.
 * Operating system.
 * Enabled modules.
-* New or existing world.
+* Whether the world is new or existing.
 * Relevant console output.
 
 ### Permissions
 
-When a change affects editing or chat behavior, test with:
+When relevant, test as:
 
-* A Gamemaster user.
-* A Player who owns the Actor.
-* A Player who does not own the Actor.
+* Gamemaster.
+* Player owning the Actor.
+* Player not owning the Actor.
 
-Confirm that users cannot modify Actor data beyond their Foundry permissions.
+Users must not modify Actor data beyond their Foundry permissions.
 
 ---
 
 ## Debugging
 
-### Browser Developer Console
+Inspect:
 
-Open the browser developer tools and inspect:
-
-* Console errors.
+* Browser console errors.
 * Failed network requests.
 * Missing templates.
-* Missing stylesheet files.
-* Localization errors.
+* Missing stylesheets.
+* Invalid localization paths.
 * Invalid Actor update paths.
 * Unhandled Promise rejections.
 
-Filter console messages using:
+Useful console filter:
 
 ```text
 PRISM
 ```
 
-### Inspecting Actor Data
+Common checks:
 
-During development, inspect:
+### System Not Listed
 
-```js
-actor.system
+Confirm:
+
+```text
+Data/systems/prism/system.json
 ```
 
-or retrieve a known test Actor through the Foundry console.
+and validate `system.json`.
 
-Do not include private campaign data in screenshots, bug reports, or commits.
+### Sheet Not Registered
 
-### Common Failure Areas
-
-#### System Not Listed
-
-Check:
-
-* Directory name is `prism`.
-* `system.json` is directly inside that directory.
-* JSON syntax is valid.
-* Manifest paths exist.
-
-#### Sheet Not Registered
-
-Check:
+Confirm:
 
 * `module/prism.mjs` loads.
-* The console contains `PRISM | Init`.
-* Import paths are valid.
+* `PRISM | Init` appears.
+* Imports resolve.
 * The Actor type is `character`.
-* Initialization did not fail before registration.
 
-#### Template Not Found
+### Template Not Found
 
-Check:
+Confirm:
 
 ```text
 systems/prism/templates/actor-character-sheet.hbs
 ```
 
-and confirm that the installed folder name matches the system ID.
-
-#### Localization Key Visible
+### Data Lost After an Action
 
 Check:
 
-* The key exists in both language files.
-* The JSON is valid.
-* The key uses the correct case.
-* The namespace begins with `prism`.
-* The manifest language path is correct.
+* `_syncSheetData()`.
+* Row selectors.
+* `data-id`.
+* `data-type`.
+* Actor update paths.
 
-#### Data Lost After Clicking a Button
-
-Check:
-
-* `_syncSheetData()` runs before the action.
-* The row selector matches the template.
-* `data-id` and `data-type` exist.
-* The row is included in the serialization helper.
-* The Actor update path is correct.
-
-#### Bag Entry Not Found
+### Wrong Bag Entry Removed
 
 Check the distinction between:
 
-* Source label ID.
+* Source-label ID.
 * Bag-entry ID.
 
-Removal uses the bag-entry ID.
+Bag removal uses the bag-entry ID.
 
 ---
 
-## Dependencies and Build Tools
+## Dependencies and Generated Files
 
 The current project runs directly from source.
 
-Do not add a dependency, package manager, bundler, compiler, or framework without discussing the change first.
+Do not add a dependency, package manager, compiler, bundler, or framework without explaining:
 
-A proposal for new tooling must explain:
-
-* What problem it solves.
-* Why existing browser and Foundry APIs are insufficient.
-* Runtime versus development-only use.
+* The problem it solves.
+* Why existing code is insufficient.
+* Runtime or development-only use.
 * License.
 * Maintenance status.
 * Security implications.
-* Installation commands.
-* Build commands.
-* Generated output.
-* Release impact.
 * Contributor impact.
-
-When tooling is introduced, update:
-
-* Root `.gitignore`.
-* This development guide.
-* Installation documentation where relevant.
-* Pull Request checks.
-* Release instructions.
-* `CONTRIBUTING.md` if contributor steps change.
+* Build and release impact.
+* Generated output.
 
 Do not commit:
 
 ```text
 node_modules/
 coverage/
-temporary build output
-local caches
+dist/
+build/
+prism.zip
 ```
 
-Generated distributable files should be clearly separated from source files.
+Generated release assets are uploaded to GitHub Releases and are not normal source files.
 
 ---
 
 ## Security Requirements
 
-Follow [`SECURITY.md`](../SECURITY.md) for vulnerability reporting.
+Follow [`SECURITY.md`](../SECURITY.md) for private vulnerability reporting.
 
 Development changes must:
 
-* Respect Foundry ownership and permission checks.
-* Validate user-controlled data.
+* Respect Foundry permissions.
+* Validate user-controlled input.
 * Escape or sanitize user-controlled HTML.
-* Avoid `eval()` and equivalent dynamic code execution.
-* Avoid exposing tokens, credentials, paths, or private world data.
-* Avoid logging sensitive Actor or user information.
+* Avoid dynamic code execution.
+* Avoid exposing tokens or credentials.
+* Avoid logging private campaign data.
 * Avoid unsafe filesystem assumptions.
-* Avoid loading executable code from untrusted remote sources.
-* Review third-party dependencies before introduction.
-* Treat chat content as a security-sensitive output surface.
+* Review third-party dependencies.
+* Treat chat output as security-sensitive.
 
-Security-sensitive findings must not be discussed in a public Issue before coordinated review.
+Do not open a public Issue for an exploitable security vulnerability.
 
 ---
 
-## Packaging and Releases
+## Release Process
 
-The repository root is not the Foundry system package root.
+Publishing a release is a maintainer responsibility.
 
-The package source is:
+External contributors should not:
 
-```text
-prism/
+* Create release tags.
+* Publish GitHub Releases.
+* Change the package version without approval.
+* Change release URLs without approval.
+* Upload release assets.
+
+### 1. Confirm Release Scope
+
+Before release preparation:
+
+1. Confirm the intended version.
+2. Review the associated milestone, when used.
+3. Confirm that required Issues are closed.
+4. Confirm that required Pull Requests are merged.
+5. Move deferred work out of the milestone.
+6. Review unresolved security or data-loss concerns.
+
+A release should not be published with known blocking security or data-loss defects.
+
+### 2. Prepare the Changelog
+
+During development, notable changes belong under:
+
+```md
+## [Unreleased]
 ```
 
-A distributable archive must preserve this runtime structure:
+Before publishing, move those entries into a versioned section:
+
+```md
+## [Unreleased]
+
+## [X.Y.Z] - YYYY-MM-DD
+```
+
+Include only changes actually present in the release.
+
+### 3. Create a Release Branch
+
+From an updated `main`:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+git checkout -b release/X.Y.Z
+```
+
+Example:
+
+```bash
+git checkout -b release/0.2.0
+```
+
+### 4. Update the Manifest
+
+Update:
+
+```text
+prism/system.json
+```
+
+Set:
+
+```json
+{
+  "version": "X.Y.Z",
+  "manifest": "https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json",
+  "download": "https://github.com/Heldan-oss/PRISM-System/releases/download/vX.Y.Z/prism.zip"
+}
+```
+
+Confirm that the tag and download URL use the same version.
+
+Review:
+
+* Compatibility values.
+* Authors.
+* Repository URL.
+* Manifest URL.
+* Download URL.
+* Languages.
+* Runtime file paths.
+
+### 5. Validate and Test
+
+Before opening the release Pull Request:
+
+* Validate `system.json`.
+* Validate `template.json`.
+* Validate localization JSON.
+* Test English and Italian.
+* Test a new world.
+* Test a copied existing world when data changed.
+* Test the main gameplay workflow.
+* Check the browser console.
+* Review the package for unauthorized content.
+
+### 6. Open the Release Pull Request
+
+Use a Pull Request title such as:
+
+```text
+chore: prepare release 0.2.0
+```
+
+The Pull Request should include:
+
+* Version change.
+* Final changelog.
+* Compatibility changes.
+* Release-specific documentation updates.
+
+After approval, merge it into `main` using the normal repository merge policy.
+
+### 7. Update Local `main`
+
+```bash
+git checkout main
+git pull --ff-only origin main
+```
+
+The package must be created from the same `main` commit that will be tagged.
+
+### 8. Build `prism.zip`
+
+Run the packaging command from the repository root.
+
+#### Windows PowerShell
+
+```powershell
+Compress-Archive `
+  -Path prism `
+  -DestinationPath prism.zip `
+  -Force
+```
+
+#### Linux or macOS
+
+```bash
+rm -f prism.zip
+zip -r prism.zip prism \
+  -x "*.DS_Store" \
+  -x "*/.idea/*"
+```
+
+### 9. Verify the Package
+
+Open the archive and confirm that it contains:
 
 ```text
 prism/
@@ -1797,90 +1412,131 @@ prism/
 └── templates/
 ```
 
-After installation, Foundry must see:
+Confirm that:
+
+* `prism/system.json` exists.
+* The ZIP contains no `.git/` directory.
+* The ZIP contains no `.github/` directory.
+* The ZIP contains no `docs/` directory.
+* The ZIP contains no IDE metadata.
+* The included manifest matches the version being published.
+
+### 10. Create the GitHub Release
+
+In GitHub:
+
+1. Open **Releases**.
+2. Select **Draft a new release**.
+3. Create or select the tag:
 
 ```text
-Data/systems/prism/system.json
+vX.Y.Z
 ```
 
-### Release Preparation
+4. Select `main` as the target.
+5. Use a title such as:
 
-Before creating a release:
+```text
+PRISM System X.Y.Z
+```
 
-1. Confirm the intended version.
-2. Update `prism/system.json`.
-3. Update `CHANGELOG.md`.
-4. Verify compatibility values.
-5. Validate all JSON files.
-6. Test English and Italian.
-7. Test the installation package in a clean environment.
-8. Test a new world.
-9. Test an existing backed-up world when data changed.
-10. Remove debug output and local files.
-11. Confirm that no commercial or unauthorized assets are included.
-12. Prepare release notes.
-13. Create the distributable archive.
-14. Verify that the archive contains the correct root structure.
+6. Add release notes based on `CHANGELOG.md`.
+7. Upload:
 
-A release should not be marked stable while known data-loss or security issues remain unresolved.
+```text
+prism.zip
+prism/system.json
+```
+
+The uploaded manifest asset must be named:
+
+```text
+system.json
+```
+
+The uploaded archive must be named:
+
+```text
+prism.zip
+```
+
+The release intended for the public `latest` manifest URL must be published and available as the latest normal release. Do not leave it as a draft.
+
+### 11. Publish and Verify
+
+After publishing, verify:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json
+```
+
+and:
+
+```text
+https://github.com/Heldan-oss/PRISM-System/releases/download/vX.Y.Z/prism.zip
+```
+
+Then test installation from a clean Foundry Setup screen using the public manifest URL.
+
+Verify:
+
+* Foundry reads the manifest.
+* Foundry downloads the correct ZIP.
+* The displayed version is correct.
+* A new PRISM world starts.
+* The Anomaly sheet opens.
+* English and Italian work.
+* No blocking console errors appear.
+
+### 12. Complete the Release
+
+After successful verification:
+
+* Close the corresponding milestone, when used.
+* Update the GitHub Project.
+* Delete the release branch.
+* Keep `CHANGELOG.md` ready for new `Unreleased` entries.
+* Announce the release through the appropriate project channel.
+
+Do not modify an already published release asset to represent a different version. Publish a new version instead.
 
 ---
 
 ## Known Technical Debt
 
-The following items are known from the current implementation and should be tracked deliberately.
+The following items remain known technical debt.
 
-### GitHub Files and IDE Metadata
+### Application V1
 
-GitHub configuration must be stored under `.github/`, not `.idea/`.
-
-The following local files should be removed from version control and ignored:
-
-```text
-.idea/
-PRISM-System.iml
-```
-
-### Application Architecture
-
-The current sheet and dialog use Foundry Application V1 classes:
+The current implementation uses:
 
 ```text
 ActorSheet
 Dialog
 ```
 
-A future modernization should evaluate:
+A future focused change should evaluate migration to Foundry Application V2 classes.
+
+Do not combine that migration with an unrelated feature.
+
+### JSON Actor Template
+
+Actor defaults are currently defined through:
 
 ```text
-ActorSheetV2
-DialogV2
-ApplicationV2
+template.json
 ```
 
-Do not combine that migration with an unrelated feature or bug fix.
+A future migration to formal Foundry DataModel classes would require:
 
-It should be handled as a dedicated architectural change with complete regression testing.
+* Schema design.
+* Compatibility review.
+* Migration planning.
+* Existing-world testing.
 
-### JSON Template Data Model
+### Marks Type
 
-The current system defines Actor defaults through `template.json`.
-
-A future architecture may migrate to formal Foundry DataModel classes and manifest document-type declarations.
-
-That migration would affect:
-
-* Schema validation.
-* Default values.
-* Existing Actors.
-* Compatibility.
-* Migration logic.
-* Tests.
-* Developer documentation.
-
-### `marks` Type Inconsistency
-
-The current schema defines:
+The schema currently defines:
 
 ```json
 {
@@ -1888,23 +1544,13 @@ The current schema defines:
 }
 ```
 
-The sheet renders `system.marks` as a textarea, which indicates text rather than an array.
+while the sheet treats Marks as textarea content.
 
-This type must be reviewed.
+The intended type and future Signs implementation must be resolved through a dedicated data-model change.
 
-A likely target is:
+### Reserved Fields
 
-```json
-{
-  "marks": ""
-}
-```
-
-Do not change it without checking existing Actor data and documenting the migration effect.
-
-### Reserved or Unused Fields
-
-The following schema fields are currently not clearly used by the sheet:
+These fields are currently unused or only partially used:
 
 ```text
 notes
@@ -1913,159 +1559,124 @@ fears
 dangers
 ```
 
-Before removing them, determine whether they are:
+Do not remove them without reviewing existing worlds and planned gameplay features.
 
-* Planned fields.
-* Legacy fields.
-* Used by existing worlds.
-* Required by future gameplay work.
+### Fear and Danger Storage
 
-Removal requires a data-change review.
+Fear and Danger are currently added directly to the bag as generic entries.
 
-### Fear and Danger Collections
+The long-term relationship between:
 
-`labelPathFromType()` maps fear and danger to:
+* Stored Fear or Danger collections.
+* Generic bag entries.
+* Gameplay limits.
 
-```text
-fears
-dangers
-```
+must be defined before expanding the data model.
 
-The current sheet does not create persistent fear or danger label rows.
+### Bag Composition Validation
 
-Instead, fear and danger are added directly to the bag as generic entries.
+The current implementation allows repeated source labels and does not enforce all gameplay composition limits.
 
-The intended long-term model should be clarified before extending either approach.
+Any validation change must:
 
-### Chat HTML Escaping
+* Use internal IDs and types.
+* Preserve existing Actor data.
+* Provide localized feedback.
+* Test boundary conditions.
+* Update this document.
 
-The current chat builder interpolates label names into an HTML string.
+### Chat HTML
 
-User-controlled values must be safely escaped or sanitized.
+User-controlled label names are currently interpolated into chat HTML.
 
-This should be addressed before a stable release.
+Escaping or sanitization must be reviewed before a stable release.
 
-### Inventory Representation
+### Inventory
 
-Inventory entries are currently plain objects inside Actor data.
+Inventory is stored as plain Actor data rather than Foundry Item documents.
 
-They are not Foundry Items.
-
-This is simple and appropriate for the current Alpha implementation, but it limits:
-
-* Drag and drop.
-* Reusable item documents.
-* Compendiums.
-* Item sheets.
-* Item-level permissions.
-* Future automation.
-
-Migrating inventory to Item documents would require a dedicated design and migration.
+Migrating to Items would be a significant data and architecture change.
 
 ### Automated Validation
 
-The repository currently has no automated validation for:
+The repository currently has no automated checks for:
 
 * JavaScript syntax.
-* JSON syntax.
+* JSON validity.
 * Localization-key parity.
-* Template validity.
-* Formatting.
+* Handlebars templates.
 * Unit tests.
 * Integration tests.
-* Packaging.
+* Release packaging.
 
-These checks may be introduced progressively.
-
-### Manifest Review
-
-Before a packaged public release, review:
-
-* Human-readable system title.
-* Grid configuration.
-* Repository URL.
-* Manifest URL.
-* Download URL.
-* Author links.
-* Compatibility range.
-* Release packaging fields.
-
-### Template Attribute Quoting
-
-The inventory placeholder currently appears without quotes around the localized value.
-
-Use:
-
-```hbs
-placeholder="{{localize 'prism.sheet.objectMessage'}}"
-```
+These should be introduced incrementally rather than as an unrelated large tooling change.
 
 ### Unused Helpers
 
-Review whether `labelTypeLabel()` is currently used.
+Review whether all exported utility functions remain necessary.
 
-Unused helpers should either:
+Unused helpers should be:
 
-* Be used consistently.
-* Be documented as planned.
-* Be removed in a focused cleanup.
+* Used consistently.
+* Documented as planned.
+* Removed through a focused cleanup.
 
 ---
 
 ## Definition of Done
 
-A development change is complete when all applicable conditions are satisfied.
+A change is complete when all applicable requirements are satisfied.
 
 ### Code
 
 * The implementation solves one defined problem.
 * Existing architecture is followed.
-* Reusable logic is separated from rendering.
-* No temporary debugging code remains.
+* Reusable logic is separated from presentation.
 * No unrelated refactoring is included.
+* Temporary debugging code is removed.
 * User-controlled data is validated.
-* Actor data is not directly mutated.
+* Persisted Actor data is updated through Foundry APIs.
 
 ### Data
 
 * Changed fields are documented.
 * Existing-world impact is understood.
 * Migration needs are identified.
-* New entries have stable IDs.
+* IDs remain stable.
 * Invalid states are handled.
 * Data persists after reload.
 
 ### Interface
 
-* User-facing text is localized.
+* Visible text is localized.
 * English and Italian are updated.
-* The interface remains usable when resized.
+* Resized layouts remain usable.
 * Keyboard and accessibility effects are considered.
-* Relevant screenshots are included in the Pull Request.
+* Visual changes include screenshots in the Pull Request.
 
 ### Testing
 
 * The system loads.
 * The affected workflow is tested.
 * Relevant edge cases are tested.
-* Additional modules are disabled when isolating behavior.
+* The console is checked.
 * Existing data is tested when affected.
 * Exact Foundry and client versions are recorded.
 
 ### Documentation
 
-* `CHANGELOG.md` is updated for user-visible changes.
-* This guide is updated for architecture changes.
-* `INSTALLATION.md` is updated for setup or packaging changes.
-* `LOCALIZATION.md` is updated for translation workflow changes.
-* `README.md` is updated for project-level behavior or compatibility changes.
+* `CHANGELOG.md` is updated for notable changes.
+* This guide is updated for architecture or release changes.
+* `INSTALLATION.md` is updated for installation changes.
+* `LOCALIZATION.md` is updated for translation-workflow changes.
+* `README.md` is updated for public project behavior.
 
 ### Legal and Security
 
 * No secrets or private data are included.
 * No unauthorized commercial material is included.
-* Third-party licenses are documented.
-* Security-sensitive concerns are handled privately.
+* Third-party licensing is documented.
+* Security-sensitive findings are handled privately.
 * The contribution may be distributed under the repository license.
 
 ---
