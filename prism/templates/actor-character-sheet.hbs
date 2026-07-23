@@ -23,7 +23,7 @@
         <section class="tab active" data-group="primary" data-tab="main">
             <main class="prism-main">
                 <section class="prism-column prism-wide">
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-type-panel prism-trait-panel">
                         <h2>{{localize "prism.sheet.traits"}}</h2>
 
                         <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">
@@ -53,7 +53,7 @@
                         {{/each}}
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-type-panel prism-adversity-panel">
                         <h2>{{localize "prism.sheet.adversity"}}</h2>
 
                         <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">
@@ -84,7 +84,7 @@
                     </section>
 
                     <div class="prism-risk-row">
-                        <section class="prism-panel">
+                        <section class="prism-panel prism-type-panel prism-fear-panel">
                             <h2>{{localize "prism.sheet.fear"}}</h2>
 
                             <button type="button"
@@ -98,7 +98,7 @@
                             </button>
                         </section>
 
-                        <section class="prism-panel">
+                        <section class="prism-panel prism-type-panel prism-danger-panel">
                             <h2>{{localize "prism.sheet.danger"}}</h2>
 
                             <button type="button"
@@ -115,7 +115,7 @@
                 </section>
 
                 <section class="prism-column">
-                    <section class="prism-panel prism-bag">
+                    <section class="prism-panel prism-neutral-panel prism-bag">
                         <h2>{{localize "prism.sheet.bag"}}</h2>
 
                         <div class="prism-bag-list">
@@ -168,7 +168,7 @@
                         </div>
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-neutral-panel">
                         <h2>{{localize "prism.sheet.latestDraw"}}</h2>
 
                         <div class="prism-last-draw-list">
@@ -180,7 +180,7 @@
                         </div>
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-neutral-panel">
                         <h2>{{localize "prism.sheet.signs"}}</h2>
                         <textarea name="system.marks">{{system.marks}}</textarea>
                     </section>
@@ -190,12 +190,12 @@
 
         <section class="tab" data-group="primary" data-tab="bio">
             <section class="prism-tab-grid">
-                <section class="prism-panel">
+                <section class="prism-panel prism-neutral-panel">
                     <h2>{{localize "prism.sheet.bio"}}</h2>
                     <textarea name="system.biography">{{system.biography}}</textarea>
                 </section>
 
-                <section class="prism-panel">
+                <section class="prism-panel prism-neutral-panel">
                     <h2>{{localize "prism.sheet.note"}}</h2>
                     <textarea name="system.personalNotes">{{system.personalNotes}}</textarea>
                 </section>
@@ -203,7 +203,7 @@
         </section>
 
         <section class="tab" data-group="primary" data-tab="inventory">
-            <section class="prism-panel">
+            <section class="prism-panel prism-neutral-panel">
                 <h2>{{localize "prism.sheet.inventory"}}</h2>
 
                 <table class="prism-inventory-table">

@@ -47,8 +47,8 @@ export class PrismActorSheet extends ActorSheet {
 		return foundry.utils.mergeObject(super.defaultOptions, {
 			classes: ["prism", "sheet", "actor"],
 			template: "systems/prism/templates/actor-character-sheet.hbs",
-			width: 760,
-			height: 820,
+			width: 800,
+			height: 900,
 			resizable: true,
 			tabs: [{
 				navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "main"

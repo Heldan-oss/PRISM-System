@@ -1,14 +1,93 @@
 :root {
-    --prism-bg: #f3f0ec;
-    --prism-surface: rgba(255, 255, 255, 0.68);
-    --prism-surface-strong: rgba(255, 255, 255, 0.88);
-    --prism-border: rgba(0, 0, 0, 0.22);
-    --prism-border-strong: rgba(0, 0, 0, 0.38);
-    --prism-text: #1f1f1f;
-    --prism-muted: #666;
+    /* Base palette */
+    --prism-fog: #f3f3f4;
+    --prism-ice: #dddee1;
+    --prism-silver: #c7cacd;
+    --prism-ash: #9fa2a7;
+    --prism-medium: #79797c;
+    --prism-graphite: #434348;
+    --prism-coal: #2a2a2e;
 
-    --prism-trait-bg: rgba(80, 150, 95, 0.25);
-    --prism-adversity-bg: rgba(170, 70, 70, 0.25);
-    --prism-fear-bg: rgba(100, 90, 150, 0.25);
-    --prism-danger-bg: rgba(200, 140, 40, 0.30);
+    /* Accent palette */
+    --prism-cyan: #6fb7d6;
+    --prism-cyan-strong: #4e9bc3;
+    --prism-cyan-dark: #397fa4;
+
+    --prism-amber: #fcc56b;
+    --prism-amber-dark: #b87e28;
+
+    --prism-red: #a34a4a;
+    --prism-red-dark: #783434;
+
+    --prism-fear: #747793;
+    --prism-fear-dark: #50536f;
+
+    /* Semantic surfaces */
+    --prism-bg: var(--prism-silver);
+    --prism-surface: rgba(232, 234, 236, 0.88);
+    --prism-surface-strong: rgba(243, 243, 244, 0.95);
+    --prism-surface-muted: rgba(199, 202, 205, 0.78);
+    --prism-surface-dark: rgba(67, 67, 72, 0.94);
+
+    /* Neutral panel appearance */
+    --prism-neutral-border: #36363c;
+    --prism-neutral-title: #303036;
+    --prism-neutral-panel-bg: rgba(67, 67, 72, 0.12);
+
+    /* Borders */
+    --prism-border-soft: rgba(67, 67, 72, 0.28);
+    --prism-border: rgba(67, 67, 72, 0.55);
+    --prism-border-strong: rgba(42, 42, 46, 0.86);
+
+    /* Typography */
+    --prism-text: #2a2d31;
+    --prism-muted: #5d6369;
+    --prism-text-inverse: #f3f3f4;
+
+    /* Functional colors */
+    --prism-accent: var(--prism-cyan-strong);
+    --prism-accent-dark: var(--prism-cyan-dark);
+    --prism-warning: var(--prism-amber);
+    --prism-warning-dark: var(--prism-amber-dark);
+
+    /* Trait */
+    --prism-trait-bg: rgba(111, 183, 214, 0.24);
+    --prism-trait-panel-bg: rgba(111, 183, 214, 0.15);
+    --prism-trait-border: #4e9bc3;
+    --prism-trait-dark: #2f7398;
+
+    /* Adversity */
+    --prism-adversity-bg: rgba(163, 73, 73, 0.24);
+    --prism-adversity-panel-bg: rgba(163, 73, 73, 0.15);
+    --prism-adversity-border: var(--prism-red);
+    --prism-adversity-dark: var(--prism-red-dark);
+
+    /* Fear */
+    --prism-fear-bg: rgba(116, 119, 147, 0.22);
+    --prism-fear-panel-bg: rgba(116, 119, 147, 0.15);
+    --prism-fear-border: var(--prism-fear);
+    --prism-fear-title: var(--prism-fear-dark);
+
+    /* Danger */
+    --prism-danger-bg: rgba(252, 197, 107, 0.34);
+    --prism-danger-panel-bg: rgba(252, 197, 107, 0.18);
+    --prism-danger-border: #c58a32;
+    --prism-danger-dark: #8b5d1e;
+
+    /* Geometry */
+    --prism-radius-small: 2px;
+    --prism-radius-medium: 4px;
+
+    /* Shadows */
+    --prism-shadow:
+            0 8px 22px rgba(42, 42, 46, 0.24);
+
+    --prism-shadow-small:
+            0 3px 8px rgba(42, 42, 46, 0.14);
+
+    --prism-inset-highlight:
+            inset 0 1px 0 rgba(255, 255, 255, 0.68);
+
+    /* Animation */
+    --prism-transition: 140ms ease;
 }
