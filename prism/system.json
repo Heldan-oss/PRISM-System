@@ -1,25 +1,39 @@
 {
   "id": "prism",
-  "title": "prism-system",
+  "title": "PRISM System",
   "description": "An unofficial system for playing PRISM on Foundry VTT",
   "version": "0.1.1",
+
   "compatibility": {
     "minimum": "12",
     "verified": "14"
   },
+
   "authors": [
     {
       "name": "Heldan"
     }
   ],
+
+  "url": "https://github.com/Heldan-oss/PRISM-System",
+  "manifest": "https://github.com/Heldan-oss/PRISM-System/releases/latest/download/system.json",
+  "download": "https://github.com/Heldan-oss/PRISM-System/releases/download/v0.1.1/prism.zip",
+
+  "readme": "https://github.com/Heldan-oss/PRISM-System/blob/main/README.md",
+  "changelog": "https://github.com/Heldan-oss/PRISM-System/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/Heldan-oss/PRISM-System/issues",
+  "license": "https://github.com/Heldan-oss/PRISM-System/blob/main/LICENSE",
+
   "esmodules": [
     "module/prism.mjs"
   ],
+
   "styles": [
     "styles/variables.css",
     "styles/sheet.css",
     "styles/prism.css"
   ],
+
   "languages": [
     {
       "lang": "it",
@@ -32,7 +46,11 @@
       "path": "lang/en.json"
     }
   ],
-  "gridDistance": 1,
-  "gridUnits": "m",
+
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+
   "socket": false
 }
