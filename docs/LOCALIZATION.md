@@ -439,7 +439,7 @@ Current examples include:
 
 ```js
 ui.notifications.warn(
-    game.i18n.localize("prism.bag.empty")
+	game.i18n.localize("prism.bag.empty")
 );
 ```
 
@@ -461,7 +461,7 @@ Use:
 
 ```js
 ui.notifications.warn(
-    game.i18n.localize("prism.bag.empty")
+	game.i18n.localize("prism.bag.empty")
 );
 ```
 
@@ -501,8 +501,8 @@ For example:
 
 ```js
 {
-    name: game.i18n.localize("prism.bagManager.fear"),
-    type: "fear"
+	name: game.i18n.localize("prism.bagManager.fear"),
+		type: "fear"
 }
 ```
 
@@ -625,7 +625,7 @@ JavaScript use:
 
 ```js
 ui.notifications.warn(
-    game.i18n.localize("prism.bag.exampleRule")
+	game.i18n.localize("prism.bag.exampleRule")
 );
 ```
 
@@ -908,7 +908,7 @@ Preferred conceptual structure:
 
 ```js
 game.i18n.format("prism.chat.drawCount", {
-    count: drawn.length
+	count: drawn.length
 });
 ```
 
@@ -1323,8 +1323,8 @@ Generic Fear and Danger example:
 
 ```js
 {
-    name: game.i18n.localize("prism.bagManager.fear"),
-    type: "fear"
+	name: game.i18n.localize("prism.bagManager.fear"),
+		type: "fear"
 }
 ```
 

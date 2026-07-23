@@ -462,7 +462,7 @@ The runtime code is divided into five modules.
 | File                     | Responsibility                                                       |
 | ------------------------ | -------------------------------------------------------------------- |
 | `module/prism.mjs`       | System initialization and Actor-sheet registration                   |
-| `module/actor-sheet.mjs` | Sheet context, delegated actions, synchronization, and chat output   |
+| `module/actor-sheet.mjs` | Sheet context, delegated actions, queued form submission, and chat output |
 | `module/bag-manager.mjs` | Bag composition rules, session state, validation, and draw operations |
 | `module/dialogs.mjs`     | User dialogs and risk-amount selection                               |
 | `module/utils.mjs`       | Shared paths, label helpers, and array utilities                     |
@@ -497,6 +497,8 @@ Business rules must remain separate from:
 `BagManager` is the authoritative owner of bag rules and warnings. The sheet may expose visual state, but it must not be the only layer preventing invalid operations.
 
 The Actor sheet uses a single delegated listener for elements with `data-action`. Supported actions are routed through an internal action map. New actions should follow the same pattern instead of adding unrelated per-button listeners.
+
+Dynamic Trait, Adversity, and Inventory inputs use a separate targeted `change` listener. Their values are merged into Foundry's normal form-submission data and saved through a serialized submission queue. This keeps field changes, sheet actions, and sheet closure on one persistence path.
 
 Reusable interface-independent helpers belong in a focused module rather than directly in the Actor sheet.
 
@@ -738,29 +740,74 @@ Unknown `data-action` elements should not be intercepted by PRISM routing.
 
 ### Sheet Synchronization
 
-Dynamic fields are synchronized before actions through:
+The sheet uses Foundry's normal form-submission workflow as the authoritative persistence path.
+
+Static named fields, such as Actor name, Concept, Biography, Notes, and Signs, are collected by the base `ActorSheet` implementation. Dynamic collections are added by the sheet override:
+
+```text
+_getSubmitData()
+```
+
+The override merges the following collections into the submission payload:
+
+* `system.traits`
+* `system.adversities`
+* `system.inventory`
+
+Dynamic row inputs intentionally do not use index-based `name` paths. Their stable `data-id` values and semantic row classes are used to rebuild the arrays without making stored identity depend on visual order.
+
+The current form options are:
+
+```text
+submitOnChange: false
+submitOnClose: true
+closeOnSubmit: false
+```
+
+Global `submitOnChange` remains disabled. Instead, the sheet listens specifically for `change` events from:
+
+```text
+.prism-label-row input
+.prism-inventory-row input
+```
+
+A targeted change calls the standard `submit()` workflow with:
+
+```text
+preventClose: true
+preventRender: true
+```
+
+This saves the current form without closing or re-rendering the sheet.
+
+Before actions that may update or re-render Actor data, handlers call:
 
 ```text
 _syncSheetData()
 ```
 
-The current synchronization covers:
+`_syncSheetData()` does not update the Actor directly. It delegates to the same queued `submit()` workflow used by dynamic field changes.
 
-* Traits.
-* Adversities.
-* Inventory rows.
+Submissions are serialized through an internal Promise queue. This prevents a field-change save and an immediately following action from completing out of order and overwriting newer values.
 
-Inventory quantities are parsed as integers and clamped to zero or greater.
+The current synchronization guarantees that Trait, Adversity, and Inventory values are preserved when:
 
-Any new dynamic collection must define how unsaved values are preserved before:
+* A dynamic field changes.
+* Another sheet action is performed.
+* The sheet is closed.
+* The world or sheet is subsequently reloaded.
 
-* Adding rows.
-* Deleting rows.
-* Drawing.
-* Updating the bag.
-* Re-rendering the sheet.
+Inventory quantities are parsed as integers and clamped to zero or greater during submission.
 
-Do not introduce controls that silently discard unsaved data.
+Any new dynamic collection must define:
+
+* How rows are identified without array-index identity.
+* How its values are added to `_getSubmitData()`.
+* Whether its inputs belong in the targeted change selector.
+* How pending values are synchronized before actions and re-renders.
+* Which persistence and immediate-close tests cover the collection.
+
+Do not introduce controls or custom update paths that can silently discard unsaved data.
 
 ### Chat Output Safety
 
@@ -1235,13 +1282,15 @@ Handlers should:
 
 1. Route only supported semantic actions.
 2. Prevent unwanted default behavior for handled actions.
-3. Synchronize unsaved data.
+3. Synchronize unsaved data through the queued form-submission path.
 4. Validate IDs and types.
 5. Delegate reusable rules to `BagManager`.
 6. Await document updates.
 7. Re-render only when required.
 
 Do not reproduce bag limits or session rules inside template event handlers.
+
+Do not create a second full-form persistence path with a direct `actor.update()` call. Dynamic sheet synchronization should continue through `_getSubmitData()`, `submit()`, and the submission queue. Focused Actor updates remain appropriate after synchronization when an action deliberately changes one specific stored collection or gameplay state.
 
 ### Error Handling
 
@@ -1341,9 +1390,18 @@ Verify:
 * Actor name and concept persist.
 * Tabs work.
 * Traits and Adversities can be managed.
+* A newly added Trait retains its name when the sheet is closed immediately.
+* A newly added Adversity retains its name when the sheet is closed immediately.
+* Editing a dynamic label and immediately selecting another action preserves the latest value.
 * Biography and notes persist.
 * Inventory rows persist.
+* The newest Inventory row retains both name and quantity when the sheet is closed immediately.
+* Several Inventory rows can be edited without the final row losing its values.
+* Dynamic values persist after closing and reopening the sheet.
+* Dynamic values persist after reloading the world.
 * Negative or invalid inventory quantities normalize safely.
+* Submission does not unexpectedly close or re-render the sheet during a dynamic-field change.
+* Rapid field-change and action sequences do not restore stale values.
 * The `224 × 224` image area renders correctly.
 * Type panels use the intended semantic accents.
 * Neutral sections do not inherit a type color.
@@ -1505,15 +1563,28 @@ Confirm:
 systems/prism/templates/actor-character-sheet.hbs
 ```
 
-### Data Lost After an Action
+### Dynamic Sheet Data Is Not Persisted
 
-Check:
+If a Trait, Adversity, or Inventory row exists but its latest values are missing after reopening the sheet, check:
 
-* `_syncSheetData()`.
-* Row selectors.
-* `data-id`.
-* `data-type`.
-* Actor update paths.
+* `_getSubmitData()` includes Traits, Adversities, and Inventory.
+* The current form is available through `this.form`.
+* Dynamic row selectors still match the template.
+* Every row has a stable `data-id`.
+* Trait and Adversity rows retain the correct `data-type`.
+* Dynamic inputs match the targeted `change` selector.
+* `_syncSheetData()` calls the queued `submit()` workflow rather than updating the Actor directly.
+* `submitOnClose` remains enabled.
+* `closeOnSubmit` remains disabled.
+* Automatic submissions use `preventClose` and `preventRender`.
+* The submission queue is not bypassed by a newly added action.
+* The browser console does not contain:
+
+```text
+PRISM | Failed to save dynamic sheet data
+```
+
+Reproduce the problem by editing only the newest row and closing the sheet immediately. Testing only after clicking another action can hide persistence defects because that action may synchronize the form first.
 
 ### Wrong Bag Entry Removed or Duplicate Check Fails
 
@@ -1899,7 +1970,16 @@ ActorSheet
 Dialog
 ```
 
-A future focused change should evaluate migration to Foundry Application V2 classes.
+Dynamic-field persistence currently relies on the Application V1 form lifecycle, including `_getSubmitData()`, `submit()`, `submitOnClose`, and submission options that suppress closing and rendering.
+
+A future focused change should evaluate migration to Foundry Application V2 classes. That migration must explicitly replace and retest:
+
+* Dynamic collection serialization.
+* Targeted field-change saving.
+* Save-on-close behavior.
+* Submission ordering.
+* Action synchronization.
+* Dialog behavior.
 
 Do not combine that migration with an unrelated feature.
 
@@ -2024,6 +2104,7 @@ A change is complete when all applicable requirements are satisfied.
 * IDs remain stable.
 * Invalid states are handled.
 * Data persists after reload.
+* Dynamic rows preserve their latest values after field changes, actions, and sheet closure.
 
 ### Interface
 
@@ -2038,6 +2119,8 @@ A change is complete when all applicable requirements are satisfied.
 * The system loads.
 * The affected workflow is tested.
 * Relevant edge cases are tested.
+* Immediate-close persistence is tested for newly added dynamic rows when applicable.
+* Rapid field-change and action sequences are tested when form submission is affected.
 * The console is checked.
 * Existing data is tested when affected.
 * Exact Foundry and client versions are recorded.
