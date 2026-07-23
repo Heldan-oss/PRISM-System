@@ -64,14 +64,15 @@ The current implementation uses:
 
 * JavaScript ES modules with the `.mjs` extension.
 * Foundry VTT Actor documents.
-* A custom Actor sheet.
-* Handlebars templates.
+* Foundry Application V1 `ActorSheet` and `Dialog` classes.
+* A custom Actor sheet rendered with Handlebars.
 * JSON localization files.
-* CSS stylesheets.
-* Foundry VTT dialogs.
-* Foundry VTT notifications.
-* Foundry VTT chat messages.
+* CSS custom properties and scoped stylesheets.
+* Foundry VTT notifications and chat messages.
 * A JSON Actor data template.
+* No runtime dependencies, compiler, bundler, or build step.
+
+The runtime package currently targets the compatibility range declared in `prism/system.json`. At the time of this update, the manifest declares Foundry VTT 12 as the minimum version and Foundry VTT 14 as the verified version. The manifest remains the authoritative source if those values change.
 
 ---
 
@@ -390,18 +391,7 @@ The manifest should contain:
 
 The `manifest` URL remains stable between releases.
 
-The `download` URL must point to the exact release matching the manifest version.
-
-For example:
-
-```json
-{
-  "version": "0.1.1",
-  "download": "https://github.com/Heldan-oss/PRISM-System/releases/download/v0.1.1/prism.zip"
-}
-```
-
-Do not change the `version` or version-specific `download` URL outside release preparation unless explicitly requested by a maintainer.
+The `version`, release tag, and version-specific `download` URL must match exactly. Do not change version or distribution fields outside release preparation unless explicitly requested by a maintainer.
 
 ### Entry Module
 
@@ -415,7 +405,7 @@ through the `esmodules` manifest field.
 
 ### Stylesheets
 
-The current stylesheet order is:
+The stylesheet order is:
 
 ```text
 styles/variables.css
@@ -425,24 +415,35 @@ styles/prism.css
 
 Order matters:
 
-1. `variables.css` defines reusable design values.
-2. `sheet.css` defines the Actor-sheet layout.
-3. `prism.css` defines shared system and chat presentation.
+1. `variables.css` defines the PRISM palette, semantic colors, geometry, shadows, and transitions.
+2. `sheet.css` defines the Actor-sheet window, layout, controls, panels, bag presentation, and inventory.
+3. `prism.css` defines shared presentation, including PRISM chat cards and result labels.
 
 ### Languages
 
-The current manifest registers:
+The manifest registers:
 
 ```text
-lang/en.json
 lang/it.json
+lang/en.json
 ```
 
-Language files must remain synchronized at the key level.
+Both files must remain valid JSON and synchronized at the key-path level.
 
-### Compatibility Changes
+### Compatibility
 
-Do not change Foundry compatibility declarations without testing the affected versions.
+The current compatibility declaration is:
+
+```json
+{
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14"
+  }
+}
+```
+
+Do not change compatibility declarations without testing the affected Foundry versions.
 
 A compatibility change must update, when applicable:
 
@@ -458,13 +459,13 @@ A compatibility change must update, when applicable:
 
 The runtime code is divided into five modules.
 
-| File                     | Responsibility                                          |
-| ------------------------ | ------------------------------------------------------- |
-| `module/prism.mjs`       | System initialization and Actor-sheet registration      |
-| `module/actor-sheet.mjs` | Sheet context, events, synchronization, and chat output |
-| `module/bag-manager.mjs` | Virtual-bag data and draw operations                    |
-| `module/dialogs.mjs`     | User dialogs                                            |
-| `module/utils.mjs`       | Shared paths, labels, and array utilities               |
+| File                     | Responsibility                                                       |
+| ------------------------ | -------------------------------------------------------------------- |
+| `module/prism.mjs`       | System initialization and Actor-sheet registration                   |
+| `module/actor-sheet.mjs` | Sheet context, delegated actions, synchronization, and chat output   |
+| `module/bag-manager.mjs` | Bag composition rules, session state, validation, and draw operations |
+| `module/dialogs.mjs`     | User dialogs and risk-amount selection                               |
+| `module/utils.mjs`       | Shared paths, label helpers, and array utilities                     |
 
 High-level flow:
 
@@ -486,14 +487,16 @@ PrismActorSheet
 
 Keep initialization code small.
 
-Business logic should be separated from:
+Business rules must remain separate from:
 
 * Handlebars presentation.
-* Click handlers.
-* CSS.
-* Localization values.
+* Click-handler routing.
+* CSS state.
+* Translated values.
 
-Reusable bag behavior belongs in `BagManager`.
+`BagManager` is the authoritative owner of bag rules and warnings. The sheet may expose visual state, but it must not be the only layer preventing invalid operations.
+
+The Actor sheet uses a single delegated listener for elements with `data-action`. Supported actions are routed through an internal action map. New actions should follow the same pattern instead of adding unrelated per-button listeners.
 
 Reusable interface-independent helpers belong in a focused module rather than directly in the Actor sheet.
 
@@ -507,7 +510,7 @@ The Actor schema is defined in:
 prism/template.json
 ```
 
-The current system supports one Actor type:
+The system supports one Actor type:
 
 ```text
 character
@@ -517,21 +520,33 @@ No custom Item types are currently defined.
 
 ### Current Actor Fields
 
-| Field           | Default | Purpose             |
-| --------------- | ------: | ------------------- |
-| `concept`       |    `""` | Character concept   |
-| `biography`     |    `""` | Biography           |
-| `personalNotes` |    `""` | Personal notes      |
-| `notes`         |    `""` | Reserved or unused  |
-| `questions`     |    `""` | Reserved or unused  |
-| `inventory`     |    `[]` | Inventory entries   |
-| `traits`        |    `[]` | Trait entries       |
-| `adversities`   |    `[]` | Adversity entries   |
-| `fears`         |    `[]` | Reserved collection |
-| `dangers`       |    `[]` | Reserved collection |
-| `marks`         |    `[]` | Current Marks value |
-| `bag`           |    `[]` | Virtual-bag entries |
-| `lastDraw`      |    `[]` | Most recent draw    |
+| Field           | Default | Purpose                                      |
+| --------------- | ------: | -------------------------------------------- |
+| `concept`       |    `""` | Character concept                            |
+| `biography`     |    `""` | Biography                                    |
+| `personalNotes` |    `""` | Personal notes                               |
+| `notes`         |    `""` | Reserved or unused                           |
+| `questions`     |    `""` | Reserved or unused                           |
+| `inventory`     |    `[]` | Inventory entries                            |
+| `traits`        |    `[]` | Trait entries                                |
+| `adversities`   |    `[]` | Adversity entries                            |
+| `fears`         |    `[]` | Reserved collection                          |
+| `dangers`       |    `[]` | Reserved collection                          |
+| `marks`         |    `[]` | Current Signs/Marks value; type mismatch remains |
+| `bag`           |    `[]` | Virtual-bag entries                          |
+| `lastDraw`      |    `[]` | Most recent successful draw                  |
+| `bagSession`    | object  | Initial-draw and risk-use session state       |
+
+The current `bagSession` default is:
+
+```json
+{
+  "initialDrawCompleted": false,
+  "riskCompleted": false
+}
+```
+
+Existing Actors created before this field was introduced may not contain it. Runtime code must treat missing values as `false`; changing `template.json` does not automatically update existing Actors.
 
 ### Trait and Adversity Entries
 
@@ -549,7 +564,17 @@ Each entry contains:
 * A user-visible name.
 * An internal semantic type.
 
+The same structure is used for Adversities with:
+
+```text
+adversity
+```
+
+as the internal type.
+
 ### Bag Entries
+
+Stored Trait and Adversity entries use:
 
 ```json
 {
@@ -573,7 +598,11 @@ Generic Fear and Danger entries use:
 
 The bag-entry ID is distinct from the source-label ID.
 
-The current implementation permits multiple bag entries originating from the same source label. Future validation changes must update this document and describe their effect on existing Actors.
+For stored Traits and Adversities, `sourceId` is the identity used for duplicate prevention. A source label may appear in the bag only once, regardless of its translated or edited display name.
+
+Generic Fear and Danger entries intentionally use `sourceId: null`. They are controlled by type limits rather than source-label uniqueness.
+
+Bag-entry names are snapshots stored at insertion time. Renaming a source label or changing the active Foundry language does not automatically rewrite existing bag entries.
 
 ### Inventory Entries
 
@@ -587,17 +616,25 @@ The current implementation permits multiple bag entries originating from the sam
 
 Inventory entries are plain objects stored inside Actor data. They are not Foundry Item documents.
 
+Inventory quantities are normalized to non-negative integers when sheet data is synchronized.
+
 ### Current Data Rules
 
 Unless a focused data change is approved:
 
 * Dynamic entries must have stable IDs.
 * Internal types must not be localized.
-* Inventory quantities must be numeric.
 * `bag` and `lastDraw` must remain arrays.
 * Blank labels must not be added to the bag.
-* Drawn entries must be removed from the bag.
-* Clearing the bag must also clear `lastDraw`.
+* A stored Trait or Adversity may be present in the bag only once per `sourceId`.
+* The bag may contain at most four Adversities.
+* The bag may contain at most three generic Fears.
+* The bag may contain at most four generic Dangers.
+* The initial draw requires at least one Danger in the bag.
+* Drawn entries are removed from the bag.
+* Clearing the bag also clears `lastDraw` and resets `bagSession`.
+* Adding the first entry to an empty bag starts a new test and clears the previous `lastDraw`.
+* Existing invalid bags are preserved; runtime validation prevents new invalid operations but does not silently delete or normalize stored entries.
 
 ---
 
@@ -615,9 +652,23 @@ and rendered by:
 prism/templates/actor-character-sheet.hbs
 ```
 
+The default sheet size is currently:
+
+```text
+800 × 900
+```
+
+The sheet is resizable and retains the PRISM-specific classes:
+
+```text
+prism sheet actor
+```
+
+These classes are required by the scoped stylesheet selectors.
+
 ### Sheet Context
 
-The sheet currently exposes:
+The sheet exposes:
 
 ```text
 system
@@ -626,27 +677,33 @@ adversities
 bag
 lastDraw
 inventory
+bagSize
+initialDrawCompleted
+riskCompleted
+canModifyBag
+canInitialDraw
+canTakeRisk
 ```
 
-Missing collections fall back to empty arrays.
+Missing collections fall back to empty arrays. Bag-state flags are derived through `BagManager.getViewState(actor)` rather than duplicated in the template.
 
 ### Sheet Actions
 
 Current actions include:
 
-| Action                  | Purpose                       |
-| ----------------------- | ----------------------------- |
-| `add-label`             | Add a Trait or Adversity      |
-| `delete-label`          | Delete a Trait or Adversity   |
-| `add-to-bag`            | Add a stored label to the bag |
-| `remove-from-bag`       | Remove one bag entry          |
-| `clear-bag`             | Clear the bag and latest draw |
-| `draw-three`            | Draw up to three entries      |
-| `risk`                  | Open the risk dialog and draw |
-| `add-fear`              | Add a generic Fear            |
-| `add-danger`            | Add a generic Danger          |
-| `add-inventory-item`    | Add an inventory row          |
-| `delete-inventory-item` | Delete an inventory row       |
+| Action                  | Purpose                                      |
+| ----------------------- | -------------------------------------------- |
+| `add-label`             | Add a Trait or Adversity source row          |
+| `delete-label`          | Delete a Trait or Adversity source row       |
+| `add-to-bag`            | Add a stored source label to the bag         |
+| `remove-from-bag`       | Remove one bag entry before the test starts  |
+| `clear-bag`             | Clear the bag, latest draw, and session state |
+| `draw-three`            | Perform the one allowed initial draw         |
+| `risk`                  | Open the risk dialog and perform one risk draw |
+| `add-fear`              | Add a generic Fear                           |
+| `add-danger`            | Add a generic Danger                         |
+| `add-inventory-item`    | Add an inventory row                         |
+| `delete-inventory-item` | Delete an inventory row                      |
 
 Use semantic template attributes:
 
@@ -663,6 +720,22 @@ Do not bind behavior to:
 * CSS presentation.
 * Array indexes.
 
+### Delegated Action Handling
+
+The sheet routes supported `data-action` values through one delegated click listener and an action-handler map.
+
+A handler should:
+
+1. Identify a supported action.
+2. Prevent default behavior only for that supported action.
+3. Synchronize unsaved sheet data when required.
+4. Validate IDs and semantic types.
+5. Delegate bag rules to `BagManager`.
+6. Await document updates.
+7. Re-render only after a successful state change.
+
+Unknown `data-action` elements should not be intercepted by PRISM routing.
+
 ### Sheet Synchronization
 
 Dynamic fields are synchronized before actions through:
@@ -670,6 +743,14 @@ Dynamic fields are synchronized before actions through:
 ```text
 _syncSheetData()
 ```
+
+The current synchronization covers:
+
+* Traits.
+* Adversities.
+* Inventory rows.
+
+Inventory quantities are parsed as integers and clamped to zero or greater.
 
 Any new dynamic collection must define how unsaved values are preserved before:
 
@@ -680,6 +761,21 @@ Any new dynamic collection must define how unsaved values are preserved before:
 * Re-rendering the sheet.
 
 Do not introduce controls that silently discard unsaved data.
+
+### Chat Output Safety
+
+The sheet escapes localized titles and user-controlled label names before inserting them into chat-card HTML.
+
+Only known semantic result types are accepted for CSS class suffixes:
+
+```text
+trait
+adversity
+fear
+danger
+```
+
+Unknown values must fall back to a safe presentation class rather than being interpolated directly into HTML.
 
 ---
 
@@ -696,12 +792,126 @@ prism/module/bag-manager.mjs
 `BagManager` handles:
 
 * Reading cloned bag data.
+* Counting entries by semantic type.
+* Exposing sheet view state.
 * Adding stored labels.
 * Adding generic Fear and Danger entries.
-* Removing entries.
-* Clearing the bag.
-* Drawing entries.
+* Preventing duplicate source labels.
+* Enforcing composition limits.
+* Removing entries before a test begins.
+* Clearing the bag and session.
+* Validating the initial draw.
+* Validating the risk draw.
 * Updating `lastDraw`.
+* Persisting `bagSession` state.
+* Showing localized warnings for invalid operations.
+
+### Composition Rules
+
+The current limits are:
+
+| Entry type | Rule |
+| ---------- | ---- |
+| Trait | No type-count limit; each source label may be added once |
+| Adversity | Maximum four; each source label may be added once |
+| Fear | Maximum three generic entries |
+| Danger | Maximum four generic entries |
+
+The limits are enforced in `BagManager`, not only through template state or CSS.
+
+The initial draw additionally requires at least one Danger in the bag.
+
+### Test Session State
+
+A bag test uses two persistent flags:
+
+```json
+{
+  "initialDrawCompleted": false,
+  "riskCompleted": false
+}
+```
+
+The intended state flow is:
+
+```text
+Bag preparation
+    │
+    ├── composition may be changed
+    ├── initial draw available when the bag contains a Danger
+    └── risk unavailable
+
+Initial draw succeeds and entries remain
+    │
+    ├── composition locks
+    ├── initial draw becomes unavailable
+    └── one risk draw becomes available
+
+Risk draw succeeds and entries remain
+    │
+    ├── composition remains locked
+    ├── initial draw remains unavailable
+    └── risk becomes unavailable
+
+Bag becomes empty or Clear Bag is used
+    │
+    └── session flags reset
+```
+
+Rules:
+
+* Only one initial draw is allowed per test.
+* Only one risk draw is allowed per test.
+* Risk requires a completed initial draw.
+* Risk does not require a remaining Danger.
+* Bag composition is locked after a successful initial draw while entries remain.
+* Locked composition prevents adding and manually removing bag entries.
+* Source Trait and Adversity rows may still be edited independently; the lock applies to bag composition.
+* `Clear Bag` is always available and resets the test.
+* If the initial draw empties the bag, the session resets automatically.
+* If the risk draw empties the bag, the session resets automatically.
+* Automatic reset does not erase the successful `lastDraw` result.
+* Adding the first entry to the next empty bag clears the previous `lastDraw`.
+
+### View State
+
+`BagManager.getViewState(actor)` exposes:
+
+```text
+bagSize
+initialDrawCompleted
+riskCompleted
+canModifyBag
+canInitialDraw
+canTakeRisk
+```
+
+The template uses these values to communicate availability. They are presentation helpers only; every action must still be validated by `BagManager`.
+
+### Clickable Unavailable Controls
+
+Unavailable bag controls are visually marked with:
+
+```hbs
+class="prism-is-disabled"
+aria-disabled="true"
+```
+
+They intentionally remain clickable so JavaScript can display the specific localized reason for the blocked operation.
+
+Do not add:
+
+```html
+disabled
+```
+
+and do not apply:
+
+```css
+pointer-events: none;
+```
+
+to those controls unless the interaction model is deliberately redesigned.
 
 ### Data Mutation
 
@@ -721,24 +931,43 @@ await actor.update({
 
 Do not directly mutate persisted Actor source data.
 
-### Drawing
+### Initial Draw
 
-The current draw process:
+The initial draw:
 
-1. Reads the current bag.
-2. Rejects an empty bag.
-3. Limits the amount to the number of available entries.
-4. Shuffles the entries.
-5. Selects the requested entries.
-6. Removes drawn entries from the bag.
-7. Stores the result in `lastDraw`.
-8. Returns the result.
+1. Rejects an empty bag.
+2. Rejects a test whose initial draw is already complete.
+3. Requires at least one Danger in the current bag.
+4. Draws up to three entries.
+5. Removes the drawn entries from the bag.
+6. Stores them in `lastDraw`.
+7. Locks the test if entries remain.
+8. Resets session flags if no entries remain.
 
-Drawing is without replacement.
+“Draw up to three” means a valid bag containing fewer than three entries draws all available entries.
+
+### Risk Draw
+
+The risk draw:
+
+1. Rejects an empty bag.
+2. Requires a completed initial draw.
+3. Rejects a second risk during the same test.
+4. Allows one, two, or three entries according to the remaining bag size.
+5. Removes the drawn entries from the bag.
+6. Stores them in `lastDraw`.
+7. Marks risk as completed if entries remain.
+8. Resets session flags if no entries remain.
+
+### Existing Invalid Data
+
+Validation is prospective. Existing Actors with duplicated entries or counts above current limits are not automatically rewritten.
+
+This avoids silent data loss. Such bags remain stored until the user clears or manually resolves them through allowed actions.
 
 ### Randomization
 
-The system currently uses a Fisher–Yates-style shuffle based on `Math.random()`.
+The system uses a Fisher–Yates-style shuffle based on `Math.random()`.
 
 It is intended for ordinary gameplay resolution, not cryptographic use.
 
@@ -761,15 +990,15 @@ The risk dialog is implemented in:
 prism/module/dialogs.mjs
 ```
 
-It resolves with:
+The available options are generated from the remaining bag size:
 
-```text
-1
-2
-3
-```
+| Remaining entries | Selectable amounts |
+| ----------------- | ------------------ |
+| 1 | 1 |
+| 2 | 1 or 2 |
+| 3 or more | 1, 2, or 3 |
 
-or:
+The dialog resolves with a positive integer from the displayed options, or:
 
 ```text
 null
@@ -777,11 +1006,13 @@ null
 
 when cancelled or closed.
 
+The dialog must not open when `BagManager.validateRisk(actor)` rejects the action.
+
 Visible dialog text must be localized.
 
 ### Chat Messages
 
-Draw results are created by the Actor sheet using Foundry `ChatMessage`.
+Successful initial and risk draws are created by the Actor sheet using Foundry `ChatMessage`.
 
 Current result types use CSS classes such as:
 
@@ -790,18 +1021,20 @@ prism-trait
 prism-adversity
 prism-fear
 prism-danger
+prism-unknown
 ```
 
 Chat output must:
 
 * Use the current Actor as speaker.
 * Use localized titles.
-* Preserve semantic result types.
+* Preserve known semantic result types.
 * Handle long labels.
-* Escape or sanitize user-controlled content.
+* Escape localized titles and user-controlled label names.
+* Reject unsafe type-derived CSS suffixes through an allow-list.
 * Avoid exposing private data.
 
-Do not interpolate new user-controlled values into HTML without reviewing their safety.
+Do not interpolate additional user-controlled values into HTML without reviewing and preserving the existing escaping strategy.
 
 ---
 
@@ -822,7 +1055,8 @@ Templates should:
 * Use semantic `data-*` attributes.
 * Quote generated attribute values.
 * Avoid mutating data.
-* Avoid complex gameplay logic.
+* Avoid duplicating gameplay validation.
+* Preserve clickable warning behavior for visually unavailable bag controls.
 
 Correct:
 
@@ -836,6 +1070,20 @@ Avoid:
 placeholder={{localize 'prism.sheet.objectMessage'}}
 ```
 
+Current semantic panel classes include:
+
+```text
+prism-type-panel
+prism-trait-panel
+prism-adversity-panel
+prism-fear-panel
+prism-danger-panel
+prism-neutral-panel
+prism-bag
+```
+
+Type classes identify visual meaning only. Game rules still use internal data types and `BagManager` validation.
+
 ### Styles
 
 Styles are divided into:
@@ -848,9 +1096,22 @@ styles/prism.css
 
 Use:
 
-* `variables.css` for reusable values and palette definitions.
-* `sheet.css` for Actor-sheet layout and controls.
+* `variables.css` for the base palette, semantic colors, type colors, geometry, shadows, and transitions.
+* `sheet.css` for Actor-sheet layout, controls, semantic panels, bag presentation, and inventory.
 * `prism.css` for shared system and chat components.
+
+The current visual direction uses:
+
+* Cold metallic gray surfaces.
+* Graphite neutral borders for general panels.
+* Cyan for Traits.
+* Muted red for Adversities.
+* Cool desaturated violet-gray for Fears.
+* Amber for Dangers and risk emphasis.
+
+General sections such as the header, bag container, latest draw, Signs, Biography, Notes, and Inventory use the neutral graphite treatment rather than a gameplay-type accent.
+
+The character image is currently designed at `224 × 224` pixels inside the sheet header.
 
 CSS must:
 
@@ -860,6 +1121,9 @@ CSS must:
 * Support translated text.
 * Avoid communicating state through color alone.
 * Remain usable when the sheet is resized.
+* Keep `variables.css` loaded before dependent stylesheets.
+* Keep visually unavailable controls clickable when the interface relies on a JavaScript warning.
+* Avoid `pointer-events: none` on those warning-capable controls.
 
 ---
 
@@ -882,6 +1146,18 @@ prism.dialog
 prism.chat
 ```
 
+Bag localization includes action labels and validation messages for:
+
+* Empty bags.
+* Blank labels.
+* Duplicate source labels.
+* Adversity, Fear, and Danger limits.
+* Missing Danger for the initial draw.
+* Risk before the initial draw.
+* Repeated initial draws.
+* Repeated risk draws.
+* Locked bag composition.
+
 ### JavaScript
 
 ```js
@@ -900,7 +1176,9 @@ Rules:
 * Keep English and Italian keys synchronized.
 * Do not localize internal types or IDs.
 * Preserve placeholders.
-* Test translated text in Foundry.
+* Validate both JSON files after every edit.
+* Test translated text and title attributes in Foundry.
+* Reload the world after changing the active language or localization files.
 * Avoid adding substantial copyrighted rules text.
 
 See [`LOCALIZATION.md`](LOCALIZATION.md) for the complete translation workflow.
@@ -944,16 +1222,26 @@ for persistent plain-object IDs.
 
 Do not use array indexes as stored identifiers.
 
+Keep these identities distinct:
+
+* Source Trait or Adversity ID.
+* Bag-entry ID.
+* Internal semantic type.
+* Localized display name.
+
 ### Event Handlers
 
 Handlers should:
 
-1. Prevent unwanted default behavior.
-2. Synchronize unsaved data.
-3. Validate IDs and types.
-4. Delegate reusable logic.
-5. Await document updates.
-6. Re-render only when required.
+1. Route only supported semantic actions.
+2. Prevent unwanted default behavior for handled actions.
+3. Synchronize unsaved data.
+4. Validate IDs and types.
+5. Delegate reusable rules to `BagManager`.
+6. Await document updates.
+7. Re-render only when required.
+
+Do not reproduce bag limits or session rules inside template event handlers.
 
 ### Error Handling
 
@@ -987,6 +1275,7 @@ Any stored-data change is therefore high risk.
 Examples include:
 
 * Adding or removing Actor fields.
+* Adding persistent session state such as `bagSession`.
 * Renaming fields.
 * Changing field types.
 * Changing Trait or Adversity structure.
@@ -1011,6 +1300,7 @@ Rules:
 * Do not silently delete stored data.
 * Do not silently rename stored properties.
 * Do not assume that changing defaults updates existing Actors.
+* Runtime code must provide safe fallbacks for missing `bagSession` fields.
 * Preserve unknown data unless deliberate removal is approved.
 * Make migrations repeatable when possible.
 * Test migrations on copied worlds.
@@ -1042,7 +1332,7 @@ Verify:
 * `PRISM | Init` appears.
 * No blocking console errors appear.
 * A `character` Actor can be created.
-* The Anomaly sheet opens.
+* The Anomaly sheet opens at its expected default size.
 
 ### Sheet
 
@@ -1053,43 +1343,80 @@ Verify:
 * Traits and Adversities can be managed.
 * Biography and notes persist.
 * Inventory rows persist.
+* Negative or invalid inventory quantities normalize safely.
+* The `224 × 224` image area renders correctly.
+* Type panels use the intended semantic accents.
+* Neutral sections do not inherit a type color.
 * The sheet remains usable when resized.
 * Existing Actor data still renders.
 
-### Virtual Bag
+### Virtual Bag Composition
 
 Verify:
 
-* Valid entries can be added.
-* Invalid entries are rejected as intended.
-* Entries can be removed.
-* Clearing resets the bag and latest draw.
-* Empty-bag drawing displays a warning.
-* Drawn entries leave the bag.
-* Remaining entries persist.
-* Draw results persist after reload.
-* Any new composition limits are tested at, below, and above their boundaries.
+* A valid Trait can be added once.
+* A valid Adversity can be added once.
+* Adding the same source Trait or Adversity twice is rejected.
+* Four Adversities are accepted and a fifth is rejected.
+* Three Fears are accepted and a fourth is rejected.
+* Four Dangers are accepted and a fifth is rejected.
+* Blank labels are rejected.
+* Every rejection displays the correct localized warning.
+* Existing invalid bags are not silently modified on load.
 
-### Risk Dialog
+### Initial Draw and Session Lock
 
 Verify:
 
-* One, two, and three can be selected.
-* Confirm performs the correct draw.
+* An empty bag cannot be drawn.
+* A bag without a Danger cannot perform the initial draw.
+* Adding at least one Danger makes the initial draw available.
+* Removing the last Danger before the test makes the initial draw unavailable again.
+* A valid initial draw removes up to three entries without replacement.
+* A valid two-entry bag containing a Danger draws two entries.
+* A successful initial draw with remaining entries locks composition.
+* Locked add and remove controls remain clickable and display `bagLocked`.
+* A second initial draw is rejected.
+* If the initial draw empties the bag, session flags reset automatically.
+
+### Risk Dialog and Risk Draw
+
+Verify:
+
+* Risk is rejected before the initial draw.
+* With one remaining entry, only amount one is offered.
+* With two remaining entries, only amounts one and two are offered.
+* With three or more remaining entries, amounts one, two, and three are offered.
+* Confirm performs the selected draw.
 * Cancel performs no draw.
 * Closing the dialog performs no draw.
-* Small bags are handled safely.
+* Risk does not require a remaining Danger.
+* Only one risk draw is allowed per test.
+* A second risk attempt displays the correct warning.
+* If risk leaves entries in the bag, both draw actions remain unavailable.
+* If risk empties the bag, session flags reset automatically.
+
+### Clear and New Test
+
+Verify:
+
+* `Clear Bag` empties the bag.
+* `Clear Bag` clears `lastDraw`.
+* `Clear Bag` resets both session flags.
+* Adding the first entry to a new empty bag clears the previous `lastDraw`.
+* A new test can perform one initial draw and one risk draw again.
 
 ### Chat
 
 Verify:
 
-* Standard and risk draws create messages.
+* Initial and risk draws create messages.
 * The Actor speaker is correct.
 * Every result is present.
 * Type classes render correctly.
+* Trait, Adversity, Fear, and Danger colors match the sheet.
 * Long and special-character labels do not break output.
-* User-controlled HTML is handled safely.
+* HTML-like label content is displayed safely rather than executed.
 
 ### Localization
 
@@ -1100,11 +1427,13 @@ Test both:
 
 Verify:
 
+* Both JSON files parse successfully.
 * No raw localization keys appear.
 * Dialogs are translated.
-* Notifications are translated.
+* Every bag validation warning is translated.
 * Chat titles are translated.
-* Buttons and labels fit the interface.
+* Button titles and visual unavailable-state messages are translated.
+* Buttons, tabs, and panel headings fit the interface.
 
 ### Compatibility
 
@@ -1137,7 +1466,7 @@ Inspect:
 * Failed network requests.
 * Missing templates.
 * Missing stylesheets.
-* Invalid localization paths.
+* Invalid localization paths or JSON syntax.
 * Invalid Actor update paths.
 * Unhandled Promise rejections.
 
@@ -1186,14 +1515,69 @@ Check:
 * `data-type`.
 * Actor update paths.
 
-### Wrong Bag Entry Removed
+### Wrong Bag Entry Removed or Duplicate Check Fails
 
 Check the distinction between:
 
-* Source-label ID.
-* Bag-entry ID.
+* Source-label ID in `sourceId`.
+* Bag-entry ID in `id`.
 
-Bag removal uses the bag-entry ID.
+Duplicate prevention uses `sourceId`. Bag removal uses the bag-entry `id`.
+
+### Bag Controls Look Unavailable but Show No Warning
+
+Confirm:
+
+* The template does not use the native `disabled` attribute.
+* CSS does not use `pointer-events: none` on warning-capable controls.
+* The click reaches the delegated sheet action.
+* The relevant localization key exists.
+
+### Session State Looks Incorrect
+
+Inspect:
+
+```js
+actor.system.bagSession
+```
+
+Expected fields are:
+
+```text
+initialDrawCompleted
+riskCompleted
+```
+
+Also inspect:
+
+```js
+actor.system.bag
+```
+
+An empty bag causes runtime session helpers to treat the test as reset, even if stale flags exist in old data.
+
+### Localization Does Not Load
+
+Check the active language:
+
+```js
+game.i18n.lang
+```
+
+Check a known key:
+
+```js
+game.i18n.localize("prism.sheet.traits")
+```
+
+If the key itself is returned, verify:
+
+* JSON syntax, especially trailing commas.
+* The `languages` paths in `system.json`.
+* The installed development directory.
+* Browser cache and world reload.
+
+A single JSON syntax error can prevent the entire language file from loading.
 
 ---
 
@@ -1563,33 +1947,28 @@ Do not remove them without reviewing existing worlds and planned gameplay featur
 
 ### Fear and Danger Storage
 
-Fear and Danger are currently added directly to the bag as generic entries.
+Fear and Danger are currently added directly to the bag as generic entries whose display names are localized at insertion time.
 
 The long-term relationship between:
 
 * Stored Fear or Danger collections.
 * Generic bag entries.
+* Language-independent stored labels.
 * Gameplay limits.
 
 must be defined before expanding the data model.
 
-### Bag Composition Validation
+### Existing Invalid Bag Data
 
-The current implementation allows repeated source labels and does not enforce all gameplay composition limits.
+Current validation prevents new invalid operations but does not migrate or normalize bags created under older rules.
 
-Any validation change must:
+A future migration, if introduced, must:
 
-* Use internal IDs and types.
-* Preserve existing Actor data.
-* Provide localized feedback.
-* Test boundary conditions.
-* Update this document.
-
-### Chat HTML
-
-User-controlled label names are currently interpolated into chat HTML.
-
-Escaping or sanitization must be reviewed before a stable release.
+* Avoid silent data loss.
+* Define how duplicates are resolved.
+* Define how over-limit entries are handled.
+* Be repeatable.
+* Be tested on copied existing worlds.
 
 ### Inventory
 

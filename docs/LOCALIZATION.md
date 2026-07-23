@@ -221,9 +221,9 @@ JSON comments are not supported.
 
 ## Key Organization
 
-Current localization keys are grouped by feature.
+Localization keys are grouped by feature.
 
-The main groups are:
+The current groups are:
 
 ```text
 prism.bag
@@ -235,23 +235,39 @@ prism.chat
 
 ### `prism.bag`
 
-Contains messages and actions associated with the virtual bag.
+Contains virtual-bag actions, validation warnings, and session-state feedback.
 
-Current examples include:
+Current action-label examples include:
 
 ```text
-prism.bag.empty
-prism.bag.labelWithoutName
 prism.bag.pExtractMessage
 prism.bag.riskMessage
 prism.bag.emptyMessage
 ```
 
+Current validation keys include:
+
+```text
+prism.bag.empty
+prism.bag.labelWithoutName
+prism.bag.duplicateLabel
+prism.bag.maxAdversities
+prism.bag.maxFears
+prism.bag.maxDangers
+prism.bag.drawThreeRequiresDanger
+prism.bag.riskRequiresInitialDraw
+prism.bag.initialDrawAlreadyCompleted
+prism.bag.riskAlreadyCompleted
+prism.bag.bagLocked
+```
+
 Example use:
 
 ```js
-game.i18n.localize("prism.bag.empty")
+game.i18n.localize("prism.bag.bagLocked")
 ```
+
+The validation messages are used by both direct action checks and warning-capable controls that look unavailable but remain clickable.
 
 ### `prism.sheet`
 
@@ -270,13 +286,19 @@ prism.sheet.adversity
 prism.sheet.fear
 prism.sheet.danger
 prism.sheet.latestDraw
+prism.sheet.signs
+prism.sheet.bio
+prism.sheet.note
+prism.sheet.inventory
+prism.sheet.object
+prism.sheet.quantity
 ```
 
 This group also contains placeholders and section titles.
 
 ### `prism.bagManager`
 
-Contains localized names used when generic entries are inserted into the bag.
+Contains localized display names used when generic entries are inserted into the bag.
 
 Current keys are:
 
@@ -305,9 +327,11 @@ prism.dialog.extract
 prism.dialog.cancel
 ```
 
+The risk dialog dynamically displays only the amount options supported by the remaining bag size. All possible option labels must still exist in every language file.
+
 ### `prism.chat`
 
-Contains titles and text used in Foundry chat messages.
+Contains titles used in Foundry chat messages.
 
 Current keys are:
 
@@ -315,6 +339,8 @@ Current keys are:
 prism.chat.draw
 prism.chat.risk
 ```
+
+Chat titles are localized at message creation time and escaped before being inserted into the PRISM chat-card HTML.
 
 ---
 
@@ -559,24 +585,25 @@ Only the visible label should be localized:
 
 ## Adding New User-Facing Text
 
-When adding a new button, message, field, dialog, notification, or chat element:
+When adding a new button, message, field, dialog, notification, title attribute, or chat element:
 
 1. Choose a clear semantic key.
 2. Add the key to `en.json`.
 3. Add the same key to `it.json`.
 4. Use the key in JavaScript or Handlebars.
-5. Verify JSON syntax.
-6. Test both languages in Foundry.
-7. Check the interface layout.
-8. Update documentation when the new text represents a new feature.
+5. Verify JSON syntax in both files.
+6. Verify key parity.
+7. Test both languages in Foundry.
+8. Check the interface layout and warning behavior.
+9. Update documentation when the text represents a new feature or rule.
 
 Example new notification:
 
 ```json
 {
   "prism": {
-    "notifications": {
-      "invalidQuantity": "Quantity must be zero or greater."
+    "bag": {
+      "exampleRule": "This operation is not allowed."
     }
   }
 }
@@ -587,8 +614,8 @@ Italian version:
 ```json
 {
   "prism": {
-    "notifications": {
-      "invalidQuantity": "La quantità deve essere maggiore o uguale a zero."
+    "bag": {
+      "exampleRule": "Questa operazione non è consentita."
     }
   }
 }
@@ -598,11 +625,19 @@ JavaScript use:
 
 ```js
 ui.notifications.warn(
-    game.i18n.localize("prism.notifications.invalidQuantity")
+    game.i18n.localize("prism.bag.exampleRule")
 );
 ```
 
+Handlebars title use:
+
+```hbs
+title="{{localize 'prism.bag.exampleRule'}}"
+```
+
 Do not merge code that introduces visible text in only one language unless the missing translation is explicitly documented and accepted.
+
+For blocked bag actions, use one specific message per reason. Do not collapse duplicate, limit, missing-Danger, locked-session, and repeated-draw failures into a generic warning.
 
 ---
 
@@ -991,23 +1026,24 @@ An unused key does not usually affect stored world data, but removing it can sti
 
 ## Validation
 
-Every localization change should validate both structure and content.
+Every localization change must validate both structure and content.
 
 ### JSON Syntax
 
 At minimum, confirm that every language file contains valid JSON.
 
-A simple validation can be performed with an editor that supports JSON diagnostics.
+A trailing comma, missing quote, comment, or mismatched brace can prevent the entire file from loading.
 
-When Node.js is available, a basic syntax check can be run with:
+When Node.js is available, validate both files with:
+
+```bash
+node -e "for (const file of ['prism/lang/en.json','prism/lang/it.json']) JSON.parse(require('fs').readFileSync(file, 'utf8')); console.log('Localization JSON is valid.');"
+```
+
+Individual checks also remain valid:
 
 ```bash
 node -e "JSON.parse(require('fs').readFileSync('prism/lang/en.json', 'utf8'))"
-```
-
-and:
-
-```bash
 node -e "JSON.parse(require('fs').readFileSync('prism/lang/it.json', 'utf8'))"
 ```
 
@@ -1015,21 +1051,23 @@ Node.js is not currently a project prerequisite, so these commands are optional 
 
 ### Key Parity
 
-Every supported language should contain the same key paths.
+Every supported language must contain the same key paths.
 
 For example, if English contains:
 
 ```text
-prism.sheet.objectMessage
+prism.bag.riskAlreadyCompleted
 ```
 
 Italian must also contain:
 
 ```text
-prism.sheet.objectMessage
+prism.bag.riskAlreadyCompleted
 ```
 
 A translation file with valid JSON can still be incomplete.
+
+Key parity should include all current bag-validation keys, not only visible sheet headings.
 
 ### Source Reference Check
 
@@ -1045,13 +1083,39 @@ and:
 {{localize
 ```
 
-Confirm that every referenced key exists.
+Confirm that every referenced key exists in both files.
 
-Also check future uses of:
+Also check current or future uses of:
 
 ```text
 game.i18n.format(
 ```
+
+Search title attributes as well as visible element content, because unavailable bag controls use localized explanatory titles.
+
+### Runtime Diagnostic
+
+Inside a running world, check the active language:
+
+```js
+game.i18n.lang
+```
+
+For Italian, the expected result is:
+
+```text
+it
+```
+
+Then test a known key:
+
+```js
+game.i18n.localize("prism.sheet.traits")
+```
+
+A translated value confirms that the file loaded and the key exists.
+
+If Foundry returns the key itself, the key is missing, misspelled, or the language file did not load.
 
 ### Duplicate Meanings
 
@@ -1069,16 +1133,17 @@ Localization changes must be tested inside Foundry VTT.
 
 ### Changing the Foundry Language
 
-Use Foundry’s language settings to switch between supported languages.
+Use Foundry world settings to switch between supported languages.
 
 After changing the language:
 
+* Save the setting.
 * Reload the world.
 * Reopen the Actor sheet.
 * Reopen dialogs.
 * Repeat notifications and chat actions.
 
-Some strings are created only when a feature is activated.
+Some strings are created only when a feature is activated. A sheet that was already open may retain old rendered text until it is reopened or re-rendered.
 
 ### Sheet Testing
 
@@ -1087,28 +1152,34 @@ Verify:
 * Actor name placeholder.
 * Concept label and placeholder.
 * Tab names.
-* Trait and adversity headings.
+* Trait, Adversity, Fear, and Danger headings.
 * Add buttons.
 * Bag actions.
-* Fear and danger labels.
 * Latest Draw heading.
-* Marks heading.
+* Signs heading.
 * Biography and notes.
 * Inventory headings.
 * Item placeholder.
 * Quantity heading.
+* Localized title attributes on warning-capable controls.
 
-### Bag Testing
+### Bag Validation Testing
 
-Verify:
+Trigger and verify every current warning:
 
-* Empty-bag warning.
-* Unnamed-label warning.
-* Draw button.
-* Risk button.
-* Clear-bag button.
-* Generic fear and danger names.
-* Latest-draw display.
+* Empty bag.
+* Unnamed source label.
+* Duplicate source label.
+* Maximum Adversities reached.
+* Maximum Fears reached.
+* Maximum Dangers reached.
+* Initial draw attempted without a Danger.
+* Risk attempted before the initial draw.
+* Initial draw attempted twice.
+* Risk attempted twice.
+* Bag modification attempted after the initial draw.
+
+Every warning must be specific, understandable, and present in both languages.
 
 ### Dialog Testing
 
@@ -1122,15 +1193,22 @@ Verify:
 * Confirm button.
 * Cancel button.
 
+Also verify dynamic option visibility:
+
+* One remaining bag entry shows only the one-label option.
+* Two remaining entries show one and two.
+* Three or more remaining entries show one, two, and three.
+
 ### Chat Testing
 
 Verify:
 
-* Standard draw title.
-* Risk draw title.
+* Initial-draw title.
+* Risk-draw title.
 * Special characters in label names.
 * Long translated titles.
 * Chat-card layout.
+* Trait, Adversity, Fear, and Danger label presentation.
 
 ### Layout Testing
 
@@ -1142,6 +1220,8 @@ Check:
 * Input placeholder length.
 * Dialog width.
 * Inventory headings.
+* Type-panel headings.
+* Neutral-panel headings.
 * Narrow or resized sheet layouts.
 
 A translation may be linguistically correct but still require a layout change if essential text becomes unreadable.
@@ -1162,7 +1242,7 @@ usually means that:
 * The key contains a typo.
 * The wrong language file loaded.
 * The JSON file is invalid.
-* The system was not reloaded.
+* The system or world was not reloaded.
 
 No raw localization key should appear in the normal interface.
 
@@ -1175,11 +1255,14 @@ No raw localization key should appear in the normal interface.
 Check:
 
 * JSON syntax.
+* Trailing commas.
 * Filename.
 * Manifest path.
 * Language code.
-* Whether Foundry was restarted or reloaded.
+* Whether Foundry was restarted or the world reloaded.
 * Whether the system is loading the expected installation directory.
+
+A syntax error in one localization file can prevent that whole file from loading even when `system.json` is configured correctly.
 
 ### English Works but Italian Does Not
 
@@ -1190,6 +1273,18 @@ Check:
 * The Italian JSON file is valid.
 * The current Foundry language is actually Italian.
 * The browser is not displaying cached content.
+
+Useful console checks:
+
+```js
+game.i18n.lang
+```
+
+and:
+
+```js
+game.i18n.localize("prism.sheet.traits")
+```
 
 ### A Key Appears in the Interface
 
@@ -1213,17 +1308,18 @@ The text may be hard-coded in:
 * HTML assembled for chat.
 * A dialog definition.
 * A notification.
+* A title attribute.
 * Stored Actor data.
 
 Search the source for the visible English text.
 
-Some values, such as generic fear and danger entries, may already be stored in Actor data from an earlier language setting. Changing the localization file does not automatically translate existing stored values.
+Also confirm that Foundry is loading the development copy you edited rather than a previously installed release.
 
 ### Translation Changed but Existing Bag Entries Did Not
 
-Generic bag entries store their localized display name at the time they are created.
+Bag entries store their display name at insertion time.
 
-For example:
+Generic Fear and Danger example:
 
 ```js
 {
@@ -1232,15 +1328,29 @@ For example:
 }
 ```
 
-Changing the language later does not currently update existing entries already stored in:
+Changing the language later does not update existing entries already stored in:
 
 ```text
 actor.system.bag
 ```
 
+Stored Trait and Adversity bag entries also retain the name snapshot captured when they were added.
+
 This is expected under the current data model.
 
-A future implementation may choose to store semantic keys instead of translated values, but that would be a data-model change requiring migration planning.
+A future implementation may store semantic localization keys instead of translated display values, but that would require a planned data-model change and migration strategy.
+
+### Warning-Capable Button Does Nothing
+
+The current interface intentionally keeps visually unavailable bag controls clickable so they can show a localized explanation.
+
+Check that:
+
+* The template does not add the native `disabled` attribute.
+* CSS does not apply `pointer-events: none`.
+* `aria-disabled="true"` and `prism-is-disabled` are present when expected.
+* The JavaScript action reaches `BagManager` validation.
+* The referenced warning key exists in both language files.
 
 ### Translation Breaks the Layout
 
@@ -1301,7 +1411,7 @@ prism/lang/it.json
 
 Do not leave one file structurally incomplete.
 
-### English Filename
+### English Is the Reference Structure
 
 The current English localization file is:
 
@@ -1315,11 +1425,33 @@ and the manifest path is:
 lang/en.json
 ```
 
-Keep the filename and manifest path synchronized.
+Use it as the structural reference when adding keys, while keeping translations natural rather than mechanically literal.
+
+Keep filenames and manifest paths synchronized.
+
+### Bag Validation Messages Are Required Interface Text
+
+The current bag workflow depends on localized warnings for invalid operations.
+
+The key set includes:
+
+```text
+prism.bag.duplicateLabel
+prism.bag.maxAdversities
+prism.bag.maxFears
+prism.bag.maxDangers
+prism.bag.drawThreeRequiresDanger
+prism.bag.riskRequiresInitialDraw
+prism.bag.initialDrawAlreadyCompleted
+prism.bag.riskAlreadyCompleted
+prism.bag.bagLocked
+```
+
+Do not remove or consolidate these keys without updating `BagManager`, the sheet template, tests, and both language files.
 
 ### Generic Bag Labels Are Stored as Translated Text
 
-Fear and danger entries use localized text when they are added to the bag.
+Fear and Danger entries use localized text when they are added to the bag.
 
 Existing entries do not automatically change when the Foundry language changes.
 
@@ -1329,6 +1461,26 @@ This should be considered when changing:
 prism.bagManager.fear
 prism.bagManager.danger
 ```
+
+### Stored Label Names Are Snapshots
+
+Trait and Adversity bag entries store the source name present when the entry is added.
+
+Renaming the source label later does not automatically rename the existing bag entry. Remove and re-add the entry before the test begins when an updated snapshot is required.
+
+### Language Changes Require a Reload
+
+After changing Foundry's language preference, reload the world and reopen the sheet.
+
+When localization appears unchanged, verify the active language and a known key through the console before changing `system.json`.
+
+### Invalid JSON Can Cause Apparent Fallback
+
+A valid `languages` manifest section is not sufficient when a language file contains invalid JSON.
+
+Trailing commas are a common cause. Validate both files before every release.
+
+---
 
 ## Related Documentation
 
