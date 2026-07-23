@@ -30,6 +30,16 @@ Because the project is currently in Alpha:
 
 ---
 
+---
+
+## [0.1.2] - 2026-07-23
+
+### Changed
+
+* bumped system version from v13 to v14
+
+---
+
 ## [0.1.1] - 2026-07-22
 
 ### Added
