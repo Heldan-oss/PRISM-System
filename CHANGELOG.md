@@ -28,7 +28,43 @@ Because the project is currently in Alpha:
 
 * No unreleased fixes documented yet.
 
----
+## [0.2.0] - 2026-07-23
+
+### Added
+
+* Added persistent test-session state for the virtual bag.
+* Added localized warnings for duplicate labels, composition limits, missing Dangers, locked bag actions, repeated initial draws, and repeated Risk actions.
+* Added distinct visual themes for Traits, Adversities, Fears, and Dangers.
+* Added automatic session reset when a draw empties the bag.
+
+### Changed
+
+* Enforced a maximum of 4 Adversities, 3 Fears, and 4 Dangers in the virtual bag.
+* Each individual Trait or Adversity can now be added to the bag only once.
+* The initial draw now requires at least one Danger and can be performed only once per test.
+* Risk can now be performed only once, after the initial draw.
+* Risk draw options now adapt to the number of entries remaining in the bag.
+* Bag composition and manual entry removal are now locked after the initial draw until the bag is cleared or emptied.
+* Clearing the bag now resets the latest draw and all test-session state.
+* Starting a new bag session now clears the previous draw result.
+* Refactored Actor-sheet action handling and virtual-bag management to centralize validation and reduce duplicated logic.
+* Normalized inventory quantities as non-negative integers.
+* Updated chat-result generation to safely escape user-controlled label names.
+* Redesigned the character sheet with a larger portrait, metallic background, stronger section borders, clearer tabs, and updated action states.
+* Updated chat cards to match the new PRISM visual theme.
+* Updated the development and localization documentation to describe the current architecture, bag rules, validation workflow, styling structure, and testing requirements.
+
+### Fixed
+
+* Fixed duplicate Traits and Adversities being accepted into the virtual bag.
+* Fixed invalid bag configurations exceeding the allowed limits.
+* Fixed the initial draw remaining available without a Danger in the bag.
+* Fixed the initial draw remaining available after the last Danger was removed.
+* Fixed Risk being usable more than once during the same test.
+* Fixed unavailable controls preventing validation notifications from being displayed.
+* Fixed Risk dialogs offering draw amounts greater than the number of remaining bag entries.
+* Fixed unsafe user-provided label content being inserted directly into chat HTML.
+* Fixed the Italian localization file failing to load because of invalid JSON syntax.
 
 ---
 

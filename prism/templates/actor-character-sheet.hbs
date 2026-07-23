@@ -1,12 +1,15 @@
 <form class="{{cssClass}}" autocomplete="off">
     <header class="prism-header">
-        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" alt="{{actor.name}}"/>
 
         <div class="prism-header-fields">
-            <input class="prism-name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'prism.sheet.characterName'}}" />
+            <input class="prism-name" name="name" type="text" value="{{actor.name}}"
+                   placeholder="{{localize 'prism.sheet.characterName'}}"/>
 
             <label>{{localize "prism.sheet.concept"}}</label>
-            <input name="system.concept" type="text" value="{{system.concept}}" placeholder="{{localize 'prism.sheet.mConcept'}}" />
+
+            <input name="system.concept" type="text" value="{{system.concept}}"
+                   placeholder="{{localize 'prism.sheet.mConcept'}}"/>
         </div>
     </header>
 
@@ -20,66 +23,152 @@
         <section class="tab active" data-group="primary" data-tab="main">
             <main class="prism-main">
                 <section class="prism-column prism-wide">
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-type-panel prism-trait-panel">
                         <h2>{{localize "prism.sheet.traits"}}</h2>
-                        <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">+ {{localize "prism.sheet.trait"}}</button>
+
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="trait">
+                            + {{localize "prism.sheet.trait"}}
+                        </button>
 
                         {{#each traits}}
                             <div class="prism-label-row" data-type="trait" data-id="{{this.id}}">
-                                <input type="text" value="{{this.name}}" placeholder="{{localize 'prism.sheet.tTipsMessage'}}" />
-                                <button type="button" data-action="add-to-bag" data-type="trait" data-id="{{this.id}}">{{localize "prism.sheet.bag"}}</button>
-                                <button type="button" class="prism-icon-button" data-action="delete-label" data-type="trait" data-id="{{this.id}}">×</button>
+                                <input type="text" value="{{this.name}}"
+                                       placeholder="{{localize 'prism.sheet.tTipsMessage'}}"/>
+
+                                <button type="button" class="{{#unless ../canModifyBag}}prism-is-disabled{{/unless}}"
+                                        data-action="add-to-bag" data-type="trait" data-id="{{this.id}}"
+                                    {{#unless ../canModifyBag}}
+                                        aria-disabled="true" title="{{localize 'prism.bag.bagLocked'}}"
+                                    {{/unless}}
+                                >
+                                    {{localize "prism.sheet.bag"}}
+                                </button>
+
+                                <button type="button" class="prism-icon-button" data-action="delete-label"
+                                        data-type="trait" data-id="{{this.id}}"
+                                        aria-label="{{localize 'prism.sheet.trait'}}">
+                                    ×
+                                </button>
                             </div>
                         {{/each}}
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-type-panel prism-adversity-panel">
                         <h2>{{localize "prism.sheet.adversity"}}</h2>
-                        <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">+ {{localize "prism.sheet.adversity"}}</button>
+
+                        <button type="button" class="prism-full-button" data-action="add-label" data-type="adversity">
+                            + {{localize "prism.sheet.adversity"}}
+                        </button>
 
                         {{#each adversities}}
                             <div class="prism-label-row" data-type="adversity" data-id="{{this.id}}">
-                                <input type="text" value="{{this.name}}" placeholder="{{localize 'prism.sheet.aTipsMessage'}}" />
-                                <button type="button" data-action="add-to-bag" data-type="adversity" data-id="{{this.id}}">{{localize "prism.sheet.bag"}}</button>
-                                <button type="button" class="prism-icon-button" data-action="delete-label" data-type="adversity" data-id="{{this.id}}">×</button>
+                                <input type="text" value="{{this.name}}"
+                                       placeholder="{{localize 'prism.sheet.aTipsMessage'}}"/>
+
+                                <button type="button" class="{{#unless ../canModifyBag}}prism-is-disabled{{/unless}}"
+                                        data-action="add-to-bag" data-type="adversity" data-id="{{this.id}}"
+                                    {{#unless ../canModifyBag}}
+                                        aria-disabled="true" title="{{localize 'prism.bag.bagLocked'}}"
+                                    {{/unless}}
+                                >
+                                    {{localize "prism.sheet.bag"}}
+                                </button>
+
+                                <button type="button" class="prism-icon-button" data-action="delete-label"
+                                        data-type="adversity" data-id="{{this.id}}"
+                                        aria-label="{{localize 'prism.sheet.adversity'}}">
+                                    ×
+                                </button>
                             </div>
                         {{/each}}
                     </section>
 
                     <div class="prism-risk-row">
-                        <section class="prism-panel">
+                        <section class="prism-panel prism-type-panel prism-fear-panel">
                             <h2>{{localize "prism.sheet.fear"}}</h2>
-                            <button type="button" class="prism-full-button" data-action="add-fear">+ {{localize "prism.sheet.fear"}}</button>
+
+                            <button type="button"
+                                    class="prism-full-button{{#unless canModifyBag}} prism-is-disabled{{/unless}}"
+                                    data-action="add-fear"
+                                {{#unless canModifyBag}}
+                                    aria-disabled="true" title="{{localize 'prism.bag.bagLocked'}}"
+                                {{/unless}}
+                            >
+                                + {{localize "prism.sheet.fear"}}
+                            </button>
                         </section>
 
-                        <section class="prism-panel">
+                        <section class="prism-panel prism-type-panel prism-danger-panel">
                             <h2>{{localize "prism.sheet.danger"}}</h2>
-                            <button type="button" class="prism-full-button" data-action="add-danger">+ {{localize "prism.sheet.danger"}}</button>
+
+                            <button type="button"
+                                    class="prism-full-button{{#unless canModifyBag}} prism-is-disabled{{/unless}}"
+                                    data-action="add-danger"
+                                {{#unless canModifyBag}}
+                                    aria-disabled="true" title="{{localize 'prism.bag.bagLocked'}}"
+                                {{/unless}}
+                            >
+                                + {{localize "prism.sheet.danger"}}
+                            </button>
                         </section>
                     </div>
                 </section>
 
                 <section class="prism-column">
-                    <section class="prism-panel prism-bag">
+                    <section class="prism-panel prism-neutral-panel prism-bag">
                         <h2>{{localize "prism.sheet.bag"}}</h2>
 
                         <div class="prism-bag-list">
                             {{#each bag}}
                                 <div class="prism-bag-entry prism-{{this.type}}">
                                     <span>{{this.name}}</span>
-                                    <button type="button" class="prism-icon-button" data-action="remove-from-bag" data-id="{{this.id}}">×</button>
+
+                                    <button type="button" class="prism-icon-button{{#unless
+                                            ../canModifyBag}} prism-is-disabled{{/unless}}"
+                                            data-action="remove-from-bag" data-id="{{this.id}}"
+                                            aria-label="{{localize 'prism.bag.emptyMessage'}}"
+                                        {{#unless ../canModifyBag}}
+                                            aria-disabled="true" title="{{localize 'prism.bag.bagLocked'}}"
+                                        {{/unless}}
+                                    >
+                                        ×
+                                    </button>
                                 </div>
                             {{/each}}
                         </div>
 
                         <div class="prism-actions">
-                            <button type="button" data-action="draw-three">{{localize "prism.bag.pExtractMessage"}}</button>
-                            <button type="button" data-action="risk">{{localize "prism.bag.riskMessage"}}</button>
-                            <button type="button" data-action="clear-bag">{{localize "prism.bag.emptyMessage"}}</button>
+                            <button type="button" class="{{#unless canInitialDraw}}prism-is-disabled{{/unless}}"
+                                    data-action="draw-three"
+                                {{#unless canInitialDraw}}
+                                    aria-disabled="true" title="{{localize 'prism.bag.initialDrawAlreadyCompleted'}}"
+                                {{/unless}}
+                            >
+                                {{localize "prism.bag.pExtractMessage"}}
+                            </button>
+
+                            <button type="button" class="{{#unless canTakeRisk}}prism-is-disabled{{/unless}}"
+                                    data-action="risk"
+                                {{#unless canTakeRisk}}
+                                    aria-disabled="true"
+
+                                        {{#if riskCompleted}}
+                                    title="{{localize 'prism.bag.riskAlreadyCompleted'}}"
+                                        {{else}}
+                                    title="{{localize 'prism.bag.riskRequiresInitialDraw'}}"
+                                        {{/if}}
+                                {{/unless}}
+                            >
+                                {{localize "prism.bag.riskMessage"}}
+                            </button>
+
+                            <button type="button" data-action="clear-bag">
+                                {{localize "prism.bag.emptyMessage"}}
+                            </button>
                         </div>
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-neutral-panel">
                         <h2>{{localize "prism.sheet.latestDraw"}}</h2>
 
                         <div class="prism-last-draw-list">
@@ -91,7 +180,7 @@
                         </div>
                     </section>
 
-                    <section class="prism-panel">
+                    <section class="prism-panel prism-neutral-panel">
                         <h2>{{localize "prism.sheet.signs"}}</h2>
                         <textarea name="system.marks">{{system.marks}}</textarea>
                     </section>
@@ -101,12 +190,12 @@
 
         <section class="tab" data-group="primary" data-tab="bio">
             <section class="prism-tab-grid">
-                <section class="prism-panel">
+                <section class="prism-panel prism-neutral-panel">
                     <h2>{{localize "prism.sheet.bio"}}</h2>
                     <textarea name="system.biography">{{system.biography}}</textarea>
                 </section>
 
-                <section class="prism-panel">
+                <section class="prism-panel prism-neutral-panel">
                     <h2>{{localize "prism.sheet.note"}}</h2>
                     <textarea name="system.personalNotes">{{system.personalNotes}}</textarea>
                 </section>
@@ -114,7 +203,7 @@
         </section>
 
         <section class="tab" data-group="primary" data-tab="inventory">
-            <section class="prism-panel">
+            <section class="prism-panel prism-neutral-panel">
                 <h2>{{localize "prism.sheet.inventory"}}</h2>
 
                 <table class="prism-inventory-table">
@@ -130,20 +219,28 @@
                     {{#each inventory}}
                         <tr class="prism-inventory-row" data-id="{{this.id}}">
                             <td>
-                                <input type="text" value="{{this.name}}" placeholder={{localize 'prism.sheet.objectMessage'}} />
+                                <input type="text" value="{{this.name}}"
+                                       placeholder="{{localize 'prism.sheet.objectMessage'}}"/>
                             </td>
+
                             <td>
-                                <input type="number" value="{{this.quantity}}" min="0" step="1" />
+                                <input type="number" value="{{this.quantity}}" min="0" step="1"/>
                             </td>
+
                             <td>
-                                <button type="button" class="prism-icon-button" data-action="delete-inventory-item" data-id="{{this.id}}">×</button>
+                                <button type="button" class="prism-icon-button" data-action="delete-inventory-item"
+                                        data-id="{{this.id}}" aria-label="{{localize 'prism.sheet.object'}}">
+                                    ×
+                                </button>
                             </td>
                         </tr>
                     {{/each}}
                     </tbody>
                 </table>
 
-                <button type="button" class="prism-full-button" data-action="add-inventory-item">+ {{localize "prism.sheet.object"}}</button>
+                <button type="button" class="prism-full-button" data-action="add-inventory-item">
+                    + {{localize "prism.sheet.object"}}
+                </button>
             </section>
         </section>
     </section>

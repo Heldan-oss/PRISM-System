@@ -6,7 +6,16 @@
       "labelWithoutName": "Etichetta senza nome: non posso aggiungerla al sacchetto.",
       "pExtractMessage": "Estrai 3",
       "riskMessage": "Rischia",
-      "emptyMessage": "Svuota"
+      "emptyMessage": "Svuota",
+      "duplicateLabel": "Questa etichetta è già presente nel sacchetto.",
+      "maxAdversities": "È stato raggiunto il limite massimo di 4 Avversità.",
+      "maxFears": "È stato raggiunto il limite massimo di 3 Paure.",
+      "maxDangers": "È stato raggiunto il limite massimo di 4 Pericoli.",
+      "drawThreeRequiresDanger": "Per effettuare l'estrazione iniziale deve essere presente almeno un Pericolo nel sacchetto.",
+      "riskRequiresInitialDraw": "Puoi rischiare solo dopo aver effettuato l'estrazione iniziale.",
+      "riskAlreadyCompleted": "Hai già rischiato durante questa prova. Svuota il sacchetto per iniziare una nuova prova.",
+      "initialDrawAlreadyCompleted": "L'estrazione iniziale è già stata effettuata. Svuota il sacchetto per iniziare una nuova prova.",
+      "bagLocked": "Il sacchetto non può essere modificato dopo l'estrazione iniziale. Svuotalo per iniziare una nuova prova."
     },
 
     "sheet": {

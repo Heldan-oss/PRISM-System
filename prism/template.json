@@ -1,6 +1,8 @@
 {
   "Actor": {
-    "types": ["character"],
+    "types": [
+      "character"
+    ],
     "templates": {
       "base": {
         "concept": "",
@@ -15,11 +17,17 @@
         "dangers": [],
         "marks": [],
         "bag": [],
-        "lastDraw": []
+        "lastDraw": [],
+        "bagSession": {
+          "initialDrawCompleted": false,
+          "riskCompleted": false
+        }
       }
     },
     "character": {
-      "templates": ["base"]
+      "templates": [
+        "base"
+      ]
     }
   },
   "Item": {
