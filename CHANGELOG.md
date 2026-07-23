@@ -27,6 +27,14 @@ Because the project is currently in Alpha:
 ### Fixed
 
 * No unreleased fixes documented yet.
+---
+
+## [0.2.1] - 2026-07-24
+
+### Fixed
+
+* persist dynamic fields across saves
+---
 
 ## [0.2.0] - 2026-07-23
 
