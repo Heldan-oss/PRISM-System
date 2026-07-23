@@ -1,294 +1,357 @@
-import { BagManager } from "./bag-manager.mjs";
+import {BagManager} from "./bag-manager.mjs";
 import PrismDialogs from "./dialogs.mjs";
-import { labelPathFromType } from "./utils.mjs";
+import {labelPathFromType} from "./utils.mjs";
+
+const ACTION_HANDLERS = Object.freeze({
+	"add-label": "_onAddLabel",
+	"delete-label": "_onDeleteLabel",
+	"add-to-bag": "_onAddToBag",
+	"remove-from-bag": "_onRemoveFromBag",
+	"clear-bag": "_onClearBag",
+	"draw-three": "_onDrawThree",
+	"risk": "_onRisk",
+	"add-fear": "_onAddFear",
+	"add-danger": "_onAddDanger",
+	"add-inventory-item": "_onAddInventoryItem",
+	"delete-inventory-item": "_onDeleteInventoryItem"
+});
+
+const LABEL_CONFIGS = Object.freeze([{
+	type: "trait", path: "traits"
+}, {
+	type: "adversity", path: "adversities"
+}]);
+
+const ALLOWED_CHAT_LABEL_TYPES = new Set(["trait", "adversity", "fear", "danger"]);
+
+const HTML_ESCAPE_CHARACTERS = Object.freeze({
+	"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+});
+
+function escapeHtml(value) {
+	return String(value ?? "").replace(/[&<>"']/g, character => HTML_ESCAPE_CHARACTERS[character]);
+}
+
+function normalizeQuantity(value) {
+	const quantity = Number.parseInt(value, 10);
+
+	if (!Number.isInteger(quantity)) {
+		return 0;
+	}
+
+	return Math.max(quantity, 0);
+}
 
 export class PrismActorSheet extends ActorSheet {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["prism", "sheet", "actor"],
-            template: "systems/prism/templates/actor-character-sheet.hbs",
-            width: 760,
-            height: 820,
-            resizable: true,
-            tabs: [
-                {
-                    navSelector: ".sheet-tabs",
-                    contentSelector: ".sheet-body",
-                    initial: "main"
-                }
-            ]
-        });
-    }
+	static get defaultOptions() {
+		return foundry.utils.mergeObject(super.defaultOptions, {
+			classes: ["prism", "sheet", "actor"],
+			template: "systems/prism/templates/actor-character-sheet.hbs",
+			width: 760,
+			height: 820,
+			resizable: true,
+			tabs: [{
+				navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "main"
+			}]
+		});
+	}
 
-    getData(options) {
-        const context = super.getData(options);
+	getData(options) {
+		const context = super.getData(options);
+		const system = this.actor.system;
 
-        context.system = this.actor.system;
-        context.traits = this.actor.system.traits ?? [];
-        context.adversities = this.actor.system.adversities ?? [];
-        context.bag = this.actor.system.bag ?? [];
-        context.lastDraw = this.actor.system.lastDraw ?? [];
-        context.inventory = this.actor.system.inventory ?? [];
+		Object.assign(context, {
+			system,
+			traits: system.traits ?? [],
+			adversities: system.adversities ?? [],
+			bag: system.bag ?? [],
+			lastDraw: system.lastDraw ?? [],
+			inventory: system.inventory ?? [], ...BagManager.getViewState(this.actor)
+		});
 
-        return context;
-    }
+		return context;
+	}
 
-    activateListeners(html) {
-        super.activateListeners(html);
+	activateListeners(html) {
+		super.activateListeners(html);
 
-        html.find("[data-action='add-label']").on("click", this._onAddLabel.bind(this));
-        html.find("[data-action='delete-label']").on("click", this._onDeleteLabel.bind(this));
-        html.find("[data-action='add-to-bag']").on("click", this._onAddToBag.bind(this));
-        html.find("[data-action='remove-from-bag']").on("click", this._onRemoveFromBag.bind(this));
-        html.find("[data-action='clear-bag']").on("click", this._onClearBag.bind(this));
-        html.find("[data-action='draw-three']").on("click", this._onDrawThree.bind(this));
-        html.find("[data-action='risk']").on("click", this._onRisk.bind(this));
-        html.find("[data-action='add-fear']").on("click", this._onAddFear.bind(this));
-        html.find("[data-action='add-danger']").on("click", this._onAddDanger.bind(this));
-        html.find("[data-action='add-inventory-item']").on("click", this._onAddInventoryItem.bind(this));
-        html.find("[data-action='delete-inventory-item']").on("click", this._onDeleteInventoryItem.bind(this));
-    }
+		html.on("click", "[data-action]", this._onAction.bind(this));
+	}
 
-    async _onAddLabel(event) {
-        event.preventDefault();
-        event.stopPropagation();
+	async _onAction(event) {
+		event.preventDefault();
+		event.stopPropagation();
 
-        await this._syncSheetData();
+		const element = event.currentTarget;
+		const action = element.dataset.action;
+		const handlerName = ACTION_HANDLERS[action];
+		const handler = this[handlerName];
 
-        const type = event.currentTarget.dataset.type;
-        const path = labelPathFromType(type);
+		if (typeof handler !== "function") {
+			return;
+		}
 
-        if (!path) return;
+		await handler.call(this, element);
+	}
 
-        const current = foundry.utils.deepClone(this.actor.system[path] ?? []);
+	async _onAddLabel(element) {
+		await this._syncSheetData();
 
-        current.push({
-            id: foundry.utils.randomID(),
-            name: "",
-            type
-        });
+		const type = element.dataset.type;
+		const path = labelPathFromType(type);
 
-        await this.actor.update({ [`system.${path}`]: current });
-        this.render(false);
-    }
+		if (!path) {
+			return;
+		}
 
-    async _onDeleteLabel(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		const labels = this._getSystemArray(path);
 
-        await this._syncSheetData();
+		labels.push({
+			id: foundry.utils.randomID(), name: "", type
+		});
 
-        const type = event.currentTarget.dataset.type;
-        const id = event.currentTarget.dataset.id;
-        const path = labelPathFromType(type);
+		await this.actor.update({
+			[`system.${path}`]: labels
+		});
 
-        if (!path || !id) return;
+		this.render(false);
+	}
 
-        const current = foundry.utils.deepClone(this.actor.system[path] ?? []);
-        const updated = current.filter(label => label.id !== id);
+	async _onDeleteLabel(element) {
+		await this._syncSheetData();
 
-        await this.actor.update({ [`system.${path}`]: updated });
-        this.render(false);
-    }
+		const {type, id} = element.dataset;
+		const path = labelPathFromType(type);
 
-    async _onAddToBag(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		if (!path || !id) {
+			return;
+		}
 
-        await this._syncSheetData();
+		const labels = this
+			._getSystemArray(path)
+			.filter(label => label.id !== id);
 
-        const button = event.currentTarget;
-        const type = button.dataset.type;
-        const id = button.dataset.id;
-        const path = labelPathFromType(type);
+		await this.actor.update({
+			[`system.${path}`]: labels
+		});
 
-        if (!path || !id) return;
+		this.render(false);
+	}
 
-        const labels = this.actor.system[path] ?? [];
-        const label = labels.find(entry => entry.id === id);
+	async _onAddToBag(element) {
+		await this._syncSheetData();
 
-        if (!label) return;
+		const {type, id} = element.dataset;
+		const path = labelPathFromType(type);
 
-        await BagManager.add(this.actor, label);
-        this.render(false);
-    }
+		if (!path || !id) {
+			return;
+		}
 
-    async _onRemoveFromBag(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		const label = (this.actor.system[path] ?? [])
+			.find(entry => entry.id === id);
 
-        await this._syncSheetData();
+		if (!label) {
+			return;
+		}
 
-        const id = event.currentTarget.dataset.id;
-        if (!id) return;
+		const added = await BagManager.add(this.actor, label);
 
-        await BagManager.remove(this.actor, id);
-        this.render(false);
-    }
+		this._renderIfSuccessful(added);
+	}
 
-    async _onClearBag(event) {
-        event.preventDefault();
-        event.stopPropagation();
+	async _onRemoveFromBag(element) {
+		await this._syncSheetData();
 
-        await this._syncSheetData();
+		const id = element.dataset.id;
 
-        await BagManager.clear(this.actor);
-        this.render(false);
-    }
+		if (!id) {
+			return;
+		}
 
-    async _onDrawThree(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		const removed = await BagManager.remove(this.actor, id);
 
-        await this._syncSheetData();
+		this._renderIfSuccessful(removed);
+	}
 
-        const drawn = await BagManager.draw(this.actor, 3);
+	async _onClearBag() {
+		await this._syncSheetData();
+		await BagManager.clear(this.actor);
 
-        if (drawn.length > 0) {
-            await this._sendDrawToChat(game.i18n.localize("prism.chat.draw"), drawn);
-            this.render(false);
-        }
-    }
+		this.render(false);
+	}
 
-    async _onRisk(event) {
-        event.preventDefault();
-        event.stopPropagation();
+	async _onDrawThree() {
+		await this._syncSheetData();
 
-        await this._syncSheetData();
+		const drawn = await BagManager.drawInitial(this.actor, 3);
 
-        const amount = await PrismDialogs.askRiskAmount();
-        if (!amount) return;
+		await this._completeDraw("prism.chat.draw", drawn);
+	}
 
-        const drawn = await BagManager.draw(this.actor, amount);
+	async _onRisk() {
+		await this._syncSheetData();
 
-        if (drawn.length > 0) {
-            await this._sendDrawToChat(game.i18n.localize("prism.chat.risk"), drawn);
-            this.render(false);
-        }
-    }
+		if (!BagManager.validateRisk(this.actor)) {
+			return;
+		}
 
-    async _onAddFear(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		const amount = await PrismDialogs.askRiskAmount(BagManager.getBagSize(this.actor));
 
-        await this._syncSheetData();
+		if (!amount) {
+			return;
+		}
 
-        await BagManager.addGeneric(this.actor, {
-            name: game.i18n.localize("prism.bagManager.fear"),
-            type: "fear"
-        });
+		const drawn = await BagManager.drawRisk(this.actor, amount);
 
-        this.render(false);
-    }
+		await this._completeDraw("prism.chat.risk", drawn);
+	}
 
-    async _onAddDanger(event) {
-        event.preventDefault();
-        event.stopPropagation();
+	async _onAddFear() {
+		await this._addGenericBagEntry("fear", "prism.bagManager.fear");
+	}
 
-        await this._syncSheetData();
+	async _onAddDanger() {
+		await this._addGenericBagEntry("danger", "prism.bagManager.danger");
+	}
 
-        await BagManager.addGeneric(this.actor, {
-            name: game.i18n.localize("prism.bagManager.danger"),
-            type: "danger"
-        });
+	async _addGenericBagEntry(type, localizationKey) {
+		await this._syncSheetData();
 
-        this.render(false);
-    }
+		const added = await BagManager.addGeneric(this.actor, {
+			name: game.i18n.localize(localizationKey), type
+		});
 
-    async _onAddInventoryItem(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		this._renderIfSuccessful(added);
+	}
 
-        await this._syncSheetData();
+	async _onAddInventoryItem() {
+		await this._syncSheetData();
 
-        const inventory = foundry.utils.deepClone(this.actor.system.inventory ?? []);
+		const inventory = this._getSystemArray("inventory");
 
-        inventory.push({
-            id: foundry.utils.randomID(),
-            name: "",
-            quantity: 1
-        });
+		inventory.push({
+			id: foundry.utils.randomID(), name: "", quantity: 1
+		});
 
-        await this.actor.update({ "system.inventory": inventory });
-        this.render(false);
-    }
+		await this.actor.update({
+			"system.inventory": inventory
+		});
 
-    async _onDeleteInventoryItem(event) {
-        event.preventDefault();
-        event.stopPropagation();
+		this.render(false);
+	}
 
-        await this._syncSheetData();
+	async _onDeleteInventoryItem(element) {
+		await this._syncSheetData();
 
-        const id = event.currentTarget.dataset.id;
-        if (!id) return;
+		const id = element.dataset.id;
 
-        const inventory = foundry.utils.deepClone(this.actor.system.inventory ?? []);
-        const updated = inventory.filter(item => item.id !== id);
+		if (!id) {
+			return;
+		}
 
-        await this.actor.update({ "system.inventory": updated });
-        this.render(false);
-    }
+		const inventory = this
+			._getSystemArray("inventory")
+			.filter(item => item.id !== id);
 
-    async _sendDrawToChat(title, drawn) {
-        const labels = drawn.map(entry => {
-            return `<span class="prism-chat-label prism-${entry.type}">${entry.name}</span>`;
-        }).join(" ");
+		await this.actor.update({
+			"system.inventory": inventory
+		});
 
-        await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-            content: `
+		this.render(false);
+	}
+
+	async _completeDraw(titleKey, drawn) {
+		if (!Array.isArray(drawn) || drawn.length === 0) {
+			return false;
+		}
+
+		await this._sendDrawToChat(game.i18n.localize(titleKey), drawn);
+
+		this.render(false);
+
+		return true;
+	}
+
+	async _sendDrawToChat(title, drawn) {
+		const safeTitle = escapeHtml(title);
+
+		const labels = drawn
+			.map(entry => {
+				const type = ALLOWED_CHAT_LABEL_TYPES.has(entry.type) ? entry.type : "unknown";
+
+				const name = escapeHtml(entry.name);
+
+				return `
+                    <span class="prism-chat-label prism-${type}">
+                        ${name}
+                    </span>
+                `;
+			})
+			.join(" ");
+
+		await ChatMessage.create({
+			speaker: ChatMessage.getSpeaker({
+				actor: this.actor
+			}), content: `
                 <div class="prism-chat-card">
-                    <h2>${title}</h2>
+                    <h2>${safeTitle}</h2>
                     <p>${labels}</p>
                 </div>
             `
-        });
-    }
+		});
+	}
 
-    async _syncSheetData() {
-        const root = this.element[0];
-        if (!root) return;
+	async _syncSheetData() {
+		const root = this.element?.[0];
 
-        const updateData = {
-            ...this._getLabelUpdateData(root),
-            "system.inventory": this._getInventoryFromSheet(root)
-        };
+		if (!root) {
+			return false;
+		}
 
-        await this.actor.update(updateData);
-    }
+		await this.actor.update({
+			...this._getLabelUpdateData(root), "system.inventory": this._getInventoryFromSheet(root)
+		});
 
-    _getLabelUpdateData(root) {
-        const configs = [
-            { type: "trait", path: "traits" },
-            { type: "adversity", path: "adversities" }
-        ];
+		return true;
+	}
 
-        const updateData = {};
+	_getLabelUpdateData(root) {
+		const updateData = {};
 
-        for (const config of configs) {
-            const rows = root.querySelectorAll(`.prism-label-row[data-type="${config.type}"]`);
+		for (const {type, path} of LABEL_CONFIGS) {
+			const rows = root.querySelectorAll(`.prism-label-row[data-type="${type}"]`);
 
-            updateData[`system.${config.path}`] = Array.from(rows).map(row => ({
-                id: row.dataset.id,
-                type: config.type,
-                name: row.querySelector("input")?.value?.trim() ?? ""
-            }));
-        }
+			updateData[`system.${path}`] = Array.from(rows, row => ({
+				id: row.dataset.id, type, name: row
+					.querySelector("input")
+					?.value
+					?.trim() ?? ""
+			}));
+		}
 
-        return updateData;
-    }
+		return updateData;
+	}
 
-    _getInventoryFromSheet(root) {
-        const rows = root.querySelectorAll(".prism-inventory-row");
+	_getInventoryFromSheet(root) {
+		const rows = root.querySelectorAll(".prism-inventory-row");
 
-        return Array.from(rows).map(row => {
-            const inputs = row.querySelectorAll("input");
+		return Array.from(rows, row => {
+			const inputs = row.querySelectorAll("input");
 
-            return {
-                id: row.dataset.id,
-                name: inputs[0]?.value?.trim() ?? "",
-                quantity: Number(inputs[1]?.value ?? 0)
-            };
-        });
-    }
+			return {
+				id: row.dataset.id, name: inputs[0]?.value?.trim() ?? "", quantity: normalizeQuantity(inputs[1]?.value)
+			};
+		});
+	}
+
+	_getSystemArray(path) {
+		return foundry.utils.deepClone(this.actor.system[path] ?? []);
+	}
+
+	_renderIfSuccessful(successful) {
+		if (successful) {
+			this.render(false);
+		}
+	}
 }

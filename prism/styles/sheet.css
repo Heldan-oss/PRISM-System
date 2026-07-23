@@ -74,6 +74,24 @@
     border-color: var(--prism-border-strong);
 }
 
+.prism button.prism-is-disabled,
+.prism button[aria-disabled="true"] {
+    opacity: 0.5;
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--prism-muted);
+    border-color: var(--prism-border);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.prism button.prism-is-disabled:hover,
+.prism button[aria-disabled="true"]:hover {
+    opacity: 0.6;
+    background: rgba(0, 0, 0, 0.09);
+    color: var(--prism-muted);
+    border-color: var(--prism-border);
+}
+
 .prism-full-button {
     width: 100%;
 }

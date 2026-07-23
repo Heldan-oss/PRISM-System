@@ -6,7 +6,16 @@
       "labelWithoutName": "Unnamed label: it cannot be added to the bag.",
       "pExtractMessage": "Draw 3",
       "riskMessage": "Take a Risk",
-      "emptyMessage": "Empty Bag"
+      "emptyMessage": "Empty Bag",
+      "duplicateLabel": "This label is already present in the bag.",
+      "maxAdversities": "The maximum limit of 4 Adversities has been reached.",
+      "maxFears": "The maximum limit of 3 Fears has been reached.",
+      "maxDangers": "The maximum limit of 4 Dangers has been reached.",
+      "drawThreeRequiresDanger": "At least one Danger must be present in the bag to perform the initial draw.",
+      "riskRequiresInitialDraw": "You can take a risk only after completing the initial draw.",
+      "riskAlreadyCompleted": "You have already taken a risk during this test. Clear the bag to begin a new test.",
+      "initialDrawAlreadyCompleted": "The initial draw has already been completed. Clear the bag to begin a new test.",
+      "bagLocked": "The bag cannot be changed after the initial draw. Clear it to begin a new test."
     },
 
     "sheet": {
