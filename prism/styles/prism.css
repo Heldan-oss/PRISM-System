@@ -1,42 +1,29 @@
-.prism-chat-card {
-    position: relative;
-    padding: 10px 12px;
-
-    border: 1px solid var(--prism-border-strong);
-    border-left: 4px solid var(--prism-neutral-border);
-    border-radius: var(--prism-radius-small);
-
-    background:
-            linear-gradient(
-                    145deg,
-                    rgba(243, 243, 244, 0.96),
-                    rgba(199, 202, 205, 0.88)
-            );
-
-    color: var(--prism-text);
-
-    box-shadow:
-            var(--prism-inset-highlight),
-            0 3px 8px rgba(42, 42, 46, 0.18);
+.chat-message {
+    border-radius: 0px !important;
+    border: none !important;
+    background-image: url("/systems/prism/ui/chat_messsage_bg.jpg");
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: repeat;
+    background-color: transparent;
 }
 
-.prism-chat-card::after {
-    content: "";
-    position: absolute;
-    top: 7px;
-    right: 8px;
-    width: 30px;
-    height: 3px;
+.chat-message h4 {
+    color: var(--prism-text);
+    font: var(--prism-font);
+    text-transform: uppercase;
+}
 
-    background:
-            linear-gradient(
-                    90deg,
-                    var(--prism-cyan-strong) 0 65%,
-                    transparent 65% 75%,
-                    var(--prism-amber) 75% 100%
-            );
+.message-content p {
+    font: var(--prism-font);
+    color: var(--prism-text);
+}
 
-    opacity: 0.8;
+.prism-chat-card {
+    position: relative;
+    padding: 5px 0px;
+    color: var(--prism-text);
+    font: var(--prism-font);
 }
 
 .prism-chat-card h2 {
@@ -44,8 +31,8 @@
     padding: 0 36px 6px 0;
 
     border-bottom: 1px solid var(--prism-neutral-border);
-    color: var(--prism-neutral-title);
-
+    color: var(--prism-text);
+    font: var(--prism-font);
     font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -61,39 +48,28 @@
     margin: 3px 2px;
     padding: 5px 9px;
 
-    border: 1px solid var(--prism-border-strong);
-    border-left-width: 4px;
-    border-radius: var(--prism-radius-small);
-
-    color: var(--prism-text);
+    color: var(--prism-text-inverse);
+    text-transform: uppercase;
     font-weight: 700;
-    line-height: 1.2;
-
-    box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    line-height: 1;
 }
 
 .prism-chat-label.prism-trait {
-    border-left-color: var(--prism-trait-border);
     background: var(--prism-trait-bg);
 }
 
 .prism-chat-label.prism-adversity {
-    border-left-color: var(--prism-adversity-border);
     background: var(--prism-adversity-bg);
 }
 
 .prism-chat-label.prism-fear {
-    border-left-color: var(--prism-fear-border);
     background: var(--prism-fear-bg);
 }
 
 .prism-chat-label.prism-danger {
-    border-left-color: var(--prism-danger-border);
     background: var(--prism-danger-bg);
 }
 
 .prism-chat-label.prism-unknown {
-    border-left-color: var(--prism-neutral-border);
     background: rgba(159, 162, 167, 0.24);
 }

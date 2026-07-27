@@ -1,4 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@400;700&display=swap");
+
 :root {
+     /* Font */
+    --prism-font: "Afacad Flux", sans-serif;   
+
     /* Base palette */
     --prism-fog: #f3f3f4;
     --prism-ice: #dddee1;
@@ -26,7 +31,7 @@
     --prism-bg: var(--prism-silver);
     --prism-surface: rgba(232, 234, 236, 0.88);
     --prism-surface-strong: rgba(243, 243, 244, 0.95);
-    --prism-surface-muted: rgba(199, 202, 205, 0.78);
+    --prism-surface-muted: rgba(238, 238, 238, 0.95);
     --prism-surface-dark: rgba(67, 67, 72, 0.94);
 
     /* Neutral panel appearance */
@@ -43,6 +48,7 @@
     --prism-text: #2a2d31;
     --prism-muted: #5d6369;
     --prism-text-inverse: #f3f3f4;
+    --prism-text-inverse-shadow: #cacaca;
 
     /* Functional colors */
     --prism-accent: var(--prism-cyan-strong);
@@ -51,25 +57,25 @@
     --prism-warning-dark: var(--prism-amber-dark);
 
     /* Trait */
-    --prism-trait-bg: rgba(111, 183, 214, 0.24);
+    --prism-trait-bg: rgb(57, 104, 124);
     --prism-trait-panel-bg: rgba(111, 183, 214, 0.15);
     --prism-trait-border: #4e9bc3;
     --prism-trait-dark: #2f7398;
 
     /* Adversity */
-    --prism-adversity-bg: rgba(163, 73, 73, 0.24);
+    --prism-adversity-bg: rgb(119, 55, 55);
     --prism-adversity-panel-bg: rgba(163, 73, 73, 0.15);
     --prism-adversity-border: var(--prism-red);
     --prism-adversity-dark: var(--prism-red-dark);
 
     /* Fear */
-    --prism-fear-bg: rgba(116, 119, 147, 0.22);
+    --prism-fear-bg: rgb(89, 90, 100);
     --prism-fear-panel-bg: rgba(116, 119, 147, 0.15);
     --prism-fear-border: var(--prism-fear);
     --prism-fear-title: var(--prism-fear-dark);
 
     /* Danger */
-    --prism-danger-bg: rgba(252, 197, 107, 0.34);
+    --prism-danger-bg: rgb(134, 107, 63);
     --prism-danger-panel-bg: rgba(252, 197, 107, 0.18);
     --prism-danger-border: #c58a32;
     --prism-danger-dark: #8b5d1e;
@@ -77,17 +83,24 @@
     /* Geometry */
     --prism-radius-small: 2px;
     --prism-radius-medium: 4px;
+    --prism-radius-big: 10px;
+    --prism-radius-max: 100%;
 
     /* Shadows */
     --prism-shadow:
             0 8px 22px rgba(42, 42, 46, 0.24);
 
     --prism-shadow-small:
-            0 3px 8px rgba(42, 42, 46, 0.14);
+            0 3px 8px rgba(115, 115, 117, 0.14);
 
     --prism-inset-highlight:
             inset 0 1px 0 rgba(255, 255, 255, 0.68);
 
     /* Animation */
     --prism-transition: 140ms ease;
+
+    /* Backgrounds */
+    --prism-sheet-body-bg: rgba(66, 66, 70, 0.15);
+    --prism-extract-three-bg: #9466bd;
+    --prism-extract-three-hover: #5e4079;
 }
