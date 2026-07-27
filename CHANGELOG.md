@@ -29,6 +29,30 @@ Because the project is currently in Alpha:
 * No unreleased fixes documented yet.
 ---
 
+## [0.3.0] - 2026-07-27
+
+### Changed
+
+* Completely redesigned the Anomaly Sheet interface.
+* Introduced a new coordinated color palette.
+* Updated backgrounds, surfaces, borders, panels, and geometric elements.
+* Revised the typography and overall visual hierarchy.
+* Redesigned buttons, input fields, controls, and interactive states.
+* Reorganized the visual structure of the sheet sections.
+* Updated the representation of Traits, Adversities, Fears, and Dangers.
+* Redesigned the result cards published in the Foundry VTT chat.
+* Reviewed and updated all CSS stylesheets currently used by the system.
+
+### Fixed
+
+* Fixed several visual inconsistencies across the Anomaly Sheet.
+* Improved alignment, spacing, and readability in the sheet sections.
+* Fixed inconsistent styling between labels, panels, inputs, and interactive elements.
+* Improved the visual consistency of chat result cards.
+* Standardized styles that were previously distributed across different CSS files.
+
+---
+
 ## [0.2.1] - 2026-07-24
 
 ### Fixed
