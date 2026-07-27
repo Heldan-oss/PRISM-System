@@ -18,21 +18,12 @@
 .prism .window-content {
     padding: 0;
     color: var(--prism-text);
-
-    background:
-            linear-gradient(
-                    115deg,
-                    rgba(255, 255, 255, 0.20),
-                    transparent 28%,
-                    rgba(67, 67, 72, 0.10) 72%,
-                    rgba(255, 255, 255, 0.14)
-            ),
-            linear-gradient(
-                    160deg,
-                    var(--prism-ice) 0%,
-                    var(--prism-silver) 52%,
-                    var(--prism-ash) 100%
-            );
+    font: var(--prism-font);
+    background-image: url("/systems/prism/ui/character_sheet_bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+    background-color: transparent;
 }
 
 .prism form {
@@ -45,25 +36,10 @@
 .prism-header {
     position: relative;
     display: grid;
-    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-columns: 160px minmax(0, 1fr);
     gap: 18px;
     align-items: stretch;
-    padding: 14px;
-
-    border: 1px solid var(--prism-border-strong);
-    border-left: 4px solid var(--prism-neutral-border);
-    border-radius: var(--prism-radius-small);
-
-    background:
-            linear-gradient(
-                    135deg,
-                    rgba(243, 243, 244, 0.96),
-                    rgba(199, 202, 205, 0.84)
-            );
-
-    box-shadow:
-            var(--prism-inset-highlight),
-            0 3px 10px rgba(42, 42, 46, 0.16);
+    padding: 12px;
 }
 
 .prism-header::after {
@@ -73,26 +49,14 @@
     bottom: 8px;
     width: 52px;
     height: 3px;
-
-    background:
-            linear-gradient(
-                    90deg,
-                    var(--prism-cyan-strong) 0 64%,
-                    transparent 64% 72%,
-                    var(--prism-amber) 72% 100%
-            );
-
     opacity: 0.8;
     pointer-events: none;
 }
 
 .prism-header .profile-img {
-    width: 224px;
-    height: 224px;
+    width: 160px;
+    height: 160px;
     object-fit: cover;
-
-    border: 2px solid var(--prism-neutral-border);
-    border-radius: var(--prism-radius-small);
     background: var(--prism-ash);
 
     box-shadow:
@@ -101,6 +65,7 @@
             0 5px 14px rgba(42, 42, 46, 0.22);
 
     transition:
+    
             border-color var(--prism-transition),
             box-shadow var(--prism-transition);
 }
@@ -121,21 +86,12 @@
     justify-content: center;
     gap: 10px;
     padding: 18px;
-
-    border: 1px solid var(--prism-border);
-    border-top: 3px solid var(--prism-neutral-border);
-    border-radius: var(--prism-radius-small);
-
-    background: rgba(243, 243, 244, 0.72);
-
-    box-shadow:
-            var(--prism-inset-highlight),
-            inset 0 -18px 30px rgba(67, 67, 72, 0.04);
+    border-radius: var(--prism-radius-big);
 }
 
 .prism-header-fields label {
     margin-top: 4px;
-    color: var(--prism-neutral-title);
+    color: var(--prism-text);
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -143,11 +99,10 @@
 }
 
 .prism-name {
-    min-height: 54px;
-    font-size: 30px;
+    min-height: 45px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: 0.025em;
-    border-bottom: 2px solid var(--prism-neutral-border);
 }
 
 /* Form controls */
@@ -159,7 +114,7 @@
     padding: 7px 9px;
 
     border: 1px solid var(--prism-medium);
-    border-radius: var(--prism-radius-small);
+    border-radius: 0px !important;
 
     background: var(--prism-surface-strong);
     color: var(--prism-text);
@@ -202,15 +157,9 @@
 .prism button {
     padding: 6px 10px;
 
-    border: 1px solid var(--prism-medium);
-    border-radius: var(--prism-radius-small);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    var(--prism-fog),
-                    var(--prism-ice)
-            );
+    border: 1px solid var(--prism-text);
+    border-radius: 0px !important;
+    background: var(--prism-surface-strong);
 
     color: var(--prism-text);
     font-weight: 700;
@@ -232,19 +181,8 @@
 
 .prism button:hover {
     border-color: var(--prism-neutral-border);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    #ffffff,
-                    rgba(67, 67, 72, 0.12)
-            );
-
+    background: var(--prism-surface-muted);
     color: var(--prism-neutral-title);
-
-    box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.90),
-            0 2px 5px rgba(42, 42, 46, 0.20);
 }
 
 .prism button:focus-visible {
@@ -274,62 +212,53 @@
 
 .prism-tabs {
     display: flex;
-    gap: 4px;
-    margin: 14px 0 10px;
-    padding: 0 6px;
-    border-bottom: 2px solid var(--prism-neutral-border);
+    border: none;
 }
 
 .prism-tabs .item {
     position: relative;
     padding: 9px 18px;
-
-    border: 1px solid var(--prism-border);
+    width: 100%;
     border-bottom: none;
-    border-radius: var(--prism-radius-small) var(--prism-radius-small) 0 0;
-
-    background: rgba(221, 222, 225, 0.78);
-    color: var(--prism-graphite);
+    color: var(--prism-text);
 
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    text-shadow: none;
     cursor: pointer;
 
     transition:
             color var(--prism-transition),
             border-color var(--prism-transition),
-            background var(--prism-transition);
+            background var(--prism-transition),
+            text-shadow var(--prism-transition);
 }
 
 .prism-tabs .item:hover {
-    border-color: var(--prism-cyan-dark);
-    background: rgba(243, 243, 244, 0.94);
-    color: var(--prism-cyan-dark);
+    color: var(--prism-text);
+    text-shadow: 0 0 6px var(--prism-cyan-dark);
 }
 
 .prism-tabs .item.active {
     border-color: var(--prism-neutral-border);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    #505056,
-                    var(--prism-graphite)
-            );
-
-    color: var(--prism-fog);
-
-    box-shadow:
-            inset 0 -3px 0 var(--prism-cyan),
-            0 -2px 8px rgba(42, 42, 46, 0.14);
+    color: var(--prism-text);
+    text-shadow: none;
+    background:var(--prism-sheet-body-bg);
 }
 
 /* Main layout */
 
 .prism .sheet-body {
-    margin-top: 8px;
+    margin-bottom: 8px;
+    background:var(--prism-sheet-body-bg);
+    padding: 8px;
+
+}
+
+.sheet-tabs {
+    margin: 0px !important;
 }
 
 .prism .sheet-body .tab {
@@ -358,28 +287,13 @@
 
     position: relative;
     padding: 11px;
-
-    border: 1px solid var(--prism-border);
-    border-left: 3px solid var(--prism-panel-accent);
-    border-radius: var(--prism-radius-small);
-
-    background:
-            linear-gradient(
-                    145deg,
-                    rgba(243, 243, 244, 0.92),
-                    var(--prism-panel-tint)
-            );
-
-    box-shadow:
-            var(--prism-inset-highlight),
-            var(--prism-shadow-small);
 }
 
 .prism-panel h2 {
     margin: 0 0 10px;
     padding: 0 0 6px;
 
-    border-bottom: 1px solid var(--prism-panel-accent);
+    border-bottom: 2px solid var(--prism-panel-accent);
     color: var(--prism-panel-title);
 
     font-size: 14px;
@@ -393,7 +307,6 @@
 .prism-panel.prism-neutral-panel {
     --prism-panel-accent: var(--prism-neutral-border);
     --prism-panel-title: var(--prism-neutral-title);
-    --prism-panel-tint: var(--prism-neutral-panel-bg);
 }
 
 /* Trait panel */
@@ -401,7 +314,6 @@
 .prism-panel.prism-trait-panel {
     --prism-panel-accent: var(--prism-trait-border);
     --prism-panel-title: var(--prism-trait-dark);
-    --prism-panel-tint: var(--prism-trait-panel-bg);
 }
 
 /* Adversity panel */
@@ -409,7 +321,6 @@
 .prism-panel.prism-adversity-panel {
     --prism-panel-accent: var(--prism-adversity-border);
     --prism-panel-title: var(--prism-adversity-dark);
-    --prism-panel-tint: var(--prism-adversity-panel-bg);
 }
 
 /* Fear panel */
@@ -433,24 +344,12 @@
 .prism-type-panel > .prism-full-button,
 .prism-type-panel button[data-action="add-to-bag"] {
     border-color: var(--prism-panel-accent);
-
-    box-shadow:
-            inset 3px 0 0 var(--prism-panel-accent),
-            inset 0 1px 0 rgba(255, 255, 255, 0.76),
-            0 1px 2px rgba(42, 42, 46, 0.16);
 }
 
 .prism-type-panel > .prism-full-button:hover,
 .prism-type-panel button[data-action="add-to-bag"]:hover {
     border-color: var(--prism-panel-title);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    var(--prism-fog),
-                    var(--prism-panel-tint)
-            );
-
+    background: var(--prism-surface-muted);
     color: var(--prism-panel-title);
 }
 
@@ -475,14 +374,7 @@
 }
 
 .prism-label-row[data-type] input {
-    border-left: 3px solid var(--prism-row-accent);
-
-    background:
-            linear-gradient(
-                    90deg,
-                    var(--prism-row-tint),
-                    var(--prism-surface-strong) 30%
-            );
+    background: var(--prism-surface-muted);
 }
 
 .prism-risk-row {
@@ -530,15 +422,9 @@
     gap: 8px;
     align-items: center;
     padding: 8px 10px;
-
-    border: 1px solid var(--prism-border-strong);
-    border-left-width: 4px;
-    border-radius: var(--prism-radius-small);
-
+    color: var(--prism-text-inverse);
+    text-transform: uppercase;
     font-weight: 700;
-
-    box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.48);
 }
 
 .prism-bag-entry span {
@@ -555,15 +441,9 @@
 
 .prism-drawn-entry {
     padding: 7px 9px;
-
-    border: 1px solid var(--prism-border-strong);
-    border-left-width: 4px;
-    border-radius: var(--prism-radius-small);
-
     font-weight: 700;
-
-    box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.46);
+    color: var(--prism-text-inverse-shadow);
+    text-transform: uppercase;
 }
 
 /* Label type appearance */
@@ -611,93 +491,45 @@
 }
 
 .prism button[data-action="draw-three"] {
-    border-color: var(--prism-cyan-dark);
+    border-color: var(--prism-extract-three-hover);
 
-    background:
-            linear-gradient(
-                    180deg,
-                    rgba(111, 183, 214, 0.54),
-                    rgba(78, 155, 195, 0.32)
-            );
-
-    color: var(--prism-coal);
-
-    box-shadow:
-            inset 3px 0 0 var(--prism-cyan-dark),
-            inset 0 1px 0 rgba(255, 255, 255, 0.56),
-            0 1px 3px rgba(42, 42, 46, 0.20);
+    background: var(--prism-extract-three-bg);
+    color: var(--prism-text-inverse);
+    box-shadow: none;
 }
 
 .prism button[data-action="draw-three"]:hover {
-    background:
-            linear-gradient(
-                    180deg,
-                    rgba(111, 183, 214, 0.76),
-                    rgba(78, 155, 195, 0.46)
-            );
-
-    color: var(--prism-coal);
+    background: var(--prism-extract-three-hover);
+    color: var(--prism-text-inverse);
 }
 
 .prism button[data-action="risk"] {
     border-color: var(--prism-warning-dark);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    rgba(252, 197, 107, 0.58),
-                    rgba(197, 138, 50, 0.30)
-            );
-
-    color: var(--prism-coal);
-
-    box-shadow:
-            inset 3px 0 0 var(--prism-amber),
-            inset 0 1px 0 rgba(255, 255, 255, 0.56),
-            0 1px 3px rgba(42, 42, 46, 0.20);
+    background: rgb(192, 149, 80);
+    color: var(--prism-text-inverse);
+    box-shadow: none;
 }
 
 .prism button[data-action="risk"]:hover {
     border-color: var(--prism-amber-dark);
-
-    background:
-            linear-gradient(
-                    180deg,
-                    rgba(252, 197, 107, 0.78),
-                    rgba(197, 138, 50, 0.42)
-            );
-
-    color: var(--prism-coal);
+    background: rgb(167, 129, 69);
+    color: var(--prism-text-inverse);
 }
 
 .prism button[data-action="clear-bag"] {
     border-color: var(--prism-coal);
 
-    background:
-            linear-gradient(
-                    180deg,
-                    var(--prism-graphite),
-                    var(--prism-coal)
-            );
-
+    background: var(--prism-graphite);
     color: var(--prism-text-inverse);
+    box-shadow: none;
 
-    box-shadow:
-            inset 3px 0 0 var(--prism-medium),
-            0 1px 3px rgba(42, 42, 46, 0.28);
 }
 
 .prism button[data-action="clear-bag"]:hover {
-    border-color: var(--prism-cyan);
+    border-color: var(--prism-coal);
 
-    background:
-            linear-gradient(
-                    180deg,
-                    #55555b,
-                    var(--prism-graphite)
-            );
-
-    color: #ffffff;
+    background: #55555b;
+    color: var(--prism-text-inverse);
 }
 
 /*
