@@ -18,6 +18,21 @@ Because the project is currently in Alpha:
 
 ### Added
 
+* No unreleased changes documented yet.
+
+### Changed
+
+* No unreleased changes documented yet.
+
+### Fixed
+
+* No unreleased fixes documented yet.
+
+---
+## [0.4.0] - 2026-07-29
+
+### Added
+
 * Added permanent Signs associated directly with individual Traits.
 * Added localized Trait controls and dialogs for creating and correcting non-blank Signs.
 * Added Sign snapshots to marked Traits placed in the virtual bag.
@@ -35,7 +50,6 @@ Because the project is currently in Alpha:
 * Preserved the legacy `system.marks` Actor field for existing-world compatibility, but it is no longer rendered or interpreted.
 
 ---
-
 ## [0.3.0] - 2026-07-27
 
 ### Changed
