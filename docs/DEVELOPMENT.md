@@ -584,7 +584,7 @@ No custom Item types are currently defined.
 | `adversities`   |    `[]` | Adversity entries                            |
 | `fears`         |    `[]` | Reserved collection                          |
 | `dangers`       |    `[]` | Reserved collection                          |
-| `marks`         |    `[]` | Current Signs/Marks value; type mismatch remains |
+| `marks`         |    `[]` | Deprecated legacy Signs/Marks value; preserved but no longer rendered |
 | `bag`           |    `[]` | Virtual-bag entries                          |
 | `lastDraw`      |    `[]` | Most recent successful draw                  |
 | `bagSession`    | object  | Initial-draw and risk-use session state       |
@@ -606,7 +606,8 @@ Existing Actors created before this field was introduced may not contain it. Run
 {
   "id": "RANDOM_ID",
   "name": "Example label",
-  "type": "trait"
+  "type": "trait",
+  "sign": ""
 }
 ```
 
@@ -615,6 +616,7 @@ Each entry contains:
 * A stable local ID.
 * A user-visible name.
 * An internal semantic type.
+* An optional normalized Sign string on Traits.
 
 The same structure is used for Adversities with:
 
@@ -633,9 +635,18 @@ Stored Trait and Adversity entries use:
   "id": "BAG_ENTRY_ID",
   "sourceId": "SOURCE_LABEL_ID",
   "name": "Example label",
-  "type": "trait"
+  "type": "trait",
+  "sign": "Permanent Sign description"
 }
 ```
+
+The `sign` property is stored only when a Trait has a non-blank Sign. It is a
+snapshot captured when the Trait is added to the bag. Existing bag entries
+without `sign` remain valid and behave as ordinary Traits.
+
+Correcting or deleting the source Trait does not rewrite an entry already
+present in the current bag or latest draw. That snapshot remains valid until
+the current test data is cleared, matching the existing name-snapshot rule.
 
 Generic Fear and Danger entries use:
 
@@ -677,6 +688,8 @@ Unless a focused data change is approved:
 * Dynamic entries must have stable IDs.
 * Internal types must not be localized.
 * `bag` and `lastDraw` must remain arrays.
+* A Trait Sign must be normalized and cannot be saved as blank text.
+* A Sign cannot be removed independently from its Trait, but its text may be corrected.
 * Blank labels must not be added to the bag.
 * A stored Trait or Adversity may be present in the bag only once per `sourceId`.
 * The bag may contain at most four Adversities.
@@ -758,6 +771,7 @@ Current actions include:
 | `clear-bag`             | Clear the bag, latest draw, and session state |
 | `draw-three`            | Perform the one allowed initial draw         |
 | `risk`                  | Open the risk dialog and perform one risk draw |
+| `edit-sign`             | Create or correct a permanent Trait Sign     |
 | `add-fear`              | Add a generic Fear                           |
 | `add-danger`            | Add a generic Danger                         |
 | `add-inventory-item`    | Add an inventory row                         |
@@ -798,7 +812,7 @@ Unknown `data-action` elements should not be intercepted by PRISM routing.
 
 The sheet uses Foundry's normal form-submission workflow as the authoritative persistence path.
 
-Static named fields, such as Actor name, Concept, Biography, Notes, and Signs, are collected by the base `ActorSheet` implementation. Dynamic collections are added by the sheet override:
+Static named fields, such as Actor name, Concept, Biography, and Notes, are collected by the base `ActorSheet` implementation. Dynamic collections are added by the sheet override:
 
 ```text
 _getSubmitData()
@@ -811,6 +825,9 @@ The override merges the following collections into the submission payload:
 * `system.inventory`
 
 Dynamic row inputs intentionally do not use index-based `name` paths. Their stable `data-id` values and semantic row classes are used to rebuild the arrays without making stored identity depend on visual order.
+
+Trait serialization preserves the stored `sign` property by stable Trait ID.
+Submitting a name change or closing the sheet must not erase a Sign.
 
 The current form options are:
 
@@ -1072,7 +1089,13 @@ This avoids silent data loss. Such bags remain stored until the user clears or m
 
 The system uses a Fisher–Yates-style shuffle based on `Math.random()`.
 
-It is intended for ordinary gameplay resolution, not cryptographic use.
+Marked-Trait coin flips also use `Math.random()`. Values below `0.5` resolve
+to the original Trait and values at or above `0.5` resolve to the Sign, giving
+both outcomes equal expected probability. Each drawn marked Trait is resolved
+independently, and the result affects only its chat interpretation.
+
+This randomization is intended for ordinary gameplay resolution, not
+cryptographic use.
 
 A change to randomization must document:
 
@@ -1113,9 +1136,22 @@ The dialog must not open when `BagManager.validateRisk(actor)` rejects the actio
 
 Visible dialog text must be localized.
 
+### Trait Sign Dialogs
+
+The Sign workflow uses two Application V1 dialogs:
+
+1. A confirmation dialog for creating or correcting a Sign.
+2. A text-entry dialog which returns the proposed Sign or `null`.
+
+The sheet normalizes the returned value, rejects blank or whitespace-only
+Signs, and updates a cloned `system.traits` array through `Actor.update()`.
+Once assigned, a Sign cannot be cleared independently from its Trait. Its text
+may be corrected, and deleting the Trait also deletes its source Sign.
+
 ### Chat Messages
 
-Successful initial and risk draws are created by the Actor sheet using Foundry `ChatMessage`.
+Successful initial and risk draws are created through `DrawChat` using Foundry
+`ChatMessage`. Structured draw data is stored under `flags.prism.draw`.
 
 Current result types use CSS classes such as:
 
@@ -1126,6 +1162,20 @@ prism-fear
 prism-danger
 prism-unknown
 ```
+
+A drawn marked Trait displays its Trait name, Sign text, and one coin-flip
+button. The coin flip:
+
+* Uses the interface-independent `flipSignCoin()` helper.
+* Returns `trait` or `sign` with equal probability.
+* Can be resolved only by a user who may update the ChatMessage.
+* Can be resolved only once per drawn marked Trait.
+* Stores its result in the ChatMessage flag and updates the original card.
+* Does not change persistent Actor or Trait state.
+
+Foundry VTT 12 uses the `renderChatMessage` hook with jQuery HTML. Foundry VTT
+13 and 14 use `renderChatMessageHTML` with an `HTMLElement`. PRISM selects the
+appropriate hook from `game.release.generation`.
 
 The current `prism.css` applies the packaged chat background to Foundry's generic:
 
@@ -1280,7 +1330,7 @@ The current visual direction uses:
 * Amber for Dangers and risk emphasis.
 * Violet for the initial three-label draw action.
 
-General sections such as the header, bag container, latest draw, Signs, Biography, Notes, and Inventory use the neutral graphite treatment rather than a gameplay-type accent.
+General sections such as the header, bag container, latest draw, Biography, Notes, and Inventory use the neutral graphite treatment rather than a gameplay-type accent. Structured Sign controls use the Trait accent because they belong to individual Traits.
 
 The character portrait is currently rendered at:
 
@@ -1561,6 +1611,14 @@ Verify:
 * Neutral sections do not inherit a type color.
 * The sheet remains usable when resized.
 * Existing Actor data still renders.
+* The legacy `system.marks` value remains stored but is no longer rendered.
+* A Trait can receive a non-blank Sign.
+* A blank or whitespace-only Sign is rejected.
+* An unnamed Trait cannot receive a Sign.
+* Sign text can be corrected but cannot be cleared.
+* Editing a Trait name and closing the sheet does not erase its Sign.
+* Deleting a Trait removes its source Sign with the Trait.
+* The `✦` button and marked indicator remain usable at supported sheet sizes.
 
 ### Virtual Bag Composition
 
@@ -1575,6 +1633,9 @@ Verify:
 * Blank labels are rejected.
 * Every rejection displays the correct localized warning.
 * Existing invalid bags are not silently modified on load.
+* Adding a marked Trait stores its current Sign snapshot in the bag entry.
+* Adding an unmarked Trait does not add a non-blank Sign.
+* Existing bag entries without `sign` remain valid.
 
 ### Initial Draw and Session Lock
 
@@ -1633,6 +1694,13 @@ Verify:
 * Repeated or tall chat messages do not expose broken background seams.
 * Long and special-character labels do not break output.
 * HTML-like label content is displayed safely rather than executed.
+* A marked Trait displays its Sign and one coin-flip button.
+* Multiple marked Traits in one draw receive independent buttons.
+* Heads resolves to the original Trait and Tails resolves to the Sign.
+* A resolved coin flip survives chat re-rendering and world reload.
+* A resolved coin flip cannot be repeated.
+* A user without ChatMessage update permission cannot resolve the flip.
+* HTML-like Sign content is displayed safely rather than executed.
 
 ### Localization
 
@@ -2222,7 +2290,7 @@ A future migration to formal Foundry DataModel classes would require:
 * Migration planning.
 * Existing-world testing.
 
-### Marks Type
+### Legacy Marks Field
 
 The schema currently defines:
 
@@ -2232,9 +2300,23 @@ The schema currently defines:
 }
 ```
 
-while the sheet treats Marks as textarea content.
+This field belonged to the former free-text Marks textarea. Structured Signs
+now live on individual Trait entries through `trait.sign`, and the legacy
+textarea is no longer rendered.
 
-The intended type and future Signs implementation must be resolved through a dedicated data-model change.
+The legacy field remains in `template.json` so existing Actor data is not
+silently deleted. Runtime code does not migrate or interpret its contents
+because free text cannot be associated reliably with stable Trait IDs.
+
+This is an additive stored-data change:
+
+* Existing Traits without `sign` are treated as unmarked.
+* Existing bag and latest-draw entries without `sign` remain valid.
+* No automated migration rewrites existing Actors.
+* Legacy `marks` content remains in Actor source data but is not editable from
+  the new sheet.
+* Test the feature on a copied world and retain a backup before using it with
+  campaign data.
 
 ### Reserved Fields
 

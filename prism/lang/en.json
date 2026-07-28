@@ -35,13 +35,19 @@
       "fear": "Fear",
       "danger": "Danger",
       "latestDraw": "Latest Draw",
-      "signs": "Marks",
       "bio": "Biography",
       "note": "Personal Notes",
       "inventory": "Inventory",
       "object": "Item",
       "objectMessage": "Enter an Item",
       "quantity": "Quantity"
+    },
+
+    "sign": {
+      "add": "Mark this Trait",
+      "edit": "Edit this Trait's Sign",
+      "empty": "A Sign cannot be empty or contain only spaces.",
+      "traitWithoutName": "Name the Trait before assigning a Sign."
     },
 
     "bagManager": {
@@ -57,12 +63,29 @@
       "sLabel": "2 labels",
       "tLabel": "3 labels",
       "extract": "Draw",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "signTitle": "Trait Sign",
+      "confirmSign": "Do you really want to mark this Trait?",
+      "confirmSignEdit": "Do you want to correct the text of this permanent Sign?",
+      "signPrompt": "Enter the Sign",
+      "save": "Save",
+      "yes": "Yes",
+      "no": "No"
     },
 
     "chat": {
       "draw": "PRISM Draw",
-      "risk": "PRISM Risk"
+      "risk": "PRISM Risk",
+      "sign": "Sign",
+      "flipSignCoin": "Flip the coin",
+      "coinHeadsTrait": "Heads — Trait",
+      "coinTailsSign": "Tails — Sign",
+      "traitResultHelp": "Use the Trait's original value.",
+      "signResultHelp": "Interpret the result narratively using the Sign.",
+      "invalidSignFlip": "This Sign coin flip is no longer valid.",
+      "signFlipForbidden": "You do not have permission to resolve this Sign.",
+      "signFlipAlreadyResolved": "This Sign coin flip has already been resolved.",
+      "signFlipFailed": "The Sign coin flip could not be completed."
     }
 
   }

@@ -86,6 +86,15 @@ Create, edit, organize, and select the tags associated with an Anomaly.
 
 Selected tags can then be used in the system’s digital resolution workflow.
 
+### Structured Signs
+
+Associate a permanent Sign directly with an individual Trait and correct its
+text without removing the marked state.
+
+When a marked Trait is added to the virtual bag and drawn, its Sign is shown
+in Foundry chat together with a single-use coin flip that resolves the result
+as either the original Trait or its Sign.
+
 ### Virtual Bag
 
 Add the tags involved in a test to a virtual bag and draw them through Foundry VTT.

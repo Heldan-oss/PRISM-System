@@ -32,8 +32,27 @@
 
                         {{#each traits}}
                             <div class="prism-label-row" data-type="trait" data-id="{{this.id}}">
-                                <input type="text" value="{{this.name}}"
-                                       placeholder="{{localize 'prism.sheet.tTipsMessage'}}"/>
+                                <div class="prism-trait-input">
+                                    {{#if this.sign}}
+                                        <span class="prism-trait-sign-indicator" aria-hidden="true"
+                                              title="{{this.sign}}">
+                                            ✦
+                                        </span>
+                                    {{/if}}
+
+                                    <input type="text" value="{{this.name}}"
+                                           class="{{#if this.sign}}prism-has-sign{{/if}}"
+                                           placeholder="{{localize 'prism.sheet.tTipsMessage'}}"/>
+                                </div>
+
+                                <button type="button"
+                                        class="prism-icon-button prism-sign-button{{#if this.sign}} prism-is-active{{/if}}"
+                                        data-action="edit-sign" data-id="{{this.id}}"
+                                        aria-label="{{#if this.sign}}{{localize 'prism.sign.edit'}}{{else}}{{localize 'prism.sign.add'}}{{/if}}"
+                                        aria-pressed="{{#if this.sign}}true{{else}}false{{/if}}"
+                                        title="{{#if this.sign}}{{localize 'prism.sign.edit'}}{{else}}{{localize 'prism.sign.add'}}{{/if}}">
+                                    <span aria-hidden="true">✦</span>
+                                </button>
 
                                 <button type="button" class="{{#unless ../canModifyBag}}prism-is-disabled{{/unless}}"
                                         data-action="add-to-bag" data-type="trait" data-id="{{this.id}}"
@@ -180,10 +199,6 @@
                         </div>
                     </section>
 
-                    <section class="prism-panel prism-neutral-panel">
-                        <h2>{{localize "prism.sheet.signs"}}</h2>
-                        <textarea name="system.marks">{{system.marks}}</textarea>
-                    </section>
                 </section>
             </main>
         </section>
