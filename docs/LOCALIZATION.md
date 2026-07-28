@@ -286,7 +286,6 @@ prism.sheet.adversity
 prism.sheet.fear
 prism.sheet.danger
 prism.sheet.latestDraw
-prism.sheet.signs
 prism.sheet.bio
 prism.sheet.note
 prism.sheet.inventory
@@ -295,6 +294,20 @@ prism.sheet.quantity
 ```
 
 This group also contains placeholders and section titles.
+
+### `prism.sign`
+
+Contains Trait-Sign button labels and validation warnings:
+
+```text
+prism.sign.add
+prism.sign.edit
+prism.sign.empty
+prism.sign.traitWithoutName
+```
+
+Signs are user-controlled Actor data. Localization applies to their controls
+and warnings, not to the stored Sign text.
 
 ### `prism.bagManager`
 
@@ -325,9 +338,19 @@ prism.dialog.sLabel
 prism.dialog.tLabel
 prism.dialog.extract
 prism.dialog.cancel
+prism.dialog.signTitle
+prism.dialog.confirmSign
+prism.dialog.confirmSignEdit
+prism.dialog.signPrompt
+prism.dialog.save
+prism.dialog.yes
+prism.dialog.no
 ```
 
-The risk dialog dynamically displays only the amount options supported by the remaining bag size. All possible option labels must still exist in every language file.
+The risk dialog dynamically displays only the amount options supported by the
+remaining bag size. All possible option labels must still exist in every
+language file. The Trait-Sign flow uses separate confirmation and text-entry
+dialogs.
 
 ### `prism.chat`
 
@@ -338,9 +361,21 @@ Current keys are:
 ```text
 prism.chat.draw
 prism.chat.risk
+prism.chat.sign
+prism.chat.flipSignCoin
+prism.chat.coinHeadsTrait
+prism.chat.coinTailsSign
+prism.chat.traitResultHelp
+prism.chat.signResultHelp
+prism.chat.invalidSignFlip
+prism.chat.signFlipForbidden
+prism.chat.signFlipAlreadyResolved
+prism.chat.signFlipFailed
 ```
 
-Chat titles are localized at message creation time and escaped before being inserted into the PRISM chat-card HTML.
+Chat titles, controls, results, and warnings are localized. Localized values
+and stored Trait or Sign text are escaped before being inserted into PRISM
+chat-card HTML.
 
 ---
 
@@ -1156,12 +1191,13 @@ Verify:
 * Add buttons.
 * Bag actions.
 * Latest Draw heading.
-* Signs heading.
+* Add-Sign and edit-Sign button labels.
 * Biography and notes.
 * Inventory headings.
 * Item placeholder.
 * Quantity heading.
 * Localized title attributes on warning-capable controls.
+* Blank-Sign and unnamed-Trait validation warnings.
 
 ### Bag Validation Testing
 
@@ -1192,6 +1228,9 @@ Verify:
 * Three-label option.
 * Confirm button.
 * Cancel button.
+* Sign confirmation title, question, Yes, and No buttons.
+* Sign-entry label, Save button, and Cancel button.
+* Sign correction confirmation text.
 
 Also verify dynamic option visibility:
 
@@ -1209,6 +1248,10 @@ Verify:
 * Long translated titles.
 * Chat-card layout.
 * Trait, Adversity, Fear, and Danger label presentation.
+* Marked-Trait label and Sign text.
+* Coin-flip button.
+* Heads/Trait and Tails/Sign results.
+* Resolved, forbidden, invalid, and failure warnings.
 
 ### Layout Testing
 

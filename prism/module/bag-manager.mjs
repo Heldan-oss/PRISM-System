@@ -1,4 +1,5 @@
 import {shuffleArray} from "./utils.mjs";
+import {normalizeSign} from "./sign-manager.mjs";
 
 const BAG_LIMITS = Object.freeze({
 	adversity: 4, fear: 3, danger: 4
@@ -89,7 +90,12 @@ export class BagManager {
 
 	static async add(actor, label) {
 		return this._addEntry(actor, {
-			sourceId: label?.id, name: label?.name, type: label?.type
+			sourceId: label?.id,
+			name: label?.name,
+			type: label?.type,
+			sign: label?.type === "trait"
+				? normalizeSign(label?.sign)
+				: ""
 		});
 	}
 
@@ -173,7 +179,7 @@ export class BagManager {
 	}
 
 	static async _addEntry(actor, {
-		sourceId = null, name, type
+		sourceId = null, name, type, sign = ""
 	}) {
 		if (!this._validateBagUnlocked(actor)) {
 			return false;
@@ -198,9 +204,22 @@ export class BagManager {
 			return false;
 		}
 
-		bag.push({
-			id: foundry.utils.randomID(), sourceId, name: normalizedName, type
-		});
+		const entry = {
+			id: foundry.utils.randomID(),
+			sourceId,
+			name: normalizedName,
+			type
+		};
+
+		const normalizedSign = type === "trait"
+			? normalizeSign(sign)
+			: "";
+
+		if (normalizedSign) {
+			entry.sign = normalizedSign;
+		}
+
+		bag.push(entry);
 
 		const updateData = {
 			"system.bag": bag, [SESSION_PATHS.initialDrawCompleted]: false, [SESSION_PATHS.riskCompleted]: false

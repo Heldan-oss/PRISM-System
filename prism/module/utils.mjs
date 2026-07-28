@@ -1,3 +1,18 @@
+const HTML_ESCAPE_CHARACTERS = Object.freeze({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+});
+
+export function escapeHtml(value) {
+    return String(value ?? "").replace(
+        /[&<>"']/g,
+        character => HTML_ESCAPE_CHARACTERS[character]
+    );
+}
+
 export function labelPathFromType(type) {
     const paths = {
         trait: "traits",

@@ -18,15 +18,22 @@ Because the project is currently in Alpha:
 
 ### Added
 
-* No unreleased changes documented yet.
+* Added permanent Signs associated directly with individual Traits.
+* Added localized Trait controls and dialogs for creating and correcting non-blank Signs.
+* Added Sign snapshots to marked Traits placed in the virtual bag.
+* Added interactive, single-use coin flips for marked Traits drawn through either extraction workflow.
+* Added persistent chat outcomes for Heads/Trait and Tails/Sign results.
 
 ### Changed
 
-* No unreleased changes documented yet.
+* Replaced the generic free-text Marks section with structured per-Trait Sign controls.
+* Updated draw chat cards to display marked Traits, their Sign text, and their resolved coin result.
+* Preserved unknown dynamic-label properties during sheet submission so Sign data is not lost.
 
-### Fixed
+### Deprecated
 
-* No unreleased fixes documented yet.
+* Preserved the legacy `system.marks` Actor field for existing-world compatibility, but it is no longer rendered or interpreted.
+
 ---
 
 ## [0.3.0] - 2026-07-27

@@ -1,5 +1,7 @@
 import {BagManager} from "./bag-manager.mjs";
+import {DrawChat} from "./draw-chat.mjs";
 import PrismDialogs from "./dialogs.mjs";
+import {hasSign, normalizeSign} from "./sign-manager.mjs";
 import {labelPathFromType} from "./utils.mjs";
 
 const ACTION_HANDLERS = Object.freeze({
@@ -10,6 +12,7 @@ const ACTION_HANDLERS = Object.freeze({
 	"clear-bag": "_onClearBag",
 	"draw-three": "_onDrawThree",
 	"risk": "_onRisk",
+	"edit-sign": "_onEditSign",
 	"add-fear": "_onAddFear",
 	"add-danger": "_onAddDanger",
 	"add-inventory-item": "_onAddInventoryItem",
@@ -28,28 +31,6 @@ const DYNAMIC_FIELD_SELECTOR = [
 	".prism-label-row input",
 	".prism-inventory-row input"
 ].join(", ");
-
-const ALLOWED_CHAT_LABEL_TYPES = new Set([
-	"trait",
-	"adversity",
-	"fear",
-	"danger"
-]);
-
-const HTML_ESCAPE_CHARACTERS = Object.freeze({
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	'"': "&quot;",
-	"'": "&#39;"
-});
-
-function escapeHtml(value) {
-	return String(value ?? "").replace(
-		/[&<>"']/g,
-		character => HTML_ESCAPE_CHARACTERS[character]
-	);
-}
 
 function normalizeQuantity(value) {
 	const quantity = Number.parseInt(value, 10);
@@ -91,7 +72,10 @@ export class PrismActorSheet extends ActorSheet {
 
 		Object.assign(context, {
 			system,
-			traits: system.traits ?? [],
+			traits: (system.traits ?? []).map(trait => ({
+				...trait,
+				sign: normalizeSign(trait.sign)
+			})),
 			adversities: system.adversities ?? [],
 			bag: system.bag ?? [],
 			lastDraw: system.lastDraw ?? [],
@@ -178,7 +162,8 @@ export class PrismActorSheet extends ActorSheet {
 		labels.push({
 			id: foundry.utils.randomID(),
 			name: "",
-			type
+			type,
+			...(type === "trait" ? {sign: ""} : {})
 		});
 
 		await this.actor.update({
@@ -232,6 +217,70 @@ export class PrismActorSheet extends ActorSheet {
 		);
 
 		this._renderIfSuccessful(added);
+	}
+
+	async _onEditSign(element) {
+		await this._syncSheetData();
+
+		const id = element.dataset.id;
+
+		if (!id) {
+			return;
+		}
+
+		const traits = this._getSystemArray("traits");
+		const trait = traits.find(entry => entry.id === id);
+
+		if (!trait || (trait.type && trait.type !== "trait")) {
+			return;
+		}
+
+		if (!trait.name?.trim()) {
+			ui.notifications.warn(
+				game.i18n.localize("prism.sign.traitWithoutName")
+			);
+			return;
+		}
+
+		const existingSign = normalizeSign(trait.sign);
+		const confirmed = await PrismDialogs.confirmTraitSign(
+			hasSign(existingSign)
+		);
+
+		if (!confirmed) {
+			return;
+		}
+
+		const proposedSign = await PrismDialogs.askTraitSign(existingSign);
+
+		if (proposedSign === null) {
+			return;
+		}
+
+		const sign = normalizeSign(proposedSign);
+
+		if (!hasSign(sign)) {
+			ui.notifications.warn(
+				game.i18n.localize("prism.sign.empty")
+			);
+			return;
+		}
+
+		if (sign === existingSign) {
+			return;
+		}
+
+		const updatedTraits = traits.map(entry => (
+			entry.id === id
+				? {...entry, sign}
+				: entry
+		));
+
+		await this.actor.update({
+			"system.traits": updatedTraits
+		});
+
+		this.render(false);
 	}
 
 	async _onRemoveFromBag(element) {
@@ -374,7 +423,8 @@ export class PrismActorSheet extends ActorSheet {
 			return false;
 		}
 
-		await this._sendDrawToChat(
+		await DrawChat.create(
+			this.actor,
 			game.i18n.localize(titleKey),
 			drawn
 		);
@@ -382,40 +432,6 @@ export class PrismActorSheet extends ActorSheet {
 		this.render(false);
 
 		return true;
-	}
-
-	async _sendDrawToChat(title, drawn) {
-		const safeTitle = escapeHtml(title);
-
-		const labels = drawn
-			.map(entry => {
-				const type =
-					ALLOWED_CHAT_LABEL_TYPES.has(entry.type)
-						? entry.type
-						: "unknown";
-
-				const name = escapeHtml(entry.name);
-
-				return `
-                    <span class="prism-chat-label prism-${type}">
-                        ${name}
-                    </span>
-                `;
-			})
-			.join(" ");
-
-		await ChatMessage.create({
-			speaker: ChatMessage.getSpeaker({
-				actor: this.actor
-			}),
-
-			content: `
-                <div class="prism-chat-card">
-                    <h2>${safeTitle}</h2>
-                    <p>${labels}</p>
-                </div>
-            `
-		});
 	}
 
 	async _syncSheetData() {
@@ -456,23 +472,35 @@ export class PrismActorSheet extends ActorSheet {
 		const updateData = {};
 
 		for (const {type, path} of LABEL_CONFIGS) {
+			const storedLabels = new Map(
+				(this.actor.system[path] ?? [])
+					.map(label => [label.id, label])
+			);
 			const rows = root.querySelectorAll(
 				`.prism-label-row[data-type="${type}"]`
 			);
 
 			updateData[`system.${path}`] = Array.from(
 				rows,
-				row => ({
-					id: row.dataset.id,
-					type,
+				row => {
+					const id = row.dataset.id;
+					const storedLabel = storedLabels.get(id) ?? {};
 
-					name:
-						row
-							.querySelector("input")
-							?.value
-							?.trim() ??
-						""
-				})
+					return {
+						...foundry.utils.deepClone(storedLabel),
+						id,
+						type,
+						name:
+							row
+								.querySelector("input")
+								?.value
+								?.trim() ??
+							"",
+						...(type === "trait"
+							? {sign: normalizeSign(storedLabel.sign)}
+							: {})
+					};
+				}
 			);
 		}
 

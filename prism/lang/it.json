@@ -35,13 +35,19 @@
       "fear": "Paura",
       "danger": "Pericolo",
       "latestDraw": "Ultima Estrazione",
-      "signs": "Segni",
       "bio": "Biografia",
       "note": "Note Personali",
       "inventory": "Inventario",
       "object": "Oggetto",
       "objectMessage": "Inserisci un Oggetto",
       "quantity": "Quantità"
+    },
+
+    "sign": {
+      "add": "Segna questo Tratto",
+      "edit": "Modifica il Segno di questo Tratto",
+      "empty": "Un Segno non può essere vuoto o contenere soltanto spazi.",
+      "traitWithoutName": "Assegna un nome al Tratto prima di aggiungere un Segno."
     },
 
     "bagManager": {
@@ -57,12 +63,29 @@
       "sLabel": "2 etichette",
       "tLabel": "3 etichette",
       "extract": "Estrai",
-      "cancel" : "Annulla"
+      "cancel" : "Annulla",
+      "signTitle": "Segno del Tratto",
+      "confirmSign": "Vuoi davvero segnare questo Tratto?",
+      "confirmSignEdit": "Vuoi correggere il testo di questo Segno permanente?",
+      "signPrompt": "Inserisci il Segno",
+      "save": "Salva",
+      "yes": "Sì",
+      "no": "No"
     },
 
     "chat": {
       "draw": "Estrazione PRISM",
-      "risk": "Rischio PRISM"
+      "risk": "Rischio PRISM",
+      "sign": "Segno",
+      "flipSignCoin": "Lancia la moneta",
+      "coinHeadsTrait": "Testa — Tratto",
+      "coinTailsSign": "Croce — Segno",
+      "traitResultHelp": "Usa il valore originario del Tratto.",
+      "signResultHelp": "Interpreta narrativamente il risultato usando il Segno.",
+      "invalidSignFlip": "Questo lancio della moneta per il Segno non è più valido.",
+      "signFlipForbidden": "Non hai i permessi per risolvere questo Segno.",
+      "signFlipAlreadyResolved": "Questo lancio della moneta per il Segno è già stato risolto.",
+      "signFlipFailed": "Non è stato possibile completare il lancio della moneta per il Segno."
     }
 
   }
