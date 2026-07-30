@@ -18,7 +18,7 @@
 .prism .window-content {
     padding: 0;
     color: var(--prism-text);
-    font: var(--prism-font);
+    font-family: var(--prism-font);
     background-image: url("/systems/prism/ui/character_sheet_bg.jpg");
     background-size: cover;
     background-position: center;
@@ -112,6 +112,7 @@
 .prism select {
     width: 100%;
     padding: 7px 9px;
+    font-family: var(--prism-font);
 
     border: 1px solid var(--prism-medium);
     border-radius: 0px !important;
@@ -163,6 +164,8 @@
 
     color: var(--prism-text);
     font-weight: 700;
+    font-family: var(--prism-font);
+    font-size: 14px;
     letter-spacing: 0.02em;
     line-height: 1.2;
     cursor: pointer;
@@ -290,14 +293,14 @@
 }
 
 .prism-panel h2 {
-    margin: 0 0 10px;
-    padding: 0 0 6px;
-
+    margin: 0 0 8px;
+    padding: 0 0 2px;
+    font-family: var(--prism-font);
     border-bottom: 2px solid var(--prism-panel-accent);
     color: var(--prism-panel-title);
 
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 17px;
+    font-weight: 900;
     letter-spacing: 0.09em;
     text-transform: uppercase;
 }
@@ -386,7 +389,7 @@
 }
 
 .prism-trait-input input.prism-has-sign {
-    padding-left: 27px;
+    padding-left: 21px;
 }
 
 .prism-trait-sign-indicator {
