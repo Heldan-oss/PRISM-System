@@ -1,3 +1,16 @@
+.journal-entry-page {
+    font-family: var(--prism-font) !important;
+}
+
+.journal-entry-page h1, 
+.journal-entry-page h2,
+.journal-entry-page h3,
+.journal-entry-page h4,
+.journal-entry-page h5,
+.journal-entry-page h6 {
+    font-family: var(--prism-font) !important;
+}
+
 .chat-message {
     border-radius: 0px !important;
     border: none !important;
@@ -10,12 +23,12 @@
 
 .chat-message h4 {
     color: var(--prism-text);
-    font: var(--prism-font);
+    font-family: var(--prism-font);
     text-transform: uppercase;
 }
 
 .message-content p {
-    font: var(--prism-font);
+    font-family: var(--prism-font);
     color: var(--prism-text);
 }
 
@@ -32,7 +45,7 @@
 
     border-bottom: 1px solid var(--prism-neutral-border);
     color: var(--prism-text);
-    font: var(--prism-font);
+    font-family: var(--prism-font);
     font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -61,13 +74,13 @@
 
 .prism-chat-label {
     display: inline-block;
-    margin: 3px 2px;
     padding: 5px 9px;
 
     color: var(--prism-text-inverse);
     text-transform: uppercase;
     font-weight: 700;
     line-height: 1;
+    font-family: var(--prism-font);
 }
 
 .prism-chat-label.prism-trait {
@@ -97,7 +110,7 @@
 }
 
 .prism-chat-sign {
-    margin: 7px 0 !important;
+    margin: 3px 0 !important;
     overflow-wrap: anywhere;
 }
 
@@ -111,7 +124,7 @@
     background: var(--prism-trait-bg);
     color: var(--prism-text-inverse);
 
-    font: var(--prism-font);
+    font-family: var(--prism-font);
     font-weight: 700;
     text-transform: uppercase;
     cursor: pointer;
@@ -137,7 +150,7 @@
     flex-direction: column;
     gap: 2px;
     padding: 6px 8px;
-    border-left: 3px solid;
+    font-family: var(--prism-font);
 }
 
 .prism-chat-coin-result strong {
@@ -152,4 +165,24 @@
 .prism-chat-sign-result {
     border-left-color: var(--prism-adversity-border);
     background: var(--prism-adversity-panel-bg);
+}
+
+body.game .app.window-app .window-content {
+    background-image: url("/systems/prism/ui/chat_messsage_bg.jpg");
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: repeat;
+    background-color: transparent;
+    color: var(--prism-text);
+    font-family: var(--prism-font);
+}
+
+.dice-roll .dice-formula, .dice-roll .dice-total {
+    font-family: var(--prism-font);
+    background: none;
+    border-radius: 0px;
+}
+
+.dice-tooltip .part-header .part-total .part-formula .dice-rolls .roll{
+    font-family: var(--prism-font);
 }

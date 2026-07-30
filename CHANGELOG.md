@@ -22,7 +22,7 @@ Because the project is currently in Alpha:
 
 ### Changed
 
-* No unreleased changes documented yet.
+* Refined PRISM typography, spacing, and visual hierarchy across the Anomaly sheet, chat cards, journal pages, application windows, and dice results.
 
 ### Fixed
 

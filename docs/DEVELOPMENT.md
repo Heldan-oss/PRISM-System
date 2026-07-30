@@ -442,7 +442,7 @@ Order matters:
 
 1. `variables.css` imports the configured web font and defines the PRISM palette, semantic colors, typography, geometry, shadows, transitions, and shared background values.
 2. `sheet.css` defines the Actor-sheet window, background, layout, controls, panels, bag presentation, inventory, and scrollbars.
-3. `prism.css` defines Foundry chat-message presentation, PRISM chat cards, and result labels.
+3. `prism.css` defines Foundry journal, application-window, dice-result, and chat-message presentation together with PRISM chat cards and result labels.
 
 The stylesheet files reference packaged runtime assets through absolute Foundry system URLs:
 
@@ -1273,7 +1273,7 @@ Use:
 
 * `variables.css` for the imported font, base palette, semantic colors, type colors, typography, geometry, shadows, transitions, and shared background values.
 * `sheet.css` for the Actor-sheet window, background, layout, controls, semantic panels, bag presentation, inventory, and scrollbars.
-* `prism.css` for Foundry chat-message presentation, PRISM chat cards, and result labels.
+* `prism.css` for Foundry journal, application-window, dice-result, and chat-message presentation together with PRISM chat cards and result labels.
 * `ui/` for runtime image assets referenced by CSS.
 
 ### Current Font
@@ -1302,13 +1302,14 @@ The Anomaly sheet window uses:
 
 through `.prism .window-content`.
 
-Foundry chat messages use:
+Foundry chat messages and application-window content matched by the global
+stylesheet rules use:
 
 ```text
 /systems/prism/ui/chat_messsage_bg.jpg
 ```
 
-through `.chat-message`.
+through `.chat-message` and `body.game .app.window-app .window-content`.
 
 The asset URL and filename must match exactly. The current chat filename intentionally documents the existing `messsage` spelling; correcting that spelling requires changing both the file and every CSS reference in the same contribution.
 
@@ -1354,7 +1355,7 @@ CSS must:
 
 * Scope Actor-sheet rules under PRISM-specific classes.
 * Keep PRISM-specific chat-card internals under `.prism-chat-card` and `.prism-chat-label`.
-* Treat changes to generic Foundry selectors such as `.chat-message`, `.chat-message h4`, and `.message-content p` as world-wide chat styling changes that require regression testing.
+* Treat changes to generic Foundry selectors such as `.journal-entry-page`, `.chat-message`, `.message-content p`, `body.game .app.window-app .window-content`, and `.dice-roll` descendants as world-wide interface styling changes that require regression testing.
 * Avoid unnecessary broad selectors affecting unrelated Foundry core interface elements.
 * Preserve keyboard focus indicators.
 * Support translated text.
@@ -1582,6 +1583,7 @@ Verify:
 * The Anomaly sheet opens at its expected default size.
 * The sheet and chat background assets load without `404` responses.
 * The interface remains readable when the remote font is unavailable and the fallback font is used.
+* Journal pages, application windows, and dice results remain readable with the PRISM font and background rules applied.
 
 ### Sheet
 
@@ -1691,6 +1693,7 @@ Verify:
 * The packaged chat background loads from `/systems/prism/ui/chat_messsage_bg.jpg`.
 * PRISM-generated chat cards remain readable over the background.
 * Non-PRISM chat messages remain readable because `.chat-message` is styled globally in the current implementation.
+* Journal entries, dice rolls, and non-PRISM application windows remain readable because `prism.css` styles those Foundry surfaces globally.
 * Repeated or tall chat messages do not expose broken background seams.
 * Long and special-character labels do not break output.
 * HTML-like label content is displayed safely rather than executed.
@@ -2375,19 +2378,27 @@ This introduces:
 
 A future focused change should evaluate whether to keep the remote import or package a redistributable font locally. Any local font inclusion must document its license and must not expose font files outside the system package.
 
-### Global Chat Selectors
+### Global Foundry Selectors
 
-The current chat stylesheet uses generic Foundry selectors:
+The current general stylesheet uses generic Foundry selectors, including:
 
 ```text
+.journal-entry-page
 .chat-message
 .chat-message h4
 .message-content p
+body.game .app.window-app .window-content
+.dice-roll .dice-formula
+.dice-roll .dice-total
 ```
 
-These rules affect all chat messages in a PRISM world, including messages not created by the PRISM system.
+These rules affect journal pages, application windows, dice results, and all
+chat messages in a PRISM world, including surfaces not created by the PRISM
+system.
 
-A future cleanup should evaluate whether the intended background belongs on every chat message or whether the selectors should be narrowed without breaking PRISM-generated output.
+A future cleanup should evaluate which visual rules are intentionally
+system-wide and whether the selectors can be narrowed without breaking
+PRISM-generated output.
 
 ### UI Asset Naming
 
@@ -2457,7 +2468,7 @@ A change is complete when all applicable requirements are satisfied.
 * Keyboard and accessibility effects are considered.
 * Packaged visual assets load from valid system paths.
 * Fallback colors and fallback fonts keep the interface readable.
-* Global chat-style changes are tested against PRISM and non-PRISM messages.
+* Global Foundry-style changes are tested against PRISM and non-PRISM journal pages, application windows, dice results, and chat messages.
 * Visual changes include screenshots in the Pull Request.
 
 ### Testing
