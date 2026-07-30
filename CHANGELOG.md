@@ -22,11 +22,18 @@ Because the project is currently in Alpha:
 
 ### Changed
 
-* Refined PRISM typography, spacing, and visual hierarchy across the Anomaly sheet, chat cards, journal pages, application windows, and dice results.
+* No unreleased changes documented yet.
 
 ### Fixed
 
 * No unreleased fixes documented yet.
+
+---
+## [0.4.1] - 2026-07-30
+
+### Changed
+
+* Refined PRISM typography, spacing, and visual hierarchy across the Anomaly sheet, chat cards, journal pages, application windows, and dice results.
 
 ---
 ## [0.4.0] - 2026-07-29
